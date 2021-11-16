@@ -44,7 +44,7 @@ namespace Fricke.Authorization.Core
                 { 
                     // Can't load members of a dynamic assembly
                 }
-                catch (TypeLoadException ex)
+                catch (TypeLoadException)
                 { }
             }
 
