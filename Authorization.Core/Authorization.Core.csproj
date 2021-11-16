@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <Description>Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims (e.g. "User.Create", "User.Read", "User.Update", "User.Delete", and "User.List").</Description>
+    <Authors>Chuck Fricke</Authors>
+    <Company>Fricke Consulting</Company>
+    <PackageTags>aspnetcore, identity, membership, authorization</PackageTags>
+    <RootNamespace>Fricke.Authorization.Core</RootNamespace>
+    <AssemblyName>Fricke.Authorization.Core</AssemblyName>
+    <Version>1.0.0</Version>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.21" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.21" />
+  </ItemGroup>
+
+</Project>
