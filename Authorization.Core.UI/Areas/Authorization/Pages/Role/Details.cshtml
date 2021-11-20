@@ -1,0 +1,119 @@
+﻿@page
+@model Role.DetailsModel
+@{
+    ViewData["Title"] = "Role Details";
+
+    var roleClaims = Model.RoleModel.Id == SysGuids.Role.Administrator
+        ? Model.RoleModel.RoleClaims.Select(rc => rc.Claim)
+        : Model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned).Select(rc => rc.Claim);
+
+    var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? "" : "disabled";
+}
+
+@section css {
+
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" />
+    </environment>
+
+    <style>
+        .col-properties {
+            min-width: 25rem;
+            max-width: 30rem;
+        }
+
+        .col-role-claims {
+            min-width: 25rem;
+            max-width: 35rem;
+        }
+    </style>
+}
+
+<div class="row">
+    <div class="col">
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+    </div>
+</div>
+<div class="row mx-sm-1 mb-3">
+    <div class="col col-properties mr-sm-5 mb-3">
+        <h5 class="form-text text-muted">The role's properties:</h5>
+        <hr />
+        <dl>
+            <dt>
+                @Html.DisplayNameFor(model => model.RoleModel.Id)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.RoleModel.Id)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.RoleModel.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.RoleModel.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.RoleModel.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.RoleModel.Description)
+            </dd>
+        </dl>
+    </div>
+    <div class="col col-role-claims">
+        <h5 class="form-text text-center text-muted mb-3">The role's claim assignments:</h5>
+        <hr />
+        <div class="mx-auto">
+            <table class="table table-sm" data-order='[[1,"asc"]]'>
+                <thead>
+                    <tr>
+                        <th class="col-auto" data-orderable="false">
+                            <label asp-for="RoleModel.RoleClaims.ElementAt(0).IsAssigned"></label>
+                        </th>
+                        <th><label asp-for="RoleModel.RoleClaims.ElementAt(0).Claim"></label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var claim in roleClaims)
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    <input class="form-check ml-3" type="checkbox" checked disabled />
+                                </td>
+                                <td>
+                                    @claim
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row mx-sm-1">
+    <div class="col">
+        <a class="@classEdit" asp-page="./Edit" asp-route-id="@Model.RoleModel.Id">Edit</a> |
+        <a asp-page="./Index">Back to List</a>
+    </div>
+</div>
+
+@section Scripts {
+
+    <environment include="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    </environment>
+
+    <script defer>
+        $('table').DataTable();
+    </script>
+}

@@ -1,0 +1,102 @@
+﻿@page
+@model User.IndexModel
+@{
+    ViewData["Title"] = "User Management";
+
+    var classCreate = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Create)) ? "" : "disabled";
+    var classDelete = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Delete)) ? "" : "disabled";
+    var classDetails = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Read)) ? "" : "disabled";
+    var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Update)) ? "" : "disabled";
+}
+
+@section css {
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" />
+    </environment>
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-4">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+    <partial name="_NotificationPartial" />
+    <div class="col-12">
+        <hr class="mt-2" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10 mx-sm-3">
+        <p>
+            <a class="@classCreate" asp-page="Create">Create New</a>
+        </p>
+
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Users[0].Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Users[0].DisplayName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Users[0].PhoneNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Users[0].LockoutEnd)
+                    </th>
+                    <th>
+                        @Html.Raw(Html.DisplayNameFor(model => model.Users[0].AccessFailedCount))
+                    </th>
+                    <th data-orderable="false"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Users)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DisplayName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PhoneNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LockoutEnd)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AccessFailedCount)
+                        </td>
+                        <td>
+                            <a class="@classEdit" asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a class="@classDetails" asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                            <a class="@classDelete" asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+
+    <environment include="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    </environment>
+
+    <script defer>
+        $('table').DataTable();
+    </script>
+}

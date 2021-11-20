@@ -1,0 +1,130 @@
+﻿@page
+@model Role.DeleteModel
+@{
+    ViewData["Title"] = "Delete Role";
+
+    var message = Model.IsSystemRole
+        ? "System Roles may not be deleted!"
+        : "Are you sure you want to delete this role?";
+
+    var btnDeleteAttr = Model.IsSystemRole ? "disabled" : "";
+}
+
+@section css {
+
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" />
+    </environment>
+
+    <style>
+        .col-properties {
+            min-width: 25rem;
+            max-width: 30rem;
+        }
+
+        .col-role-table {
+            min-width: 25rem;
+            max-width: 35rem;
+        }
+    </style>
+}
+
+<div class="row align-items-center">
+    <div class="col-4">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+    <div class="col text-danger">
+        <h5>@message</h5>
+    </div>
+    <div class="col-12">
+        <hr class="mt-2" />
+    </div>
+</div>
+<div class="row mx-sm-1 mb-3">
+    <div class="col-12">
+        <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
+    </div>
+    <div class="col-auto col-properties mr-sm-5 mb-3">
+        <h5 class="form-text text-muted">The role's properties:</h5>
+        <hr />
+        <dl>
+            <dt>
+                @Html.DisplayNameFor(model => model.RoleModel.Id)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.RoleModel.Id)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.RoleModel.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.RoleModel.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.RoleModel.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.RoleModel.Description)
+            </dd>
+        </dl>
+    </div>
+    <div class="col col-role-table">
+        <h5 class="form-text text-muted text-center mb-3">Users assigned to this role:</h5>
+        <hr />
+        <div class="mx-auto">
+            <table class="table table-sm" data-order='[[1,"asc"]]'>
+                <thead>
+                    <tr>
+                        <th><label asp-for="RoleModel.RoleUsers.ElementAt(0).Email"></label></th>
+                        <th><label asp-for="RoleModel.RoleUsers.ElementAt(0).Name"></label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var user in Model.RoleModel.RoleUsers)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(x => user.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(x => user.Name)
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row mx-sm-1">
+    <div class="col">
+        <form id="formDelete" method="post">
+            <input type="hidden" asp-for="IsSystemRole" />
+            <input type="hidden" asp-for="RoleModel.Id" />
+            <input type="hidden" asp-for="RoleModel.Name" />
+            <input id="btnDelete" type="submit" value="Delete" class="btn btn-primary" @btnDeleteAttr /> |
+            <a asp-page="./Index">Back to List</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+
+    <environment include="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    </environment>
+
+    <script defer>
+        $('table').DataTable();
+    </script>
+}

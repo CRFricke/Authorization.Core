@@ -1,0 +1,11 @@
+﻿@model ModelBase
+@if (Model.Notifications != null)
+{
+    <div class="col mx-md-2">
+        @foreach (var notification in Model.Notifications)
+        {
+            var textClass = notification.Severity == Severity.High ? "text-danger" : "text-success";
+            <h6 class="@textClass">@notification.Message</h6>
+        }
+    </div>
+}
