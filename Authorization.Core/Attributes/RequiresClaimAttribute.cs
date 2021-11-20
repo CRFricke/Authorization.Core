@@ -22,7 +22,6 @@ namespace Fricke.Authorization.Core.Attributes
         /// <summary>
         /// Creates a new instance of the RequiresClaimAttribute class with the specified claim type and values.
         /// </summary>
-        /// <param name="claimType">The claim type to be used to initialize the new RequiresClaimAttribute instance.</param>
         /// <param name="claimValues">The claim values to be used to initialize the new RequiresClaimAttribute instance.</param>
         public RequiresClaimAttribute(params string[] claimValues)
         {

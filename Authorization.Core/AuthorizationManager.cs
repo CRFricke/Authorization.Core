@@ -15,6 +15,12 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core
 {
+    /// <summary>
+    /// Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims
+    /// (e.g. "User.Create", "User.Read", "User.Update", "User.Delete", and "User.List").
+    /// </summary>
+    /// <typeparam name="TUser">The <see cref="Type"/> of user objects. The Type must be or extend from <see cref="AuthUser"/>.</typeparam>
+    /// <typeparam name="TRole">The <see cref="Type"/> of role objects. The Type must be or extend from <see cref="AuthRole"/>.</typeparam>
     public sealed class AuthorizationManager<TUser, TRole> : IAuthorizationManager
         where TUser : AuthUser
         where TRole : AuthRole
@@ -354,7 +360,7 @@ namespace Fricke.Authorization.Core
         /// <summary>
         /// Returns the claims associated with the specified Role.
         /// </summary>
-        /// <param name="roleId">The ID of the Role whose claims are to be retrived.</param>
+        /// <param name="role">The Role whose claims are to be retrived.</param>
         /// <returns>A HashSet containing the IDs of the associated claims.</returns>
         private HashSet<string> GetRoleClaims(TRole role)
         {
@@ -416,7 +422,7 @@ namespace Fricke.Authorization.Core
         /// <summary>
         /// Returns the IDs of the Roles assigned to the specified user.
         /// </summary>
-        /// <param name="userId">The Id of the user whose Role IDs are to be returned.</param>
+        /// <param name="user">The user whose Role IDs are to be returned.</param>
         /// <returns>A HashSet containing the IDs of the assigned roles.</returns>
         private async Task<HashSet<string>> GetUserRolesAsync(TUser user)
         {

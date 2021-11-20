@@ -6,13 +6,16 @@ using System;
 
 namespace Fricke.Authorization.Core
 {
+    /// <summary>
+    /// Provides extension methods for the <see cref="IdentityBuilder"/> class.
+    /// </summary>
     public static class IdentityBuilderExtensions
     {
         /// <summary>
         /// Adds the Authorization.Core services to the <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <typeparam name="TContext">A DB Context class that extends <see cref="AuthDbContext"/></typeparam>
-        /// <param name="serviceCollection">The <see cref="IServiceCollection"/> to add the service to.</param>
+        /// <typeparam name="TContext">A DB Context class that derives from <see cref="AuthDbContext"/></typeparam>
+        /// <param name="builder">The <see cref="IdentityBuilder"/> object.</param>
         public static IdentityBuilder AddAuthorizationCore<TContext>(this IdentityBuilder builder)
         {
             var roleType = builder.RoleType ?? typeof(AuthRole);

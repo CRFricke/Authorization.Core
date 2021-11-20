@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core
 {
+    /// <summary>
+    /// Defines the methods and properties exposed by the <see cref="AuthorizationManager"/> class.
+    /// </summary>
     public interface IAuthorizationManager
     {
         /// <summary>

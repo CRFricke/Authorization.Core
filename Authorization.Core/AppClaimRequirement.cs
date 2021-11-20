@@ -29,6 +29,7 @@ namespace Fricke.Authorization.Core
         /// </summary>
         public HashSet<string> ClaimValues { get; }
 
+        ///<inheritdoc/>
         public override string ToString()
         {
             return $"{string.Join(", ", ClaimValues)}";

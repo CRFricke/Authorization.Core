@@ -13,7 +13,7 @@ namespace Fricke.Authorization.Core
         /// <summary>
         /// The claim type of the claims the Authorization.Core library uses.
         /// </summary>
-        internal const string ClaimType = ClaimTypes.AuthorizationDecision;
+        public const string ClaimType = ClaimTypes.AuthorizationDecision;
 
 
         /// <summary>

@@ -3,6 +3,9 @@ using System.Security.Claims;
 
 namespace Fricke.Authorization.Core
 {
+    /// <summary>
+    /// Provides extension methods for the <see cref="ClaimsPrincipal"/> class.
+    /// </summary>
     public static class ClaimsPrincipalExtensions
     {
         /// <summary>
