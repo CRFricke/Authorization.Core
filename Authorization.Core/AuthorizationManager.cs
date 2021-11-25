@@ -214,7 +214,7 @@ namespace Fricke.Authorization.Core
                     _logger.LogInformation(
                         $"{nameof(AppClaimRequirement)} of \"{failedClaim}\" for {resourceType} '{raObject.Name}' not met by '{userName}' - restricted operation on system User or Role."
                         );
-                    return AuthorizationResult.SystemObject(claimRequirement.ClaimValues);
+                    return AuthorizationResult.SystemObject(failedClaims);
                 }
             }
 

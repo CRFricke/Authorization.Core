@@ -942,5 +942,49 @@ namespace Authorization.Core.Tests
 
             Assert.True(authContext.HasSucceeded);
         }
+
+        [Fact(DisplayName = "AppClaimRequirementHandler [Role] only returns failing claims.")]
+        public async Task AuthorizationManagerTest26Async()
+        {
+            var principal = new AppUser("RoleManager@StEmilian.com");
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
+                cp.Identity.Name == principal.UserName
+                );
+
+            var userRoleCache = new Mock<UserRoleCache>();
+            userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
+                .Callback(new TryGetValueDelegate(
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.RoleManager }); }
+                    )
+                ).Returns(true);
+
+            var roleClaimCache = new Mock<RoleClaimCache>();
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.RoleManager, out It.Ref<object>.IsAny))
+                .Callback(new TryGetValueDelegate(
+                    (object key, out object value) => { value = new HashSet<string>(SysClaims.Role.DefinedClaims); }
+                    )
+                ).Returns(true);
+
+            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
+                sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
+                sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
+                );
+
+            var logger = new TestLogger<AuthorizationManager>();
+            var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
+
+            var resource = new AppRole() { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Read, SysClaims.Role.UpdateClaims);
+            var authContext = new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { appClaimRequirement }, claimsPrincipal, resource);
+
+            await new AppClaimRequirementHandler(authManager)
+                .HandleAsync(authContext);
+
+            Assert.False(authContext.HasSucceeded);
+            Assert.Single(logger.LogEntries);
+            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+            Assert.DoesNotContain(SysClaims.Role.Read, logger.LogEntries[0].Message);
+        }
     }
 }
