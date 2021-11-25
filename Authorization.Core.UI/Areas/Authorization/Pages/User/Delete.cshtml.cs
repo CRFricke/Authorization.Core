@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.User
 {
-    [RequiresClaim(SysClaims.User.Delete)]
+    [RequiresClaims(SysClaims.User.Delete)]
     [PageImplementationType(typeof(DeleteModel<,>))]
     public abstract class DeleteModel : ModelBase
     {

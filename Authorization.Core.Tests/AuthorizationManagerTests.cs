@@ -679,7 +679,7 @@ namespace Authorization.Core.Tests
         [Fact(DisplayName = "AppClaimRequirementProvider returns valid AuthorizationPolicy")]
         public async Task AuthorizationManagerTest19Async()
         {
-            var attribute = new RequiresClaimAttribute(SysClaims.Role.Read);
+            var attribute = new RequiresClaimsAttribute(SysClaims.Role.Read);
 
             var provider = new AppClaimRequirementProvider(
                 new OptionsWrapper<AuthorizationOptions>(new AuthorizationOptions())

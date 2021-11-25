@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.User
 {
-    [RequiresClaim(SysClaims.User.List)]
+    [RequiresClaims(SysClaims.User.List)]
     [PageImplementationType(typeof(IndexModel<,>))]
     public abstract class IndexModel : ModelBase
     {

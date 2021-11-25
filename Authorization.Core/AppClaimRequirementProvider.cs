@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Fricke.Authorization.Core
 {
     /// <summary>
-    /// IAuthorizationPolicyProvider implementation that supports use of the RequiresClaim authorization attribute
+    /// IAuthorizationPolicyProvider implementation that supports use of the RequiresClaims authorization attribute
     /// </summary>
     public class AppClaimRequirementProvider : IAuthorizationPolicyProvider
     {
@@ -32,12 +32,12 @@ namespace Fricke.Authorization.Core
         /// <inheritdoc />
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            RequiresClaimAttribute.TryParse(policyName, out RequiresClaimAttribute? requiresClaimAttribute);
-            if (requiresClaimAttribute != null)
+            RequiresClaimsAttribute.TryParse(policyName, out RequiresClaimsAttribute? requiresClaimsAttribute);
+            if (requiresClaimsAttribute != null)
             {
                 var policy = new AuthorizationPolicyBuilder();
                 policy.AddRequirements(
-                    new AppClaimRequirement(requiresClaimAttribute.ClaimValues)
+                    new AppClaimRequirement(requiresClaimsAttribute.ClaimValues)
                     );
                 return Task.FromResult(policy.Build());
             }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.Role
 {
-    [RequiresClaim(SysClaims.Role.Update)]
+    [RequiresClaims(SysClaims.Role.Update)]
     [PageImplementationType(typeof(EditModel<,>))]
     public abstract class EditModel : ModelBase
     {

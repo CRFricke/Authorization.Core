@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.Role
 {
-    [RequiresClaim(SysClaims.Role.Delete)]
+    [RequiresClaims(SysClaims.Role.Delete)]
     [PageImplementationType(typeof(DeleteModel<,>))]
     public abstract class DeleteModel : ModelBase
     {

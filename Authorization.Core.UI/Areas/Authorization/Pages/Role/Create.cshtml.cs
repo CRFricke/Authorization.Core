@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.Role
 {
-    [RequiresClaim(SysClaims.Role.Create)]
+    [RequiresClaims(SysClaims.Role.Create)]
     [PageImplementationType(typeof(CreateModel<,>))]
     public abstract class CreateModel : ModelBase
     {

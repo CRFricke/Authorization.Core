@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.Role
 {
-    [RequiresClaim(SysClaims.Role.Read)]
+    [RequiresClaims(SysClaims.Role.Read)]
     [PageImplementationType(typeof(DetailsModel<,>))]
     public abstract class DetailsModel : ModelBase
     {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Fricke.Authorization.Core.UI.Pages.Role
 {
-    [RequiresClaim(SysClaims.Role.List)]
+    [RequiresClaims(SysClaims.Role.List)]
     [PageImplementationType(typeof(IndexModel<,>))]
     public abstract class IndexModel : ModelBase
     {
