@@ -116,7 +116,9 @@ public class EditModel : PageModel
 ```
 It is also possible to check authorization programically:
 ```c#
-var result = await authorizationManager.AuthorizeAsync(User, role, new AppClaimRequirement(AppClaims.Role.UpdateClaims));
+var result = await authorizationManager.AuthorizeAsync(
+    User, role, new AppClaimRequirement(AppClaims.Role.UpdateClaims)
+    );
 if (!result.Succeeded)
 {
     HandleError(user, result.Errors);
