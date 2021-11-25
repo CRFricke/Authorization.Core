@@ -1,5 +1,5 @@
 ﻿using Authorization.Core.UI.Tests.Web.Authorization;
-using Fricke.Authorization.Core.UI;
+using Fricke.Authorization.Core;
 using Fricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

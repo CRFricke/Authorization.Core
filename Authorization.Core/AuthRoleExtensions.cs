@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Fricke.Authorization.Core.UI
+namespace Fricke.Authorization.Core
 {
+    /// <summary>
+    /// Provides extension methods for manipulating <see cref="AuthRole"/> objects.
+    /// </summary>
     public static class AuthRoleExtensions
     {
         /// <summary>
-        /// Sets the Claims collection of this application role.
+        /// Sets the Claims collection of this <see cref="AuthRole"/> object.
         /// </summary>
         /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
         /// <param name="claims">The claim values to be assigned to this application role.</param>

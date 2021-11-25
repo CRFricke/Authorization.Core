@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Fricke.Authorization.Core.UI
+namespace Fricke.Authorization.Core
 {
+    /// <summary>
+    /// Provides extension methods for manipulating <see cref="AuthUser"/> objects.
+    /// </summary>
     public static class AuthUserExtensions
     {
         /// <summary>
-        /// Sets the Claims collection of this application user>.
+        /// Sets the Claims collection of this <see cref="AuthUser"/> objects.
         /// </summary>
         /// <param name="user">The AuthUser <see cref="AuthUser"/> whose Claims collection is to be updated.</param>
         /// <param name="claims">The claim values to be assigned to this <see cref="AuthUser"/>.</param>
