@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace Fricke.Authorization.Core.Data
+namespace CRFricke.Authorization.Core.Data
 {
     /// <summary>
     /// Base class for a database context used by the Authorization.Core library.

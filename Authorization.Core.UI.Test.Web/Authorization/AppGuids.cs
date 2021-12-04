@@ -1,4 +1,4 @@
-﻿using Fricke.Authorization.Core;
+﻿using CRFricke.Authorization.Core;
 using System.Collections.Generic;
 
 namespace Authorization.Core.UI.Tests.Web.Authorization

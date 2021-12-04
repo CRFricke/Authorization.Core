@@ -1,4 +1,4 @@
-﻿using Fricke.Authorization.Core.UI.Data;
+﻿using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Fricke.Authorization.Core.UI.Models
+namespace CRFricke.Authorization.Core.UI.Models
 {
     public class RoleModel
     {

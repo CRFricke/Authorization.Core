@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Defines the Guids used by the system.

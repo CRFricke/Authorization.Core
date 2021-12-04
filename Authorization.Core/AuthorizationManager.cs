@@ -1,5 +1,5 @@
-﻿using Fricke.Authorization.Core.Attributes;
-using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core.Attributes;
+using CRFricke.Authorization.Core.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims

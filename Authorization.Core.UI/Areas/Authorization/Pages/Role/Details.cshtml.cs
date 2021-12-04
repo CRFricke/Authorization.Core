@@ -1,12 +1,12 @@
-using Fricke.Authorization.Core.Attributes;
-using Fricke.Authorization.Core.UI.Data;
-using Fricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.Attributes;
+using CRFricke.Authorization.Core.UI.Data;
+using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
-namespace Fricke.Authorization.Core.UI.Pages.Role
+namespace CRFricke.Authorization.Core.UI.Pages.Role
 {
     [RequiresClaims(SysClaims.Role.Read)]
     [PageImplementationType(typeof(DetailsModel<,>))]

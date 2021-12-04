@@ -1,4 +1,4 @@
-﻿namespace Fricke.Authorization.Core
+﻿namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Interface used to mark application objects that require authorization.

@@ -1,10 +1,10 @@
-﻿using Fricke.Authorization.Core.UI.Pages;
+﻿using CRFricke.Authorization.Core.UI.Pages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Fricke.Authorization.Core.UI
+namespace CRFricke.Authorization.Core.UI
 {
     public static class TempDataDictionaryExtensions
     {

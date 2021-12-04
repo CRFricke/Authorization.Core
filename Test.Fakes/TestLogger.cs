@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Fricke.Test.Fakes
+namespace CRFricke.Test.Fakes
 {
     /// <summary>
     /// Defines the information contained in a log entry.

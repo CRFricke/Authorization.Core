@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Fricke.Authorization.Core.Attributes
+namespace CRFricke.Authorization.Core.Attributes
 {
     /// <summary>
     /// Identifies claims that are restricted for system entities.

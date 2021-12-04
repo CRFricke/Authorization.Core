@@ -1,9 +1,9 @@
 ﻿using Authorization.Core.UI.Tests.Data;
-using Fricke.Authorization.Core;
-using Fricke.Authorization.Core.UI;
-using Fricke.Authorization.Core.UI.Models;
-using Fricke.Authorization.Core.UI.Pages.User;
-using Fricke.Test.Fakes;
+using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.UI;
+using CRFricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.UI.Pages.User;
+using CRFricke.Test.Fakes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

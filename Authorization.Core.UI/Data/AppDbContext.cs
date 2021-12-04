@@ -1,9 +1,9 @@
-﻿using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace Fricke.Authorization.Core.UI.Data
+namespace CRFricke.Authorization.Core.UI.Data
 {
     /// <summary>
     /// Base class for a database context used by the Authorization.Core library.

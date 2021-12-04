@@ -1,4 +1,4 @@
-﻿namespace Fricke.Authorization.Core.UI.Pages
+﻿namespace CRFricke.Authorization.Core.UI.Pages
 {
     /// <summary>
     /// The severity associated with a <see cref="Notification"/>.

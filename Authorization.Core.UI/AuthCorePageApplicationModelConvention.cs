@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace Fricke.Authorization.Core.UI
+namespace CRFricke.Authorization.Core.UI
 {
     /// <summary>
     /// Generates the correct TypeInfo required to instantiate the model for the specified razor page.

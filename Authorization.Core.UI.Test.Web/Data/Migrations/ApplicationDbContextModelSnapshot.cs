@@ -15,7 +15,7 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.21");
 
-            modelBuilder.Entity("Fricke.Authorization.Core.UI.Data.AppRole", b =>
+            modelBuilder.Entity("CRFricke.Authorization.Core.UI.Data.AppRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -70,7 +70,7 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Fricke.Authorization.Core.UI.Data.AppUser", b =>
+            modelBuilder.Entity("CRFricke.Authorization.Core.UI.Data.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -361,7 +361,7 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Fricke.Authorization.Core.UI.Data.AppRole", null)
+                    b.HasOne("CRFricke.Authorization.Core.UI.Data.AppRole", null)
                         .WithMany("Claims")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -370,7 +370,7 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Fricke.Authorization.Core.UI.Data.AppUser", null)
+                    b.HasOne("CRFricke.Authorization.Core.UI.Data.AppUser", null)
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -379,7 +379,7 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Fricke.Authorization.Core.UI.Data.AppUser", null)
+                    b.HasOne("CRFricke.Authorization.Core.UI.Data.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -388,13 +388,13 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Fricke.Authorization.Core.UI.Data.AppRole", null)
+                    b.HasOne("CRFricke.Authorization.Core.UI.Data.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Fricke.Authorization.Core.UI.Data.AppUser", null)
+                    b.HasOne("CRFricke.Authorization.Core.UI.Data.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -403,7 +403,7 @@ namespace Authorization.Core.UI.Test.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Fricke.Authorization.Core.UI.Data.AppUser", null)
+                    b.HasOne("CRFricke.Authorization.Core.UI.Data.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <RootNamespace>Fricke.Authorization.Core.UI</RootNamespace>
-    <AssemblyName>Fricke.Authorization.Core.UI</AssemblyName>
+    <RootNamespace>CRFricke.Authorization.Core.UI</RootNamespace>
+    <AssemblyName>CRFricke.Authorization.Core.UI</AssemblyName>
     <Authors>Chuck Fricke</Authors>
     <Company>Fricke Consulting</Company>
     <Description>Extends ASP.NET Core Identity to include a UI for management of Users and Roles.</Description>

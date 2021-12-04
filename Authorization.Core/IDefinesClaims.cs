@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Used to identify the classes that define the application's Claims.

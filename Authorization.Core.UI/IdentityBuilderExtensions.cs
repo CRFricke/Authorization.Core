@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Fricke.Authorization.Core.UI
+namespace CRFricke.Authorization.Core.UI
 {
     public static class IdentityBuilderExtensions
     {

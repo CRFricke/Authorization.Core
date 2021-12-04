@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
 
-namespace Fricke.Authorization.Core.UI
+namespace CRFricke.Authorization.Core.UI
 {
     internal class ConfigureAuthCoreUIRazorOptions<TUser, TRole> : IPostConfigureOptions<RazorPagesOptions>
         where TUser : class

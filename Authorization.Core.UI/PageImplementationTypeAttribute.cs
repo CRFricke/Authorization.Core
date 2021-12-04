@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Fricke.Authorization.Core.UI
+namespace CRFricke.Authorization.Core.UI
 {
     /// <summary>
     /// Specifies the generic type template to be used to instantiate the model for the associated razor page.

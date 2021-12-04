@@ -1,4 +1,4 @@
-﻿namespace Fricke.Authorization.Core.UI
+﻿namespace CRFricke.Authorization.Core.UI
 {
     /// <summary>
     /// Configuration options for Authorization.Core.UI.

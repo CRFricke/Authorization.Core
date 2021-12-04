@@ -1,7 +1,7 @@
 using Authorization.Core.Tests.Data;
-using Fricke.Authorization.Core;
-using Fricke.Authorization.Core.Attributes;
-using Fricke.Test.Fakes;
+using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.Attributes;
+using CRFricke.Test.Fakes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +18,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
-using AuthorizationFailure = Fricke.Authorization.Core.AuthorizationFailure;
+using AuthorizationFailure = CRFricke.Authorization.Core.AuthorizationFailure;
 
 namespace Authorization.Core.Tests
 {
@@ -42,7 +42,7 @@ namespace Authorization.Core.Tests
             var result = await authorizationManager.AuthorizeAsync(claimsPrincipal, appClaimRequirement);
 
             Assert.False(result.Succeeded);
-            Assert.Equal(Fricke.Authorization.Core.AuthorizationFailure.Reason.NoUserId, result.Failure.FailureReason);
+            Assert.Equal(AuthorizationFailure.Reason.NoUserId, result.Failure.FailureReason);
             Assert.Equal(appClaimRequirement.ClaimValues, result.Failure.FailingClaims);
         }
 
