@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Fricke.Test.Fakes
+namespace CRFricke.Test.Fakes
 {
     /// <summary>
     /// A TempData dictionary used to back TempData during a test run.

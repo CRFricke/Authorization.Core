@@ -1,9 +1,9 @@
-﻿using Fricke.Authorization.Core.Attributes;
+﻿using CRFricke.Authorization.Core.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// IAuthorizationPolicyProvider implementation that supports use of the RequiresClaims authorization attribute

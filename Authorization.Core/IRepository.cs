@@ -1,11 +1,11 @@
-﻿using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Defines the methods and properties exposed by the database repository.

@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-    <RootNamespace>Fricke.Authorization.Core</RootNamespace>
-    <AssemblyName>Fricke.Authorization.Core</AssemblyName>
+    <RootNamespace>CRFricke.Authorization.Core</RootNamespace>
+    <AssemblyName>CRFricke.Authorization.Core</AssemblyName>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <Description>Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims (e.g. "User.Create", "User.Read", "User.Update", "User.Delete", and "User.List").</Description>
     <Authors>Chuck Fricke</Authors>

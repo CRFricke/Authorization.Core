@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
-namespace Fricke.Authorization.Core.Data
+namespace CRFricke.Authorization.Core.Data
 {
     /// <summary>
     /// Base class for application users.

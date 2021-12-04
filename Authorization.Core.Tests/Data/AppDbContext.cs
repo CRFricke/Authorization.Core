@@ -1,4 +1,4 @@
-﻿using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Authorization.Core.Tests.Data

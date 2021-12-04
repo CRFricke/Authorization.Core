@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Fricke.Test.Fakes
+namespace CRFricke.Test.Fakes
 {
     /// <summary>
     /// Base class used to track the state of an entity's properties and claims.

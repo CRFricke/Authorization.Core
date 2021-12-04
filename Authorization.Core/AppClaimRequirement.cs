@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Represents an authorization requirement for one or more application claim values.

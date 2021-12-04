@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// A local in-memory cache used to store the claims associated with an ApplicationRole.

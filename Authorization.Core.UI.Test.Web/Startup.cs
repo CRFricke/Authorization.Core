@@ -1,7 +1,7 @@
 using Authorization.Core.UI.Test.Web.Data;
-using Fricke.Authorization.Core;
-using Fricke.Authorization.Core.UI;
-using Fricke.Authorization.Core.UI.Data;
+using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.UI;
+using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;

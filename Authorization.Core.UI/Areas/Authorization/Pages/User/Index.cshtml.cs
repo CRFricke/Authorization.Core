@@ -1,5 +1,5 @@
-using Fricke.Authorization.Core.Attributes;
-using Fricke.Authorization.Core.UI.Data;
+using CRFricke.Authorization.Core.Attributes;
+using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Fricke.Authorization.Core.UI.Pages.User
+namespace CRFricke.Authorization.Core.UI.Pages.User
 {
     [RequiresClaims(SysClaims.User.List)]
     [PageImplementationType(typeof(IndexModel<,>))]

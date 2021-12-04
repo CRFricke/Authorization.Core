@@ -1,6 +1,6 @@
-﻿using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core.Data;
 
-namespace Fricke.Authorization.Core.UI.Data
+namespace CRFricke.Authorization.Core.UI.Data
 {
     public class AppRole : AuthRole
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 
-namespace Fricke.Authorization.Core.Attributes
+namespace CRFricke.Authorization.Core.Attributes
 {
     ///<inheritdoc/>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]

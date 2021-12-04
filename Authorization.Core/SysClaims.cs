@@ -1,9 +1,9 @@
-﻿using Fricke.Authorization.Core.Attributes;
+﻿using CRFricke.Authorization.Core.Attributes;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Defines the Claims used by the system.

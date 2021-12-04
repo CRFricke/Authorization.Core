@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 
-namespace Fricke.Authorization.Core.UI.Pages
+namespace CRFricke.Authorization.Core.UI.Pages
 {
     public class ModelBase : PageModel
     {

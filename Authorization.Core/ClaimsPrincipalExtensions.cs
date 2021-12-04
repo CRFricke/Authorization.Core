@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Provides extension methods for the <see cref="ClaimsPrincipal"/> class.

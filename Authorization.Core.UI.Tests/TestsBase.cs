@@ -1,6 +1,6 @@
 ﻿using Authorization.Core.UI.Tests.Data;
-using Fricke.Authorization.Core;
-using Fricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.UI.Models;
 using System.Collections.Generic;
 
 namespace Authorization.Core.UI.Tests

@@ -1,5 +1,5 @@
-﻿using Fricke.Authorization.Core;
-using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.Data;
 
 namespace Authorization.Core.Tests.Data
 {

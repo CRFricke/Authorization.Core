@@ -1,10 +1,10 @@
-﻿using Fricke.Authorization.Core.Data;
+﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Fricke.Authorization.Core
+namespace CRFricke.Authorization.Core
 {
     /// <summary>
     /// Provides extension methods for the <see cref="IdentityBuilder"/> class.
