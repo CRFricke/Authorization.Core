@@ -11,9 +11,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    permissions:
-       packages: read
-
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -25,8 +22,9 @@ jobs:
           3.1.x
           5.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
+        owner: CRFricke
       env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NUGET_AUTH_TOKEN: ${{secrets.USER_PAT}}
 
     - name: Restore dependencies
       run: dotnet restore
