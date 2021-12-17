@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CRFricke.Test.Support" Version="1.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="MockQueryable.Moq" Version="5.0.1" />
     <PackageReference Include="Moq" Version="4.16.1" />
@@ -23,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Authorization.Core.UI\Authorization.Core.UI.csproj" />
-    <ProjectReference Include="..\Test.Fakes\Test.Fakes.csproj" />
   </ItemGroup>
 
 </Project>

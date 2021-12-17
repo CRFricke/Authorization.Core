@@ -1,7 +1,7 @@
 using Authorization.Core.Tests.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.Attributes;
-using CRFricke.Test.Fakes;
+using CRFricke.Test.Support.Fakes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
