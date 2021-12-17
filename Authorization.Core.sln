@@ -18,9 +18,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Test.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests", "Authorization.Core.UI.Tests\Authorization.Core.UI.Tests.csproj", "{8B662D41-F811-44C0-8A05-8DE849B1249F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{FA413BEC-27EE-4E32-AF25-54DB50BE0859}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".assets", ".assets", "{FA413BEC-27EE-4E32-AF25-54DB50BE0859}"
 	ProjectSection(SolutionItems) = preProject
-		Assets\icon.png = Assets\icon.png
+		assets\icon.png = assets\icon.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{3A15F1C7-6888-40A5-A9CF-112140704746}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7FDD3390-A763-43FF-BFB2-64B964E3962A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
 Global
@@ -55,6 +62,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FA413BEC-27EE-4E32-AF25-54DB50BE0859} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
+		{3A15F1C7-6888-40A5-A9CF-112140704746} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
+		{7FDD3390-A763-43FF-BFB2-64B964E3962A} = {3A15F1C7-6888-40A5-A9CF-112140704746}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EEEE8EE-B2B2-43B4-9814-87DE79EED7D8}
