@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
@@ -19,12 +18,13 @@
     <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
     <PackageTags>aspnetcore, identity, membership, authorization</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <!-- To get a "deterministic build" for our NuGet package: -->
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <DebugType>embedded</DebugType>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
