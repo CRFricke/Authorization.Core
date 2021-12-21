@@ -55,7 +55,7 @@ jobs:
 
     - name: Create NuGet package
       if: ${{github.ref_type == 'tag'}}
-      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --nobuild --output nuget
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build --output nuget
 
     - name: Upload NuGet packages
       if: ${{github.ref_type == 'tag'}}
