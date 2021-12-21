@@ -51,7 +51,7 @@ jobs:
       run: dotnet build --configuration $BUILD_CONFIG --no-restore /p:Version=$BUILD_VERSION
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
 
     - name: Create NuGet packages
       if: ${{github.ref_type == 'tag'}}
