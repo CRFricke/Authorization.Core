@@ -2,24 +2,34 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Nullable>enable</Nullable>
-    <RootNamespace>CRFricke.Authorization.Core</RootNamespace>
-    <AssemblyName>CRFricke.Authorization.Core</AssemblyName>
-    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    <Description>Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims (e.g. "User.Create", "User.Read", "User.Update", "User.Delete", and "User.List").</Description>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <Authors>Chuck Fricke</Authors>
     <Company>Fricke Consulting</Company>
-    <PackageTags>aspnetcore, identity, membership, authorization</PackageTags>
-    <Version>1.0.0-beta2</Version>
-    <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>icon.png</PackageIcon>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Copyright>Copyright © Chuck Fricke 2021</Copyright>
+    <Description>Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims (e.g. "User.Create", "User.Read", "User.Update", "User.Delete", and "User.List").</Description>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
+    <PackageTags>aspnetcore, identity, membership, authorization</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- To get a "deterministic build" for our NuGet package: -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\Assets\icon.png">
+    <None Include="..\assets\icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
