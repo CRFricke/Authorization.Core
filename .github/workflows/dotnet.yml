@@ -1,13 +1,20 @@
 name: .NET
 
+env:
+    VER_MAJOR_DEFAULT: 1
+    VER_MINOR_DEFAULT: 0
+    VER_PATCH_DEFAULT: 0
+
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ '**' ]
+    tags: ['v*']
 
 jobs:
   build:
+
+    env:
+      BUILD_CONFIG: 'Release'
 
     runs-on: ubuntu-latest
 
@@ -15,12 +22,23 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Get Build Version
+      shell: pwsh
+      run: |
+        Import-Module .\build\ActionModule.psm1
+        Get-VersionVariables $env:GITHUB_REF
+        $Version = "$Tag_Major.$Tag_Minor.$Tag_Patch"
+        if ($Tag_PreRelease) { $Version += "-$Tag_PreRelease" }
+        if ($Tag_Build) { $Version += "+$Tag_Build" }
+        Set-ActionVariable "BUILD_VERSION" "$Version"
+        Write-Host "BUILD_VERSION: $Version"
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: |
           3.1.x
-          5.0.x
+          6.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -30,7 +48,15 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --configuration $BUILD_CONFIG --no-restore /p:Version=$BUILD_VERSION
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
+
+    - name: Create NuGet packages
+      if: ${{github.ref_type == 'tag'}}
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
+
+    - name: Upload NuGet packages
+      if: ${{github.ref_type == 'tag'}}
+      run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}

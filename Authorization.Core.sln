@@ -30,6 +30,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{510D93A5-42D2-4035-8B8F-C1EE522F0449}"
+	ProjectSection(SolutionItems) = preProject
+		build\ActionModule.psm1 = build\ActionModule.psm1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +69,7 @@ Global
 		{FA413BEC-27EE-4E32-AF25-54DB50BE0859} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 		{31E52A25-70A5-4FA7-8E87-02AA511DB5BC} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 		{D43E1E0C-52CC-4848-84AA-7C157BDBB286} = {31E52A25-70A5-4FA7-8E87-02AA511DB5BC}
+		{510D93A5-42D2-4035-8B8F-C1EE522F0449} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EEEE8EE-B2B2-43B4-9814-87DE79EED7D8}

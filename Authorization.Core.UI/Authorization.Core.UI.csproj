@@ -3,29 +3,39 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <RootNamespace>CRFricke.Authorization.Core.UI</RootNamespace>
-    <AssemblyName>CRFricke.Authorization.Core.UI</AssemblyName>
+    <AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <Authors>Chuck Fricke</Authors>
     <Company>Fricke Consulting</Company>
-    <Description>Extends ASP.NET Core Identity to include a UI for management of Users and Roles.</Description>
-    <PackageTags>aspnetcore, identity, membership, authorization, UI</PackageTags>
-    <Version>1.0.0-beta1</Version>
-    <RepositoryUrl>https://github.com/CRFricke/Authorization.Core</RepositoryUrl>
     <Copyright>Copyright © Chuck Fricke 2021</Copyright>
-    <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Extends ASP.NET Core Identity to include a UI for management of Users and Roles.</Description>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
+    <PackageTags>aspnetcore, identity, membership, authorization, UI</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- To get a "deterministic build" for our NuGet package: -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Assets\icon.png">
+    <None Include="..\assets\icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
