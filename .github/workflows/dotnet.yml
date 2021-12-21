@@ -38,7 +38,7 @@ jobs:
       with:
         dotnet-version: |
           3.1.x
-          5.0.x
+          6.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -55,12 +55,8 @@ jobs:
 
     - name: Create NuGet packages
       if: ${{github.ref_type == 'tag'}}
-      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build --output nuget /p:Version=$BUILD_VERSION
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
     - name: Upload NuGet packages
       if: ${{github.ref_type == 'tag'}}
-      run: dotnet nuget push "nuget/*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Upload NuGet Symbol packages
-      if: ${{github.ref_type == 'tag'}}
-      run: dotnet nuget push "nuget/*.snupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
