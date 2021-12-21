@@ -48,14 +48,14 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore /p:Version=$BUILD_VERSION
+      run: dotnet build --configuration $BUILD_CONFIG --no-restore /p:Version=$BUILD_VERSION
 
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
-    - name: Create NuGet package
+    - name: Create NuGet packages
       if: ${{github.ref_type == 'tag'}}
-      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build --output nuget
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build --output nuget /p:Version=$BUILD_VERSION
 
     - name: Upload NuGet packages
       if: ${{github.ref_type == 'tag'}}
