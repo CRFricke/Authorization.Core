@@ -17,6 +17,15 @@
     <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
     <PackageTags>aspnetcore, identity, membership, authorization, UI</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <!-- For 'push' workflow, we embed the PDB in the DLL and push the nupkg to github.com -->
+  <PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'push'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <!-- For 'release' workflow, we create a separate symbol package and push both to nuget.org -->
+  <PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'release'">
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
@@ -39,14 +48,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CRFricke.Authorization.Core" Version="1.0.0-beta1.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
   </ItemGroup>
 
 
