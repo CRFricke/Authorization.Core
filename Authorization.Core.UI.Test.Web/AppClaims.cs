@@ -1,7 +1,7 @@
 ﻿using CRFricke.Authorization.Core;
 using System.Collections.Generic;
 
-namespace Authorization.Core.UI.Tests.Web.Authorization
+namespace Authorization.Core.UI.Test.Web
 {
     /// <summary>
     /// Defines the Claims used by the application.

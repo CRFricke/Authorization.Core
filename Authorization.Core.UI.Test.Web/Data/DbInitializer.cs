@@ -1,5 +1,4 @@
-﻿using Authorization.Core.UI.Tests.Web.Authorization;
-using CRFricke.Authorization.Core;
+﻿using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
