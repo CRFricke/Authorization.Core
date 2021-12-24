@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CRFricke.Authorization.Core" Version="1.0.0-beta1.4" />
+    <PackageReference Include="CRFricke.Authorization.Core" Version="1.0.0-beta1.5" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
