@@ -119,7 +119,7 @@ public class AppGuids
 }
 ```
 
-### Associate Claims with the appropriate Roles in the Identity database:
+### Associate Claims with the appropriate Roles in the Identity database
 
 Now that the Claims and Guids are defined, use ASP.NET Core Identity's RoleManager to create and persist an 
 `AuthRole` for each Role as shown below.
@@ -138,7 +138,7 @@ if (!result.Succeeded)
 }
 ```
 
-### Associate Roles with the appropriate Users in the Identity database:
+### Associate Roles with the appropriate Users in the Identity database
 
 Continuing with the example above, use ASP.NET Core Identity's UserManager to create and persist an 
 `AuthUser` for each User as shown below.

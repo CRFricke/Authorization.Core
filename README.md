@@ -1,6 +1,6 @@
 # Authorization.Core
 
-A set of library packageses that implement granular claims-based authorization on top of Microsoft's ASP.NET Core 
+A set of library packages that implement granular claims-based authorization on top of Microsoft's ASP.NET Core 
 Identity Framework.
 
 ## The Authorization.Core Package
