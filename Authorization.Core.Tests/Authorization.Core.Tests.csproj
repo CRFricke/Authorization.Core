@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Authorization.Core.UI\Authorization.Core.UI.csproj" />
     <ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
   </ItemGroup>
 
