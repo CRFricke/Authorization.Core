@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace CRFricke.Authorization.Core
 {
     /// <summary>
-    /// Defines the Claims used by the system.
+    /// Defines the Claims used by the Authorization system.
     /// </summary>
     public class SysClaims
     {

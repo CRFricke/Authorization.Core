@@ -17,7 +17,18 @@ namespace CRFricke.Authorization.Core
         /// <param name="user">The AuthUser <see cref="AuthUser"/> whose Claims collection is to be updated.</param>
         /// <param name="claims">The claim values to be assigned to this <see cref="AuthUser"/>.</param>
         /// <returns>The <typeparamref name="TUser"/>class instance.</returns>
-        public static TUser SetClaims<TUser>(this TUser user, ICollection<string> claims) where TUser : AuthUser
+        public static TUser SetClaims<TUser>(this TUser user, IEnumerable<string> claims) where TUser : AuthUser
+        {
+            return SetClaims(user, claims.ToArray());
+        }
+
+        /// <summary>
+        /// Sets the Claims collection of this <see cref="AuthUser"/> objects.
+        /// </summary>
+        /// <param name="user">The AuthUser <see cref="AuthUser"/> whose Claims collection is to be updated.</param>
+        /// <param name="claims">The claim values to be assigned to this <see cref="AuthUser"/>.</param>
+        /// <returns>The <typeparamref name="TUser"/>class instance.</returns>
+        public static TUser SetClaims<TUser>(this TUser user, params string[] claims) where TUser : AuthUser
         {
             user.Claims.Clear();
 
@@ -36,6 +47,17 @@ namespace CRFricke.Authorization.Core
         /// <param name="assignedClaims">The claim values to be assigned to this application user.</param>
         /// <returns><em>true</em>, if the Claims collection was modified; otherwise, <em>false</em>.</returns>
         public static bool UpdateClaims(this AuthUser user, IEnumerable<string> assignedClaims)
+        {
+            return UpdateClaims(user, assignedClaims.ToArray());
+        }
+
+        /// <summary>
+        /// Updates the Claims collection using the specified claim values.
+        /// </summary>
+        /// <param name="user">The AuthUser <see cref="AuthUser"/> whose Claims collection is to be updated.</param>
+        /// <param name="assignedClaims">The claim values to be assigned to this application user.</param>
+        /// <returns><em>true</em>, if the Claims collection was modified; otherwise, <em>false</em>.</returns>
+        public static bool UpdateClaims(this AuthUser user, params string[] assignedClaims)
         {
             var oldClaims =
                 from claim in user.Claims

@@ -98,7 +98,7 @@ namespace CRFricke.Authorization.Core.UI.Models
         /// The <typeparamref name="TUser"/> class instance to be used to initialize this <see cref="UserModel"/> object.
         /// </param>
         /// <returns>The initialized <see cref="UserModel"/> object.</returns>
-        public virtual UserModel InitFromUser<TUser>(TUser user) where TUser : AppUser
+        public virtual UserModel InitFromUser<TUser>(TUser user) where TUser : AuthUiUser
         {
             Id = user.Id;
             AccessFailedCount = user.AccessFailedCount;
@@ -119,8 +119,8 @@ namespace CRFricke.Authorization.Core.UI.Models
         }
 
         public virtual async Task<UserModel> InitRoleInfoAsync<TUser, TRole>(IRepository<TUser, TRole> repository)
-            where TRole : AppRole
-            where TUser : AppUser
+            where TRole : AuthUiRole
+            where TUser : AuthUiUser
         {
             Roles = await (
                 from ar in repository.Roles
@@ -159,7 +159,7 @@ namespace CRFricke.Authorization.Core.UI.Models
             }
         }
 
-        public virtual void UpdateUser<TUser>(TUser user) where TUser : AppUser
+        public virtual void UpdateUser<TUser>(TUser user) where TUser : AuthUiUser
         {
             var normalizer = new UpperInvariantLookupNormalizer();
 

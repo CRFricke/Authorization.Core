@@ -15,7 +15,17 @@ namespace CRFricke.Authorization.Core
         /// </summary>
         /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
         /// <param name="claims">The claim values to be assigned to this application role.</param>
-        public static TRole SetClaims<TRole>(this TRole role, ICollection<string> claims) where TRole : AuthRole
+        public static TRole SetClaims<TRole>(this TRole role, IEnumerable<string> claims) where TRole : AuthRole
+        {
+            return SetClaims(role, claims.ToArray());
+        }
+
+        /// <summary>
+        /// Sets the Claims collection of this <see cref="AuthRole"/> object.
+        /// </summary>
+        /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
+        /// <param name="claims">The claim values to be assigned to this application role.</param>
+        public static TRole SetClaims<TRole>(this TRole role, params string[] claims) where TRole : AuthRole
         {
             role.Claims.Clear();
 
@@ -34,6 +44,17 @@ namespace CRFricke.Authorization.Core
         /// <param name="assignedClaims">The claim values to be assigned to this application role.</param>
         /// <returns><em>true</em>, if the Claims collection was modified; otherwise, <em>false</em>.</returns>
         public static bool UpdateClaims(this AuthRole role, IEnumerable<string> assignedClaims)
+        {
+            return UpdateClaims(role, assignedClaims.ToArray());
+        }
+
+        /// <summary>
+        /// Updates the Claims collection using the specified claim values.
+        /// </summary>
+        /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
+        /// <param name="assignedClaims">The claim values to be assigned to this application role.</param>
+        /// <returns><em>true</em>, if the Claims collection was modified; otherwise, <em>false</em>.</returns>
+        public static bool UpdateClaims(this AuthRole role, params string[] assignedClaims)
         {
             var oldClaims =
                 from claim in role.Claims

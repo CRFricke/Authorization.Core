@@ -8,7 +8,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
 {
     internal class UserTracker : EntityTrackerBase
     {
-        public UserTracker(AppUser user)
+        public UserTracker(AuthUiUser user)
         {
             InitPropertyTracker(nameof(AccessFailedCount), user.AccessFailedCount);
             InitPropertyTracker(nameof(Email), user.Email);

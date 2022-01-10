@@ -21,8 +21,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.User
     }
 
     internal class DetailsModel<TUser, TRole> : DetailsModel
-        where TUser : AppUser
-        where TRole : AppRole
+        where TUser : AuthUiUser
+        where TRole : AuthUiRole
     {
         private readonly IAuthorizationManager _authManager;
         private readonly IRepository<TUser, TRole> _repository;

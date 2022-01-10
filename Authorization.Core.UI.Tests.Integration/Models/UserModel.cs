@@ -28,7 +28,7 @@ namespace Authorization.Core.UI.Tests.Integration.Models
         public bool LockoutEnabled { get; set; }
 
 
-        internal static UserModel CreateFrom(AppUser user)
+        internal static UserModel CreateFrom(AuthUiUser user)
         {
             return new UserModel
             {
@@ -45,9 +45,9 @@ namespace Authorization.Core.UI.Tests.Integration.Models
             };
         }
 
-        internal AppUser ToUser()
+        internal AuthUiUser ToUser()
         {
-            return new AppUser
+            return new AuthUiUser
             {
                 AccessFailedCount = AccessFailedCount,
                 Id = Id ?? Guid.NewGuid().ToString(),

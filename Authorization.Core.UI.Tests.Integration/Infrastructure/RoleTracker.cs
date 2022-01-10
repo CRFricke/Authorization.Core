@@ -8,7 +8,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
 {
     internal class RoleTracker : EntityTrackerBase
     {
-        public RoleTracker(AppRole role)
+        public RoleTracker(AuthUiRole role)
         {
             InitPropertyTracker(nameof(Id), role.Id);
             InitPropertyTracker(nameof(Name), role.Name);

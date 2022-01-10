@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CRFricke.Authorization.Core.UI.Data
 {
-    public class AppUser : AuthUser
+    public class AuthUiUser : AuthUser
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="AppUser"/> class.
+        /// Creates a new instance of the <see cref="AuthUiUser"/> class.
         /// </summary>
-        public AppUser()
+        public AuthUiUser()
         { }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="AppUser"/> class with the specified email address.
+        /// Creates a new instance of the <see cref="AuthUiUser"/> class with the specified email address.
         /// </summary>
-        /// <param name="email">The Email address of the <see cref="AppUser"/>.</param>
-        public AppUser(string email) : base(email)
+        /// <param name="email">The Email address of the <see cref="AuthUiUser"/>.</param>
+        public AuthUiUser(string email) : base(email)
         { }
 
         /// <summary>

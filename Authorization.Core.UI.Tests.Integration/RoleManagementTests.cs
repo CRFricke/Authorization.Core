@@ -4,6 +4,7 @@ using Authorization.Core.UI.Test.Web.Data;
 using Authorization.Core.UI.Tests.Integration.Infrastructure;
 using Authorization.Core.UI.Tests.Integration.Models;
 using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.UI;
 using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -206,7 +207,7 @@ namespace Authorization.Core.UI.Tests.Integration
         [Fact(DisplayName = "Delete page disables Delete button for system Role")]
         public async void RoleManagementTest11()
         {
-            var roleId = SysGuids.Role.UserManager;
+            var roleId = SysUiGuids.Role.UserManager;
             var client = WebAppFactory.CreateClient();
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
@@ -217,7 +218,7 @@ namespace Authorization.Core.UI.Tests.Integration
         [Fact(DisplayName = "Delete page displays authorization failure message")]
         public async void RoleManagementTest12()
         {
-            var roleId = SysGuids.Role.UserManager;
+            var roleId = SysUiGuids.Role.UserManager;
             var client = WebAppFactory.CreateClient();
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
@@ -229,7 +230,7 @@ namespace Authorization.Core.UI.Tests.Integration
         [Fact(DisplayName = "Edit page displays authorization failure message")]
         public async void RoleManagementTest13()
         {
-            var roleId = SysGuids.Role.UserManager;
+            var roleId = SysUiGuids.Role.UserManager;
             var client = WebAppFactory.CreateClient();
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
@@ -246,7 +247,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
             var edit = (await Pages.Role.Edit.CreateAsync(client, userId))
-                .UpdateProperties(new Dictionary<string, string> { { nameof(AppRole.Id), Guid.Empty.ToString() } });
+                .UpdateProperties(new Dictionary<string, string> { { nameof(AuthUiRole.Id), Guid.Empty.ToString() } });
             var index = await edit.ClickSaveButtonAsync();
 
             Assert.Contains("not found in the database", index.GetNotificationErrorText());
@@ -282,7 +283,7 @@ namespace Authorization.Core.UI.Tests.Integration
             await WebAppFactory.LoginExistingUserAsync(client, WebAppFactory.AppUserEmail, WebAppFactory.AppUserPassword);
         }
 
-        private AppRole EnsureListerRoleExists()
+        private AuthUiRole EnsureListerRoleExists()
         {
             var dbContext = WebAppFactory.Services.GetRequiredService<ApplicationDbContext>();
             var role = dbContext.Roles

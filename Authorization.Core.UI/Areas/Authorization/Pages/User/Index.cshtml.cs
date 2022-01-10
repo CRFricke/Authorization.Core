@@ -42,7 +42,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.User
                 return Email;
             }
 
-            internal UserModel InitFromUser<TUser>(TUser user) where TUser : AppUser
+            internal UserModel InitFromUser<TUser>(TUser user) where TUser : AuthUiUser
             {
                 Id = user.Id;
                 Email = user.Email;
@@ -65,8 +65,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.User
     }
 
     internal class IndexModel<TUser, TRole> : IndexModel
-        where TRole : AppRole
-        where TUser : AppUser
+        where TRole : AuthUiRole
+        where TUser : AuthUiUser
     {
         private readonly IRepository<TUser, TRole> _repository;
         /// <summary>

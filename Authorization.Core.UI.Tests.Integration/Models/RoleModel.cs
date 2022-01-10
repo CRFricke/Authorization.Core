@@ -11,9 +11,9 @@ namespace Authorization.Core.UI.Tests.Integration.Models
 
         public string Description { get; set; }
 
-        internal AppRole ToRole()
+        internal AuthUiRole ToRole()
         {
-            return new AppRole
+            return new AuthUiRole
             {
                 Id = Id ?? Guid.NewGuid().ToString(),
                 Name = Name,
@@ -21,7 +21,7 @@ namespace Authorization.Core.UI.Tests.Integration.Models
             };
         }
 
-        internal static RoleModel CreateFrom(AppRole role)
+        internal static RoleModel CreateFrom(AuthUiRole role)
         {
             return new RoleModel
             {
