@@ -1,7 +1,7 @@
 ﻿@using CRFricke.Authorization.Core.UI.Data
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<AppUser> SignInManager
-@inject UserManager<AppUser> UserManager
+@inject SignInManager<AuthUiUser> SignInManager
+@inject UserManager<AuthUiUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

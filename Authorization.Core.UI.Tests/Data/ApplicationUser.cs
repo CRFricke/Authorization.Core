@@ -3,7 +3,7 @@ using CRFricke.Authorization.Core.UI.Data;
 
 namespace Authorization.Core.UI.Tests.Data
 {
-    public class ApplicationUser : AppUser, IRequiresAuthorization
+    public class ApplicationUser : AuthUiUser, IRequiresAuthorization
     {
         /// <summary>
         /// Creates a new instance of the ApplicationUser class with default values.

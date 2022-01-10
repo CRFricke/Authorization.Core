@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Authorization.Core.UI.Tests.Data
 {
-    public class ApplicationDbContext : AppDbContext<ApplicationUser, ApplicationRole>
+    public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRole>
     {
         /// <summary>
         /// Used for testing.

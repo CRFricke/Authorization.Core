@@ -3,7 +3,7 @@
 namespace CRFricke.Authorization.Core
 {
     /// <summary>
-    /// Defines the Guids used by the system.
+    /// Defines the Guids used by the Authorization system.
     /// </summary>
     public class SysGuids
     {
@@ -18,21 +18,11 @@ namespace CRFricke.Authorization.Core
             public const string Administrator = "3f1dfcb9-7088-4877-8352-7a6e43063650";
 
             /// <summary>
-            /// The Guid assigned to the RoleManager Role.
-            /// </summary>
-            public const string RoleManager = "5e79c59c-b0c1-4857-8f3a-d99dbd1e099f";
-
-            /// <summary>
-            /// The Guid assigned to the UserManager Role.
-            /// </summary>
-            public const string UserManager = "d29ad18a-eaae-407c-8398-92a99182148a";
-
-            /// <summary>
             /// Returns a list of all GUIDs defined for Role entities.
             /// </summary>
             public static readonly List<string> DefinedGuids = new List<string>
             {
-                Administrator, RoleManager, UserManager
+                Administrator
             };
 
             ///<inheritdoc/>

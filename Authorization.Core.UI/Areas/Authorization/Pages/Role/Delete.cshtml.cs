@@ -27,8 +27,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
     }
 
     internal class DeleteModel<TUser, TRole> : DeleteModel
-        where TUser : AppUser
-        where TRole : AppRole
+        where TUser : AuthUiUser
+        where TRole : AuthUiRole
     {
         private readonly IAuthorizationManager _authManager;
         private readonly ILogger<DeleteModel> _logger;

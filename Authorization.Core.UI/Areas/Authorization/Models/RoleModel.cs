@@ -75,7 +75,7 @@ namespace CRFricke.Authorization.Core.UI.Models
             return this;
         }
 
-        public virtual RoleModel InitFromRole(AppRole role)
+        public virtual RoleModel InitFromRole(AuthUiRole role)
         {
             Id = role.Id;
             Name = role.Name;
@@ -85,8 +85,8 @@ namespace CRFricke.Authorization.Core.UI.Models
         }
 
         public virtual async Task<RoleModel> InitRoleUsersAsync<TUser, TRole>(IRepository<TUser, TRole> repository)
-            where TRole : AppRole
-            where TUser : AppUser
+            where TRole : AuthUiRole
+            where TUser : AuthUiUser
         {
             _ = Name ?? throw new InvalidOperationException(
                 $"{nameof(InitFromRole)} has not been called."
@@ -134,7 +134,7 @@ namespace CRFricke.Authorization.Core.UI.Models
             }
         }
 
-        public virtual void UpdateRole(AppRole role)
+        public virtual void UpdateRole(AuthUiRole role)
         {
             var normalizer = new UpperInvariantLookupNormalizer();
 

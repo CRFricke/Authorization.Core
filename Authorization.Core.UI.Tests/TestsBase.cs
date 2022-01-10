@@ -1,5 +1,6 @@
 ﻿using Authorization.Core.UI.Tests.Data;
 using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.UI;
 using CRFricke.Authorization.Core.UI.Models;
 using System.Collections.Generic;
 
@@ -53,7 +54,7 @@ namespace Authorization.Core.UI.Tests
         {
             return new List<string>
             {
-                SysGuids.Role.Administrator, SysGuids.Role.RoleManager, SysGuids.Role.UserManager,
+                SysGuids.Role.Administrator, SysUiGuids.Role.RoleManager, SysUiGuids.Role.UserManager,
                 SysGuids.User.Administrator
             };
         }

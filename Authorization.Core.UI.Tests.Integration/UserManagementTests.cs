@@ -4,6 +4,7 @@ using Authorization.Core.UI.Tests.Integration.Extensions;
 using Authorization.Core.UI.Tests.Integration.Infrastructure;
 using Authorization.Core.UI.Tests.Integration.Models;
 using CRFricke.Authorization.Core;
+using CRFricke.Authorization.Core.UI;
 using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +40,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         private readonly string[] TesterUserClaims = new string[]
         {
-            nameof(SysGuids.Role.RoleManager), nameof(SysGuids.Role.UserManager)
+            nameof(SysUiGuids.Role.RoleManager), nameof(SysUiGuids.Role.UserManager)
         };
 
 
@@ -106,7 +107,7 @@ namespace Authorization.Core.UI.Tests.Integration
                 .SetValue(nameof(user.GivenName), "Ferd")
                 .SetValue(nameof(user.Surname), "Burfel")
                 .SetValue(nameof(user.LockoutEnd), new DateTimeOffset?(DateTime.Now.AddHours(3)))
-                .SetClaims(nameof(SysGuids.Role.RoleManager), nameof(SysGuids.Role.UserManager));
+                .SetClaims(nameof(SysUiGuids.Role.RoleManager), nameof(SysUiGuids.Role.UserManager));
 
             var index = await Pages.User.Index.CreateAsync(client);
             var edit = await index.ClickEditLinkAsync(user.Id);
@@ -254,7 +255,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
             var edit = (await Pages.User.Edit.CreateAsync(client, userId))
-                .SetClaims(new [] { nameof(SysGuids.Role.UserManager) });
+                .SetClaims(new [] { nameof(SysUiGuids.Role.UserManager) });
             edit = await edit.ClickSaveButtonExpectingErrorAsync();
 
             Assert.Contains("Can not update User", edit.GetValidationSummaryText());
@@ -268,7 +269,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
             var edit = (await Pages.User.Edit.CreateAsync(client, userId))
-                .UpdateProperties(new Dictionary<string, string> { { nameof(AppUser.Id), Guid.Empty.ToString() } });
+                .UpdateProperties(new Dictionary<string, string> { { nameof(AuthUiUser.Id), Guid.Empty.ToString() } });
             var index = await edit.ClickSaveButtonAsync();
 
             Assert.Contains("not found in the database", index.GetNotificationErrorText());
@@ -304,7 +305,7 @@ namespace Authorization.Core.UI.Tests.Integration
             await WebAppFactory.LoginExistingUserAsync(client, WebAppFactory.AppUserEmail, WebAppFactory.AppUserPassword);
         }
 
-        private AppUser EnsureTesterUserExists()
+        private AuthUiUser EnsureTesterUserExists()
         {
             var dbContext = WebAppFactory.Services.GetRequiredService<ApplicationDbContext>();
             var user = dbContext.Users

@@ -943,7 +943,7 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Edit Role [Get] sets IsSystemRole")]
         public async Task RoleManagement_Test33Async()
         {
-            var role = new ApplicationRole { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var role = new ApplicationRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.DefinedGuids == GetDefinedGuids() &&

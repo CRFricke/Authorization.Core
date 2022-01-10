@@ -24,8 +24,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
     }
 
     internal class EditModel<TUser, TRole> : EditModel
-        where TRole : AppRole
-        where TUser : AppUser
+        where TRole : AuthUiRole
+        where TUser : AuthUiUser
     {
         private readonly IAuthorizationManager _authManager;
         private readonly ILogger<EditModel> _logger;

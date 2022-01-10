@@ -84,13 +84,15 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
 
         private void SeedDatabase(ApplicationDbContext dbContext)
         {
+            dbContext.SeedDatabase();
+
             var role = dbContext.Roles
                 .Where(ar => ar.Id == AppRoleId)
                 .AsNoTracking()
                 .FirstOrDefault();
             if (role == null)
             {
-                role = new AppRole { Id = AppRoleId, Name = "AppRole" };
+                role = new AuthUiRole { Id = AppRoleId, Name = "AppRole" };
                 dbContext.Roles.Add(role);
                 dbContext.SaveChanges();
             }
@@ -107,12 +109,12 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
             }
         }
 
-        private static AppUser InitializeAppUser(AppRole role)
+        private static AuthUiUser InitializeAppUser(AuthUiRole role)
         {
-            var hasher = new PasswordHasher<AppUser>();
+            var hasher = new PasswordHasher<AuthUiUser>();
             var normalizer = new UpperInvariantLookupNormalizer();
 
-            AppUser user = new AppUser
+            AuthUiUser user = new AuthUiUser
             {
                 Id = AppUserId,
                 Email = AppUserEmail,

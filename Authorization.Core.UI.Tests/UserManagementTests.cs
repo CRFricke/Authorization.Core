@@ -76,13 +76,13 @@ namespace Authorization.Core.UI.Tests
         public async Task UserManagement_Test3Async()
         {
             ApplicationUser user = null;
-            var expectedClaims = new string[] { nameof(SysGuids.Role.RoleManager) };
+            var expectedClaims = new string[] { nameof(SysUiGuids.Role.RoleManager) };
 
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
@@ -243,8 +243,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var expectedClaims = new[] { roles[2].Name };
@@ -393,8 +393,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
@@ -555,8 +555,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var expectedClaims = new[] { roles[2].Name };
@@ -633,8 +633,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var expectedClaims = new[] { roles[2].Name };
@@ -869,8 +869,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
@@ -921,8 +921,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
@@ -1073,8 +1073,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var principalUser = new ApplicationUser("AdminUser@company.com");
@@ -1137,8 +1137,8 @@ namespace Authorization.Core.UI.Tests
             var roles = new List<ApplicationRole>
             {
                 new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.RoleManager) },
-                new ApplicationRole { Name = nameof(SysGuids.Role.UserManager) }
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
+                new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
             var principal = new ApplicationUser("AdminUser@company.com");

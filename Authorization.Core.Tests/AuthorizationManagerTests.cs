@@ -1,6 +1,7 @@
 using Authorization.Core.Tests.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.Attributes;
+using CRFricke.Authorization.Core.UI;
 using CRFricke.Test.Support.Fakes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -320,12 +321,12 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.UserManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.UserManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.User.DefinedClaims); }
                     )
@@ -360,16 +361,16 @@ namespace Authorization.Core.Tests
         public async Task AuthorizationManagerTest12Async()
         {
             var principal = new AppUser("TestUser@StEmilian.com");
-            var role = new AppRole { Id = SysGuids.Role.RoleManager, Name = nameof(SysGuids.Role.RoleManager) };
+            var role = new AppRole { Id = SysUiGuids.Role.RoleManager, Name = nameof(SysUiGuids.Role.RoleManager) };
             var appClaimRequirement = new AppClaimRequirement(SysClaims.User.Create);
             var expectedClaims = SysClaims.Role.DefinedClaims;
 
             var user = new AppUser("NewUser@StEmilian.com");
             user.Claims.Add(
-                new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = nameof(SysGuids.Role.RoleManager) }
+                new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = nameof(SysUiGuids.Role.RoleManager) }
                 );
             user.Claims.Add(
-                new IdentityUserClaim<string> { Id = 2, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = nameof(SysGuids.Role.UserManager) }
+                new IdentityUserClaim<string> { Id = 2, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = nameof(SysUiGuids.Role.UserManager) }
                 );
 
             var dbContext = Mock.Of<AppDbContext>(db =>
@@ -379,17 +380,17 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.UserManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.UserManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.User.DefinedClaims); }
                     )
                 ).Returns(true);
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.RoleManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.RoleManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.Role.DefinedClaims); }
                     )
@@ -425,13 +426,13 @@ namespace Authorization.Core.Tests
         public async Task AuthorizationManagerTest13Async()
         {
             var principal = new AppUser("TestUser@StEmilian.com");
-            var role = new AppRole { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var role = new AppRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
             var appClaimRequirement = new AppClaimRequirement(SysClaims.User.Create);
             var expectedClaims = SysClaims.Role.DefinedClaims;
 
             var user = new AppUser("NewUser@StEmilian.com");
             user.Claims.Add(
-                new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = nameof(SysGuids.Role.UserManager) }
+                new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = nameof(SysUiGuids.Role.UserManager) }
                 );
 
             var dbContext = Mock.Of<AppDbContext>(db =>
@@ -441,12 +442,12 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.UserManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.UserManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.User.DefinedClaims); }
                     )
@@ -525,12 +526,12 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.RoleManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.RoleManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.RoleManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.RoleManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.Role.DefinedClaims); }
                     )
@@ -573,12 +574,12 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.RoleManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.RoleManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.RoleManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.RoleManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.Role.DefinedClaims); }
                     )
@@ -605,7 +606,7 @@ namespace Authorization.Core.Tests
         [Fact(DisplayName = "IsAuthorized returns True")]
         public async Task AuthorizationManagerTest17Async()
         {
-            var role = new AppRole { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var role = new AppRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
             var roleClaimCache = new Mock<RoleClaimCache>();
             roleClaimCache.Setup(mc => mc.TryGetValue(role.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
@@ -642,7 +643,7 @@ namespace Authorization.Core.Tests
         [Fact(DisplayName = "IsAuthorized returns False")]
         public async Task AuthorizationManagerTest18Async()
         {
-            var role = new AppRole { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var role = new AppRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
             var roleClaimCache = new Mock<RoleClaimCache>();
             roleClaimCache.Setup(mc => mc.TryGetValue(role.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
@@ -703,7 +704,7 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
@@ -743,7 +744,7 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
@@ -783,18 +784,18 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.UserManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.UserManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.User.DefinedClaims); }
                     )
                 ).Returns(true);
 
-            var role = new AppRole { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var role = new AppRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
             var dbContext = Mock.Of<AppDbContext>(db =>
                 db.Set<AppRole>() == new[] { role }.AsQueryable().BuildMockDbSet().Object
                 );
@@ -834,7 +835,7 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
@@ -845,7 +846,7 @@ namespace Authorization.Core.Tests
             var logger = new TestLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
-            var resource = new AppRole() { Id = SysGuids.Role.RoleManager, Name = nameof(SysGuids.Role.RoleManager) };
+            var resource = new AppRole() { Id = SysUiGuids.Role.RoleManager, Name = nameof(SysUiGuids.Role.RoleManager) };
             var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Delete);
             var authContext = new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { appClaimRequirement }, claimsPrincipal, resource);
 
@@ -874,7 +875,7 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.UserManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.UserManager }); }
                     )
                 ).Returns(true);
 
@@ -885,7 +886,7 @@ namespace Authorization.Core.Tests
             var logger = new TestLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
-            var resource = new AppRole() { Id = SysGuids.Role.RoleManager, Name = nameof(SysGuids.Role.RoleManager) };
+            var resource = new AppRole() { Id = SysUiGuids.Role.RoleManager, Name = nameof(SysUiGuids.Role.RoleManager) };
             var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.UpdateClaims);
             var authContext = new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { appClaimRequirement }, claimsPrincipal, resource);
 
@@ -914,12 +915,12 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.RoleManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.RoleManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.RoleManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.RoleManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.Role.DefinedClaims); }
                     )
@@ -955,12 +956,12 @@ namespace Authorization.Core.Tests
             var userRoleCache = new Mock<UserRoleCache>();
             userRoleCache.Setup(mc => mc.TryGetValue(principal.Id, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
-                    (object key, out object value) => { value = new HashSet<string>(new[] { SysGuids.Role.RoleManager }); }
+                    (object key, out object value) => { value = new HashSet<string>(new[] { SysUiGuids.Role.RoleManager }); }
                     )
                 ).Returns(true);
 
             var roleClaimCache = new Mock<RoleClaimCache>();
-            roleClaimCache.Setup(mc => mc.TryGetValue(SysGuids.Role.RoleManager, out It.Ref<object>.IsAny))
+            roleClaimCache.Setup(mc => mc.TryGetValue(SysUiGuids.Role.RoleManager, out It.Ref<object>.IsAny))
                 .Callback(new TryGetValueDelegate(
                     (object key, out object value) => { value = new HashSet<string>(SysClaims.Role.DefinedClaims); }
                     )
@@ -974,7 +975,7 @@ namespace Authorization.Core.Tests
             var logger = new TestLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
-            var resource = new AppRole() { Id = SysGuids.Role.UserManager, Name = nameof(SysGuids.Role.UserManager) };
+            var resource = new AppRole() { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
             var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Read, SysClaims.Role.UpdateClaims);
             var authContext = new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { appClaimRequirement }, claimsPrincipal, resource);
 

@@ -22,8 +22,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.User
     }
 
     internal class CreateModel<TUser, TRole> : CreateModel
-        where TUser : AppUser, new()
-        where TRole : AppRole
+        where TUser : AuthUiUser, new()
+        where TRole : AuthUiRole
     {
         private readonly IAuthorizationManager _authManager;
         private readonly ILogger<CreateModel> _logger;

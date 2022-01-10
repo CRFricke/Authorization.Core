@@ -27,8 +27,8 @@ namespace Authorization.Core.UI.Test.Web
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                 );
-            services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddRoles<AppRole>()
+            services.AddDefaultIdentity<AuthUiUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<AuthUiRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddAuthorizationCore<ApplicationDbContext>()
                 .AddAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");

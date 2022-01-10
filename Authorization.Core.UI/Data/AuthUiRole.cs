@@ -2,7 +2,7 @@
 
 namespace CRFricke.Authorization.Core.UI.Data
 {
-    public class AppRole : AuthRole
+    public class AuthUiRole : AuthRole
     {
         /// <summary>
         /// A description of the role.
