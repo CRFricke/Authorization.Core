@@ -16,7 +16,7 @@ namespace CRFricke.Authorization.Core
         /// </summary>
         /// <typeparam name="TContext">A DB Context class that derives from <see cref="AuthDbContext"/></typeparam>
         /// <param name="builder">The <see cref="IdentityBuilder"/> object.</param>
-        public static IdentityBuilder AddAuthorizationCore<TContext>(this IdentityBuilder builder)
+        public static IdentityBuilder AddCRFrickeAuthorizationCore<TContext>(this IdentityBuilder builder)
         {
             var roleType = builder.RoleType ?? typeof(AuthRole);
 

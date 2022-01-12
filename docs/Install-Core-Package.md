@@ -6,14 +6,14 @@ log in. To create a new ASP.NET Core Web Application with authentication, see
 To add authentication to an existing ASP.NET Core Application, see 
 [Scaffold Identity in ASP.NET Core projects](https://docs.microsoft.com/en-gb/aspnet/core/security/authentication/scaffold-identity?view=aspnetcore-6.0&tabs=visual-studio#scaffold-identity-into-a-razor-project-without-existing-authorization).
 
-The following steps show how to install the Authorization.Core package.
+The following sections show how to install and configure the Authorization.Core package.
 
-1.  Install the CRFricke.Authorization.Core package:
+#### Install the package:
 
 - Via dotnet CLI:
 
 ```
-  dotnet add [<project>] package CRFricke.Authorization.Core
+  dotnet add <project> package CRFricke.Authorization.Core
 ```
 
 - Via NuGet Package Manager:
@@ -22,46 +22,46 @@ The following steps show how to install the Authorization.Core package.
 
     Using [Visual Studio for Mac](https://docs.microsoft.com/en-us/visualstudio/mac/nuget-walkthrough?toc=%2Fnuget%2Ftoc.json&view=vsmac-2019#find-and-install-a-package)
 
-2.  (Optional) Extend the `AuthRole` and/or `AuthUser` classes.
+#### Extend the AuthRole and/or AuthUser classes (optional).
 
-    The Authorization.Core package extends the Microsoft Identity classes `IdentityRole` and 
-    `IdentityUser`. If you extended any of these classes (or need to), you must derive your 
-    classes from the associated Authorization.Core classes (`AuthRole` and `AuthUser`).
+The Authorization.Core package extends the Microsoft Identity classes `IdentityRole` and 
+`IdentityUser`. If you extended any of these classes (or need to), you must derive your 
+classes from the associated Authorization.Core classes (`AuthRole` and `AuthUser`).
 
-3.  Update the `ApplicationDbContext` class to derive from `AuthDbContext`.
+#### Update the ApplicationDbContext class to derive from AuthDbContext.
 
-    **_Note:_** The following example shows the form to use when both the `AuthRole` and `AuthUser` classes 
-    have been extended. 
-
-```csharp
-   using CRFricke.Authorization.Core.Data;
-   using Microsoft.EntityFrameworkCore;
-
-   namespace WebApplication1.Data
-   {
-       public class ApplicationDbContext : AuthDbContext<ApplicationUser, ApplicationRole>
-       {
-           public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-               : base(options)
-           {
-           }
-       }
-   }
-```
-
-4.  Update the class name specified in `_LoginPartial.cshtml`.
-
-    The class name specified in the `@inject` statements for `SignInManager` and `UserManager` 
-    must be `AuthUser` (or the name of your derived class; in this case, `ApplicationUser`).
+**_Note:_** The following example shows the form to use when both the `AuthRole` and `AuthUser` classes 
+have been extended. 
 
 ```csharp
-   @using CRFricke.Authorization.Core.Data
-   @using Microsoft.AspNetCore.Identity
-   @inject SignInManager<ApplicationUser> SignInManager
-   @inject UserManager<ApplicationUser> UserManager
+using CRFricke.Authorization.Core.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace WebApplication.Data
+{
+    public class ApplicationDbContext : AuthDbContext<ApplicationUser, ApplicationRole>
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
+    }
+}
 ```
 
-5.  Update Startup.cs (Program.cs in \.Net 6.0):
+#### Update the class name specified in _LoginPartial.cshtml.
+
+The class name specified in the `@inject` statements for `SignInManager` and `UserManager` 
+must be `AuthUser` (or the name of your derived class; in this case, `ApplicationUser`).
+
+```csharp
+@using CRFricke.Authorization.Core.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+```
+
+#### Update Startup.cs (Program.cs in .Net 6.0):
 
 - Chain an `AddAuthorizationCore` clause to the `AddDefaultIdentity` statement.
 - Change any `IdentityUser` class references to `AuthUser` (or the name of your derived class).
@@ -72,7 +72,7 @@ The following steps show how to install the Authorization.Core package.
       );
    services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
       .AddEntityFrameworkStores<ApplicationDbContext>()
-      .AddAuthorizationCore<ApplicationDbContext>();
+      .AddCRFrickeAuthorizationCore<ApplicationDbContext>();
 ``` 
 
 At this point you should be able build your project and still be able to log in.
