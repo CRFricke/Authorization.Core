@@ -6,12 +6,12 @@ namespace CRFricke.Authorization.Core.UI
 {
     public static class IdentityBuilderExtensions
     {
-        public static IdentityBuilder AddAuthorizationCoreUI(this IdentityBuilder builder)
+        public static IdentityBuilder AddCRFrickeAuthorizationCoreUI(this IdentityBuilder builder)
         {
-            return AddAuthorizationCoreUI(builder, o => { });
+            return AddCRFrickeAuthorizationCoreUI(builder, o => { });
         }
 
-        public static IdentityBuilder AddAuthorizationCoreUI(this IdentityBuilder builder, Action<AuthCoreUIOptions> configUIOptions)
+        public static IdentityBuilder AddCRFrickeAuthorizationCoreUI(this IdentityBuilder builder, Action<AuthCoreUIOptions> configUIOptions)
         {
             var roleType = builder.RoleType ?? typeof(IdentityUserRole<string>);
 
