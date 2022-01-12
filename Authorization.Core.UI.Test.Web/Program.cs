@@ -4,13 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace Authorization.Core.UI.Test.Web
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
 
@@ -20,12 +19,12 @@ namespace Authorization.Core.UI.Test.Web
 
                 try
                 {
-                    await DbInitializer.SeedDatabaseAsync(services);
+                    DbInitializer.InitializeDatabase(services);
                 }
                 catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
+                    logger.LogError(ex, "An error occurred initializing the DB.");
                 }
             }
 

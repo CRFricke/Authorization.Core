@@ -13,7 +13,7 @@ The following steps show how to install the Authorization.Core package.
 - Via dotnet CLI:
 
 ```
-  dotnet add PROJECT package CRFricke.Authorization.Core --version 1.0.0
+  dotnet add [<project>] package CRFricke.Authorization.Core
 ```
 
 - Via NuGet Package Manager:
@@ -30,13 +30,16 @@ The following steps show how to install the Authorization.Core package.
 
 3.  Update the `ApplicationDbContext` class to derive from `AuthDbContext`.
 
+    **_Note:_** The following example shows the form to use when both the `AuthRole` and `AuthUser` classes 
+    have been extended. 
+
 ```csharp
    using CRFricke.Authorization.Core.Data;
    using Microsoft.EntityFrameworkCore;
 
    namespace WebApplication1.Data
    {
-       public class ApplicationDbContext : AuthDbContext
+       public class ApplicationDbContext : AuthDbContext<ApplicationUser, ApplicationRole>
        {
            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
                : base(options)
@@ -49,30 +52,30 @@ The following steps show how to install the Authorization.Core package.
 4.  Update the class name specified in `_LoginPartial.cshtml`.
 
     The class name specified in the `@inject` statements for `SignInManager` and `UserManager` 
-    must be `AuthUser` (or the name of your derived class).
+    must be `AuthUser` (or the name of your derived class; in this case, `ApplicationUser`).
 
 ```csharp
    @using CRFricke.Authorization.Core.Data
    @using Microsoft.AspNetCore.Identity
-   @inject SignInManager<AuthUser> SignInManager
-   @inject UserManager<AuthUser> UserManager
+   @inject SignInManager<ApplicationUser> SignInManager
+   @inject UserManager<ApplicationUser> UserManager
 ```
 
 5.  Update Startup.cs (Program.cs in \.Net 6.0):
 
 - Chain an `AddAuthorizationCore` clause to the `AddDefaultIdentity` statement.
-- Change any `IdentityUser` class references to `AuthUser`.
+- Change any `IdentityUser` class references to `AuthUser` (or the name of your derived class).
 
 ```csharp
-   services.AddDbContext<AuthDbContext>(options =>
+   services.AddDbContext<ApplicationDbContext>(options =>
       options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
       );
-   services.AddDefaultIdentity<AuthUser>(options => options.SignIn.RequireConfirmedAccount = true)
-      .AddEntityFrameworkStores<AuthDbContext>()
-      .AddAuthorizationCore<AuthDbContext>();
+   services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+      .AddEntityFrameworkStores<ApplicationDbContext>()
+      .AddAuthorizationCore<ApplicationDbContext>();
 ``` 
 
 At this point you should be able build your project and still be able to log in.
 
 Now that the Authorization.Core package is installed, it is time to 
-[Configure your roles](Configure-Roles.md).
+[Configure your roles and users](Configure-Roles.md).

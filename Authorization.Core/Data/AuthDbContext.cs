@@ -36,9 +36,7 @@ namespace CRFricke.Authorization.Core.Data
     /// </summary>
     /// <typeparam name="TUser">The <see cref="Type"/> of user objects.</typeparam>
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects.</typeparam>
-    public abstract class AuthDbContext<TUser, TRole> :
-        IdentityDbContext<TUser, TRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>,
-        IRepository<TUser, TRole>
+    public abstract class AuthDbContext<TUser, TRole> : IdentityDbContext<TUser, TRole, string>, IRepository<TUser, TRole>
         where TUser : AuthUser, new()
         where TRole : AuthRole, new()
     {
@@ -117,7 +115,7 @@ namespace CRFricke.Authorization.Core.Data
                     Id = SysGuids.User.Administrator,
                     Email = email,
                     EmailConfirmed = true,
-                    LockoutEnabled = false,
+                    LockoutEnabled = true,
                     NormalizedEmail = normalizer.NormalizeEmail(email),
                     NormalizedUserName = normalizer.NormalizeName(email),
                     PasswordHash = "AQAAAAEAACcQAAAAEPPGh+zIZ8PSo5IQ1IjPnVqUph0c0utc5Kd37NmA8U1Fhe+MEu3gbxP81sPcxkJaMQ==", // "Administrat0r!"
