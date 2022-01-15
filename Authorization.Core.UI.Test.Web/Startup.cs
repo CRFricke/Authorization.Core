@@ -30,7 +30,7 @@ namespace Authorization.Core.UI.Test.Web
                 .AddRoles<AuthUiRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddAccessRightBasedAuthorization<ApplicationDbContext>()
-                .AddCRFrickeAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");
+                .AddAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");
             services.AddRazorPages();
         }
 
