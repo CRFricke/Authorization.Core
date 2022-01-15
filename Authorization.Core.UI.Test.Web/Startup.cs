@@ -29,7 +29,7 @@ namespace Authorization.Core.UI.Test.Web
             services.AddDefaultIdentity<AuthUiUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<AuthUiRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddCRFrickeAuthorizationCore<ApplicationDbContext>()
+                .AddAccessRightBasedAuthorization<ApplicationDbContext>()
                 .AddCRFrickeAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");
             services.AddRazorPages();
         }
