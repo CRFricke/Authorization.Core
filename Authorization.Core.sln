@@ -39,10 +39,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{317DF210-7B4D-4AE6-980B-C832EB0BED05}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Configure-Roles.md = docs\Configure-Roles.md
+		docs\Configure-Core-Roles-and-Users.md = docs\Configure-Core-Roles-and-Users.md
+		docs\Configure-UI-Roles-and-Users.md = docs\Configure-UI-Roles-and-Users.md
 		docs\Enforcing-Authorization.md = docs\Enforcing-Authorization.md
 		docs\Install-Core-Package.md = docs\Install-Core-Package.md
-		docs\Install-Core.UI-Package.md = docs\Install-Core.UI-Package.md
+		docs\Install-UI-Package.md = docs\Install-UI-Package.md
 	EndProjectSection
 EndProject
 Global
