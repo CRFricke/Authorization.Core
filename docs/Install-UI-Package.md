@@ -8,10 +8,10 @@ To add authentication to an existing ASP.NET Core Application, see
 
 The following sections show how to install and configure the Authorization.Core.UI package.
 
-### Install the package
-
 _**Note:**_ If the Authorization.Core package is installed, it should be removed before installing 
 the UI package (the code changes can remain).
+
+### Install the package
 
 - Via dotnet CLI:
 
@@ -33,8 +33,8 @@ classes from the associated Authorization.Core.UI classes (`AuthUiRole` and `Aut
 
 ### Update the ApplicationDbContext class to derive from AuthUiContext
 
-**_Note:_** The following example shows the form to use when both the `AuthUiRole` and `AuthUiUser` classes 
-have been extended. 
+**_Note:_** The following example shows the form to use when both the `AuthUiUser` and `AuthUiRole` classes 
+have been extended (by ApplicationUser and ApplicationRole). 
 
 ```csharp
 using CRFricke.Authorization.Core.UI.Data;
@@ -55,13 +55,31 @@ namespace WebApplication.Data
 ### Update the class name specified in _LoginPartial.cshtml
 
 The class name specified in the `@inject` statements for `SignInManager` and `UserManager` 
-must be `AuthUiUser` (or the name of your derived class; in this case, `ApplicationUser`).
+must be `AuthUiUser` (or the name of your derived class; in this case, ApplicationUser).
 
 ```csharp
 @using CRFricke.Authorization.Core.Data
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+```
+
+### Add a RenderSectionAsync statement to _Layout.cshtml
+
+The razor pages exposed by the UI package need to add stylesheet links in the `<head>` section of 
+_Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the end of the section:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Authorization.Core.UI.Test.Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    @await RenderSectionAsync("css", required: false)
+</head>
 ```
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
