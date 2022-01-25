@@ -45,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CRFricke.EF.Core.Utilities" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.22" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.22" />

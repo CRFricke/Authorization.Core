@@ -1,4 +1,4 @@
-## Testing and Enforcing Authorization
+﻿## Testing and Enforcing Authorization
 
 The simplest way to enforce authorization is to add the `RequiresClaims` attribute to the `PageModel` 
 (or `Controller`) class of any page that requires authorization:
@@ -7,7 +7,7 @@ The simplest way to enforce authorization is to add the `RequiresClaims` attribu
 [RequiresClaims(AppClaims.Calendar.Update)]
 public class EditModel : PageModel
 {
-    ...
+    ⁝
 }
 ```
 
@@ -32,19 +32,19 @@ Or in the Razor model (or MVC Controller):
 public class EditModel : PageModel
 {
     private readonly IAuthorizationManager _authManager;
-    private readonly IRepository<Calendar> _calendarRepo;
+    private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<EditModel> _logger;
 
-    public EditModel(IAuthorizationManager authManager, IRepository<Calendar> calendarRepo, ILogger<EditModel> logger)
+    public EditModel(IAuthorizationManager authManager, ApplicationDbContext dbContext, ILogger<EditModel> logger)
     {
         _authManager = authManager;
-        _calendarRepo = calendarRepo;
+        _dbContext = dbContext;
         _logger = logger;
     }
 
     public async Task OnGetAsync(string id)
     {
-        var calendarEvent = _calendarRepo.Find(id);
+        var calendarEvent = await _dbContext.FindAsync(id);
         if (calendarEvent == null)
         {
             return NotFound();
@@ -57,9 +57,7 @@ public class EditModel : PageModel
         {
             HandleError(user, authResult.Errors);
         }
-
-        ...
-
+        ⁝
     }
 }
 ```
@@ -70,19 +68,19 @@ Or using Microsoft's authorization service:
 public class EditModel : PageModel
 {
     private readonly IAuthorizationService _authService;
-    private readonly IRepository<Calendar> _calendarRepo;
+    private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<EditModel> _logger;
 
-    public EditModel(IAuthorizationService authService, IRepository<Calendar> calendarRepo, ILogger<EditModel> logger)
+    public EditModel(IAuthorizationService authService, ApplicationDbContext dbContext, ILogger<EditModel> logger)
     {
         _authService = authService;
-        _calendarRepo = calendarRepo;
+        _dbContext = dbContext;
         _logger = logger;
     }
 
     public async Task OnGetAsync(string id)
     {
-        var calendarEvent = _calendarRepo.Find(id);
+        var calendarEvent = await _dbContext.FindAsync(id);
         if (calendarEvent == null)
         {
             return NotFound();
@@ -96,15 +94,14 @@ public class EditModel : PageModel
         {
             HandleError(calendarEvent, authResult.Failure);
         }
-
-        ...
-
+        ⁝
     }
 }
 ```
 
-If your application updates the claims associated with a Role, it also needs to refresh the role cache to 
-pick up the change:
+If your application updates the claims associated with a Role, it also needs to refresh the role cache to pick up 
+the change (otherwise the change will not go into effect until the Role is evicted from the cache or the application 
+is restarted):
 
 ```csharp
     if (RoleModel.ClaimsUpdated)

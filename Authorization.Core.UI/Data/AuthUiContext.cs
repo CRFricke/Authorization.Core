@@ -1,6 +1,10 @@
 ﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Data
 {
@@ -71,13 +75,14 @@ namespace CRFricke.Authorization.Core.UI.Data
         }
 
         /// <inheritdoc/>
-        public override void SeedDatabase()
+        public override async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
         {
-            base.SeedDatabase();
+            await base.SeedDatabaseAsync(serviceProvider);
 
-            var normalizer = new UpperInvariantLookupNormalizer();
+            var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
+            var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthUiContext>();
 
-            var role = Roles.Find(SysGuids.Role.Administrator);
+            var role = await Roles.FindAsync(SysGuids.Role.Administrator);
             if (role != null)
             {
                 if (role.Description == null)
@@ -85,10 +90,11 @@ namespace CRFricke.Authorization.Core.UI.Data
                     role.Description = "Administrators have access to all portions of the application.";
 
                     Roles.Update(role);
+                    logger.LogInformation($"{role.GetType().Name} '{role.Name}' has been updated.");
                 }
             }
 
-            role = Roles.Find(SysUiGuids.Role.RoleManager);
+            role = await Roles.FindAsync(SysUiGuids.Role.RoleManager);
             if (role == null)
             {
                 role = new TRole
@@ -100,10 +106,11 @@ namespace CRFricke.Authorization.Core.UI.Data
                 };
                 ((AuthUiRole)role).SetClaims(SysClaims.Role.DefinedClaims);
 
-                Roles.Add(role);
+                await Roles.AddAsync(role);
+                logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' has been created.");
             }
 
-            role = Roles.Find(SysUiGuids.Role.UserManager);
+            role = await Roles.FindAsync(SysUiGuids.Role.UserManager);
             if (role == null)
             {
                 role = new TRole
@@ -115,10 +122,18 @@ namespace CRFricke.Authorization.Core.UI.Data
                 };
                 ((AuthUiRole)role).SetClaims(SysClaims.User.DefinedClaims);
 
-                Roles.Add(role);
+                await Roles.AddAsync(role);
+                logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' has been created.");
             }
 
-            SaveChanges();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "SaveChangesAsync() method failed.");
+            }
         }
     }
 }
