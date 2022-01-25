@@ -1,7 +1,6 @@
 using Authorization.Core.UI.Test.Web.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
-using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,11 +25,13 @@ namespace Authorization.Core.UI.Test.Web
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                 );
-            services.AddDefaultIdentity<AuthUiUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddRoles<AuthUiRole>()
+
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddAccessRightBasedAuthorization<ApplicationDbContext>()
+                .AddAccessRightBasedAuthorization()
                 .AddAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");
+
             services.AddRazorPages();
         }
 

@@ -1,4 +1,4 @@
-﻿using CRFricke.Authorization.Core.UI.Data;
+﻿using Authorization.Core.UI.Test.Web.Data;
 using System;
 
 namespace Authorization.Core.UI.Tests.Integration.Models
@@ -28,7 +28,7 @@ namespace Authorization.Core.UI.Tests.Integration.Models
         public bool LockoutEnabled { get; set; }
 
 
-        internal static UserModel CreateFrom(AuthUiUser user)
+        internal static UserModel CreateFrom(ApplicationUser user)
         {
             return new UserModel
             {
@@ -45,9 +45,9 @@ namespace Authorization.Core.UI.Tests.Integration.Models
             };
         }
 
-        internal AuthUiUser ToUser()
+        internal ApplicationUser ToUser()
         {
-            return new AuthUiUser
+            return new ApplicationUser
             {
                 AccessFailedCount = AccessFailedCount,
                 Id = Id ?? Guid.NewGuid().ToString(),

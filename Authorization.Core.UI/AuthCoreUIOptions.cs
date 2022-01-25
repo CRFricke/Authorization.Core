@@ -7,6 +7,7 @@
     {
         /// <summary>
         /// The friendly area name the UI should be configured under.
+        /// The default value is "Authorization".
         /// </summary>
         public string FriendlyAreaName { get; set; }
     }

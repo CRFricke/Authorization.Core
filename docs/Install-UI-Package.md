@@ -1,4 +1,4 @@
-## Installing the Authorization.Core.UI package
+﻿## Installing the Authorization.Core.UI package
 
 This section assumes that ASP.NET Core Identity is already installed, and that you can sucessfully 
 log in. To create a new ASP.NET Core Web Application with authentication, see 
@@ -80,12 +80,16 @@ _Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the e
     <link rel="stylesheet" href="~/css/site.css" />
     @await RenderSectionAsync("css", required: false)
 </head>
+    ⁝
 ```
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
 
 - Chain an `AddAccessRightBasedAuthorization` clause to the `AddDefaultIdentity` statement.
 - Chain an `AddAuthorizationCoreUI` clause to the AddAccessRightBasedAuthorization clause.
+    - You can specify an alternate area name for the pages exposed by the UI package by specifying the 
+    desired name in the `AuthCoreUIOptions.FriendlyAreaName` property (shown below). If a value is 
+    not specified, the default is "Authorization".
 - Change any `IdentityUser` class references to `AuthUiUser` (or the name of your derived class).
 
 ```csharp
@@ -95,7 +99,7 @@ _Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the e
    services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
       .AddEntityFrameworkStores<ApplicationDbContext>()
       .AddAccessRightBasedAuthorization<ApplicationDbContext>()
-      .AddAuthorizationCoreUI();
+      .AddAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");
 ``` 
 
 ### Add a migration to pick up schema changes added by the UI package

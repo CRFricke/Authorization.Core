@@ -1,4 +1,5 @@
 ﻿using CRFricke.Authorization.Core.Data;
+using CRFricke.EF.Core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,17 +13,33 @@ namespace CRFricke.Authorization.Core
     public static class IdentityBuilderExtensions
     {
         /// <summary>
-        /// Adds the Authorization.Core services to the <see cref="IServiceCollection"/>.
+        /// Adds AccessRight based authorization services to the <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <typeparam name="TContext">A DB Context class that derives from <see cref="AuthDbContext"/></typeparam>
-        /// <param name="builder">The <see cref="IdentityBuilder"/> object.</param>
-        public static IdentityBuilder AddAccessRightBasedAuthorization<TContext>(this IdentityBuilder builder)
+        /// <param name="builder">The <see cref="IdentityBuilder"/> instance this method extends.</param>
+        /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
+        public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder)
         {
-            var roleType = builder.RoleType ?? typeof(AuthRole);
+            Type contextType;
 
-            VerifyTypeDerivesFrom(typeof(TContext), typeof(AuthDbContext<,>));
+            using (var serviceProvider = builder.Services.BuildServiceProvider())
+            {
+                var storeType = builder.RoleType != null
+                    ? serviceProvider.GetRequiredService(typeof(IRoleStore<>).MakeGenericType(builder.RoleType)).GetType()
+                    : serviceProvider.GetRequiredService(typeof(IUserStore<>).MakeGenericType(builder.UserType)).GetType();
+
+                contextType = storeType.GenericTypeArguments[1];
+            }
+
+            VerifyTypeDerivesFrom(contextType, typeof(AuthDbContext<,>));
+
             VerifyTypeDerivesFrom(builder.UserType, typeof(AuthUser));
-            VerifyTypeDerivesFrom(roleType, typeof(AuthRole));
+
+            if (builder.RoleType != null)
+            {
+                VerifyTypeDerivesFrom(builder.RoleType, typeof(AuthRole));
+            }
+
+            var roleType = builder.RoleType ?? typeof(AuthRole);
 
             var authManagerType = typeof(AuthorizationManager<,>)
                 .MakeGenericType(builder.UserType, roleType);
@@ -33,10 +50,13 @@ namespace CRFricke.Authorization.Core
                 .AddHttpContextAccessor()
                 .AddSingleton<RoleClaimCache>()
                 .AddSingleton<UserRoleCache>()
-                .AddScoped(iRepository, typeof(TContext))
+                .AddScoped(iRepository, contextType)
                 .AddSingleton(typeof(IAuthorizationManager), authManagerType)
                 .AddSingleton<IAuthorizationPolicyProvider, AppClaimRequirementProvider>()
-                .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>();
+                .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>()
+                .AddDbInitializer(options =>
+                    options.UseDbContext(contextType, DbInitializationOption.Migrate)
+                    );
 
             return builder;
         }

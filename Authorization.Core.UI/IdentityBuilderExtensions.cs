@@ -17,8 +17,9 @@ namespace CRFricke.Authorization.Core.UI
 
             builder.Services.Configure(configUIOptions);
 
-            builder.Services.ConfigureOptions(typeof(ConfigureAuthCoreUIRazorOptions<,>)
-                .MakeGenericType(builder.UserType, roleType));
+            builder.Services.ConfigureOptions(
+                typeof(ConfigureAuthCoreUIRazorOptions<,>).MakeGenericType(builder.UserType, roleType)
+                );
 
             return builder;
         }

@@ -26,11 +26,11 @@ namespace CRFricke.Authorization.Core
             => new IdentityRoleClaim<string> { RoleId = roleId, ClaimType = ClaimType, ClaimValue = claimValue };
 
         /// <summary>
-        /// Creates a new IdentityRoleClaim using the specified Role ID and claim value.
+        /// Creates a new IdentityUserClaim using the specified User ID and claim value.
         /// </summary>
         /// <param name="userId">The ID of the User being assigned the claim.</param>
         /// <param name="claimValue">The claim value.</param>
-        /// <returns>A new IdentityRoleClaim with the specified values.</returns>
+        /// <returns>A new IdentityUserClaim with the specified values.</returns>
         public static IdentityUserClaim<string> CreateUserClaim(string userId, string claimValue)
             => new IdentityUserClaim<string> { UserId = userId, ClaimType = ClaimTypes.Role, ClaimValue = claimValue };
 

@@ -6,9 +6,8 @@ map one or more of these `IdentityRole` entities to an `IdentityUser`.
 
 ### Define the claims associated with your entities
 
-At startup, the package's AuthorizationManager scans the assemblies loaded into the execution context of 
-of the current domain for classes that implement the `IDefinesClaims` interface. It uses this interface 
-to load the claims defined by the application.
+At startup, the package's AuthorizationManager scans the application's assemblies for classes that implement 
+the `IDefinesClaims` interface. It uses this interface to load the claims defined by the application.
 
 The Authorization.Core package provides a set of claims to control access to both Users and Roles. The claims 
 defined for Role entities are shown below (the claims defined for User entities correspond one-for-one with 
@@ -97,8 +96,8 @@ interface. It uses this interface to load the Guids of any entities pre-installe
 The Authorization.Core package provides definitions for the Guids associated with the `Administrator` Role 
 and User in the `SysGuids` class.
 
-Define the Guids associated any entities that are pre-installed by your application. Use the example below as 
-a guide.
+Define the Guids associated with any entities that are pre-installed by your application. Use the example 
+below as a guide.
 
 ```csharp
 /// <summary>
@@ -133,28 +132,31 @@ public class AppGuids
 }
 ```
 
-### Add database initialization to the application's startup logic
+### Add SeedDatabaseAsync method override to your application's DbContext (optional)
 
-The Authorization.Core package contains logic that can be called during database initialization to ensure 
-the `Administrator` Role and User are installed. If either are accidently deleted, they will be reinstalled 
-the next time the application is restarted.
+The `AuthDbContext` contained in the Authorization.Core package contains a virtual `SeedDatabaseAsync` 
+method that is called during database initialization to ensure the `Administrator` Role and User account 
+are installed. If either are accidently deleted, they are reinstalled the next time the application is restarted.
 
-The following steps show how to set this up.
+_**Note:**_ The initial value for the Administrator's password is **"Administrat0r!"**. 
+If the Administrator account is reinstalled during an application restart, 
+_**the Administrator's password will revert to its initial value.**_
 
-#### Add SeedDatabase override to your application's dbcontext (optional)
+_**Always be sure to change the Administrator's initial password in a production environment.**_
 
-If you have entities that you want to ensure are installed during database initialization, you can override the 
-`AuthDbContext.SeedDatabase` method in your DbContext (the one you derived from `AuthDbContext`):
+The `SeedDatabaseAsync` method can be overriden in your application's DbContext (the one you derived from 
+`AuthDbContext`) to provide similar functionality for your application:
 
 ```csharp
 /// <inheritdoc/>
-public override void SeedDatabase()
+public override async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
 {
-    base.SeedDatabase();
+    await base.SeedDatabaseAsync(serviceProvider);
 
-    var normalizer = new UpperInvariantLookupNormalizer();
+    var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
+    var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<ApplicationDbContext>();
 
-    var role = Roles.Find(AppGuids.Role.CalendarManager);
+    var role = await Roles.FindAsync(AppGuids.Role.CalendarManager);
     if (role == null)
     {
         role = new ApplicationRole
@@ -164,10 +166,11 @@ public override void SeedDatabase()
             NormalizedName = normalizer.NormalizeName(nameof(AppGuids.Role.CalendarManager))
         }.SetClaims(AppClaims.Calendar.DefinedClaims);
 
-        Roles.Add(role);
+        await Roles.AddAsync(role);
+        logger.LogInformation($"{nameof(ApplicationRole)} '{role.Name}' has been created.");
     }
 
-    var user = Users.Find(AppGuids.User.CalendarGuy);
+    var user = await Users.FindAsync(AppGuids.User.CalendarGuy);
     if (user == null)
     {
         var email = "CalendarGuy@company.com";
@@ -177,127 +180,30 @@ public override void SeedDatabase()
             Id = AppGuids.User.CalendarGuy,
             Email = email,
             EmailConfirmed = true,
-            LockoutEnabled = true,
+            LockoutEnabled = false,
             NormalizedEmail = normalizer.NormalizeEmail(email),
             NormalizedUserName = normalizer.NormalizeName(email),
             PasswordHash = "<hash-of-calendar-guys-password>",
             UserName = email
         }.SetClaims(new[] { role.Name });
 
-        Users.Add(user);
+        await Users.AddAsync(user);
+        logger.LogInformation($"{nameof(ApplicationUser)} '{user.Email}' has been created.");
     }
-
-    SaveChanges();
-}
-```
-
-#### Add database initializer class
-
-This sample class ensures the database is created and all migrations have been run. It then calls the 
-`SeedDatabase` method of the DbContext:
-
-```csharp
-public static class DbInitializer
-{
-    public static void InitializeDatabase(IServiceProvider services)
-    {
-        var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(DbInitializer));
-        var dbContext = services.GetRequiredService<ApplicationDbContext>();
-
-        try
-        {
-            dbContext.Database.Migrate();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Database.Migrate() failed.");
-            throw;
-        }
-
-        try
-        {
-            dbContext.SeedDatabase();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "SeedDatabase() failed.");
-            throw;
-        }
-    }
-}
-```
-
-#### Call database initializer class during application startup
-
-Replace the code in the Main method of Program.cs with the code shown below (change the names in the `try` block 
-to match the class you created in the previous step as necessary):
-
-```csharp
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var host = CreateHostBuilder(args).Build();
-
-        using (var scope = host.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-
-            try
-            {
-                DbInitializer.InitializeDatabase(services);
-            }
-            catch (Exception ex)
-            {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred initializing the DB.");
-            }
-        }
-
-        host.Run();
-    }
-
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            });
-}
-```
-
-In the case of .Net 6.0, the code goes after the `builder.Build()` statement in Program.cs:
-
-```csharp
-var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
 
     try
     {
-        DbInitializer.InitializeDatabase(services);
+        await SaveChangesAsync();
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred initializing the DB.");
+        logger.LogError(ex, "SaveChangesAsync() method failed.");
     }
 }
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
 ```
 
+
 At this point you should still be able build your project and log in.
-
-_**Note:**_ The first time your application is run, the database will be seeded with the `Administrator` Role 
-and User account. The initial value for the Administrator's password is **"Administrat0r!"**. If the Administrator 
-User account is deleted, it will be restored the next time the application is restarted. 
-_**When this occurs, the Administrator's password will revert to its initial value.**_
-
-_**Always be sure to change the Administrator's initial password in a production environment.**_
 
 Now that your Roles and Users are configured, it's time to 
 [add authorization checks to your application code](Enforcing-Authorization.md).

@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CRFricke.EF.Core.Utilities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.Data
 {
@@ -36,7 +40,7 @@ namespace CRFricke.Authorization.Core.Data
     /// </summary>
     /// <typeparam name="TUser">The <see cref="Type"/> of user objects.</typeparam>
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects.</typeparam>
-    public abstract class AuthDbContext<TUser, TRole> : IdentityDbContext<TUser, TRole, string>, IRepository<TUser, TRole>
+    public abstract class AuthDbContext<TUser, TRole> : IdentityDbContext<TUser, TRole, string>, IRepository<TUser, TRole>, ISeedingContext
         where TUser : AuthUser, new()
         where TRole : AuthRole, new()
     {
@@ -85,14 +89,13 @@ namespace CRFricke.Authorization.Core.Data
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
-        /// <summary>
-        /// Called to seed the database.
-        /// </summary>
-        public virtual void SeedDatabase()
+        /// <inheritdoc/>
+        public virtual async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
         {
-            var normalizer = new UpperInvariantLookupNormalizer();
+            var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
+            var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthDbContext>();
 
-            var role = Roles.Find(SysGuids.Role.Administrator);
+            var role = await Roles.FindAsync(SysGuids.Role.Administrator);
             if (role == null)
             {
                 role = new TRole
@@ -102,10 +105,11 @@ namespace CRFricke.Authorization.Core.Data
                     NormalizedName = normalizer.NormalizeName(nameof(SysGuids.Role.Administrator))
                 };
 
-                Roles.Add(role);
+                await Roles.AddAsync(role);
+                logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' has been created.");
             }
 
-            var user = Users.Find(SysGuids.User.Administrator);
+            var user = await Users.FindAsync(SysGuids.User.Administrator);
             if (user == null)
             {
                 var email = "Admin@company.com";
@@ -123,10 +127,18 @@ namespace CRFricke.Authorization.Core.Data
                 };
                 ((AuthUser)user).SetClaims(role.Name);
 
-                Users.Add(user);
+                await Users.AddAsync(user);
+                logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' has been created.");
             }
 
-            SaveChanges();
+            try
+            {
+                await SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "SaveChangesAsync() method failed.");
+            }
         }
     }
 }

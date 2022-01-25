@@ -1,4 +1,4 @@
-﻿using CRFricke.Authorization.Core.UI.Data;
+﻿using Authorization.Core.UI.Test.Web.Data;
 using System;
 
 namespace Authorization.Core.UI.Tests.Integration.Models
@@ -11,9 +11,9 @@ namespace Authorization.Core.UI.Tests.Integration.Models
 
         public string Description { get; set; }
 
-        internal AuthUiRole ToRole()
+        internal ApplicationRole ToRole()
         {
-            return new AuthUiRole
+            return new ApplicationRole
             {
                 Id = Id ?? Guid.NewGuid().ToString(),
                 Name = Name,
@@ -21,7 +21,7 @@ namespace Authorization.Core.UI.Tests.Integration.Models
             };
         }
 
-        internal static RoleModel CreateFrom(AuthUiRole role)
+        internal static RoleModel CreateFrom(ApplicationRole role)
         {
             return new RoleModel
             {

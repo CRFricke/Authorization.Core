@@ -3,7 +3,6 @@ using Authorization.Core.UI.Test.Web.Data;
 using Authorization.Core.UI.Tests.Integration.Extensions;
 using Authorization.Core.UI.Tests.Integration.Pages;
 using CRFricke.Authorization.Core;
-using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -26,8 +25,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
         internal const string AppUserEmail = "AppUser@company.com";
         internal const string AppUserPassword = "AppUserP@ssw0rd!";
 
-        private readonly SqliteConnection _connection
-            = new SqliteConnection($"DataSource=:memory:");
+        private readonly SqliteConnection _connection = new SqliteConnection($"DataSource=:memory:");
 
         public WebAppFactory()
         {
@@ -74,25 +72,21 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
 
         public void EnsureDatabaseCreated(IServiceProvider services)
         {
-            using (var scope = services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                dbContext.Database.EnsureCreated();
-                SeedDatabase(dbContext);
-            }
+            using var scope = services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            dbContext.Database.EnsureCreated();
+            SeedDatabase(dbContext);
         }
 
         private void SeedDatabase(ApplicationDbContext dbContext)
         {
-            dbContext.SeedDatabase();
-
             var role = dbContext.Roles
                 .Where(ar => ar.Id == AppRoleId)
                 .AsNoTracking()
                 .FirstOrDefault();
             if (role == null)
             {
-                role = new AuthUiRole { Id = AppRoleId, Name = "AppRole" };
+                role = new ApplicationRole { Id = AppRoleId, Name = "AppRole" };
                 dbContext.Roles.Add(role);
                 dbContext.SaveChanges();
             }
@@ -109,12 +103,12 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
             }
         }
 
-        private static AuthUiUser InitializeAppUser(AuthUiRole role)
+        private static ApplicationUser InitializeAppUser(ApplicationRole role)
         {
-            var hasher = new PasswordHasher<AuthUiUser>();
+            var hasher = new PasswordHasher<ApplicationUser>();
             var normalizer = new UpperInvariantLookupNormalizer();
 
-            AuthUiUser user = new AuthUiUser
+            ApplicationUser user = new ApplicationUser
             {
                 Id = AppUserId,
                 Email = AppUserEmail,
