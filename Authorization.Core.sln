@@ -21,6 +21,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".assets", ".assets", "{FA413BEC-27EE-4E32-AF25-54DB50BE0859}"
 	ProjectSection(SolutionItems) = preProject
 		assets\icon.png = assets\icon.png
+		assets\Role-Create-Page.png = assets\Role-Create-Page.png
+		assets\Role-Delete-Page.png = assets\Role-Delete-Page.png
+		assets\Role-Details-Page.png = assets\Role-Details-Page.png
+		assets\Role-Edit-Page.png = assets\Role-Edit-Page.png
+		assets\Role-Management-Page.png = assets\Role-Management-Page.png
+		assets\User-Create-Page.png = assets\User-Create-Page.png
+		assets\User-Delete-Page.png = assets\User-Delete-Page.png
+		assets\User-Details-Page.png = assets\User-Details-Page.png
+		assets\User-Edit-Page.png = assets\User-Edit-Page.png
+		assets\User-Management-Page.png = assets\User-Management-Page.png
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{31E52A25-70A5-4FA7-8E87-02AA511DB5BC}"
@@ -44,6 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{317DF210-7
 		docs\Enforcing-Authorization.md = docs\Enforcing-Authorization.md
 		docs\Install-Core-Package.md = docs\Install-Core-Package.md
 		docs\Install-UI-Package.md = docs\Install-UI-Package.md
+		docs\UI-Role-Management-Page.md = docs\UI-Role-Management-Page.md
+		docs\UI-User-Management-Page.md = docs\UI-User-Management-Page.md
 	EndProjectSection
 EndProject
 Global
