@@ -63,7 +63,9 @@ must be `AuthUser` (or the name of your derived class; in this case, `Applicatio
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
 
-- Chain an `AddAccessRightBasedAuthorization` clause to the `AddDefaultIdentity` statement.
+- If you extended the `AuthRole` class, chain an `AddRoles` clause with the name of the new class 
+  to the `AddDefaultIdentity` statement.
+- Chain an `AddAccessRightBasedAuthorization` clause to the `AddEntityFrameworkStores` clause.
 - Change any `IdentityUser` class references to `AuthUser` (or the name of your derived class).
 
 ```csharp
@@ -71,8 +73,9 @@ must be `AuthUser` (or the name of your derived class; in this case, `Applicatio
       options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
       );
    services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+      .AddRoles<ApplicationRole>()
       .AddEntityFrameworkStores<ApplicationDbContext>()
-      .AddAccessRightBasedAuthorization<ApplicationDbContext>();
+      .AddAccessRightBasedAuthorization();
 ``` 
 
 At this point you should be able build your project and still be able to log in.

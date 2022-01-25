@@ -85,7 +85,9 @@ _Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the e
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
 
-- Chain an `AddAccessRightBasedAuthorization` clause to the `AddDefaultIdentity` statement.
+- If you extended the `AuthUiRole` class, chain an `AddRoles` clause with the name of the new class 
+  to the `AddDefaultIdentity` statement.
+- Chain an `AddAccessRightBasedAuthorization` clause to the `AddEntityFrameworkStores` clause.
 - Chain an `AddAuthorizationCoreUI` clause to the AddAccessRightBasedAuthorization clause.
     - You can specify an alternate area name for the pages exposed by the UI package by specifying the 
     desired name in the `AuthCoreUIOptions.FriendlyAreaName` property (shown below). If a value is 
@@ -97,8 +99,9 @@ _Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the e
       options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
       );
    services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+      .AddRoles<ApplicationRole>()
       .AddEntityFrameworkStores<ApplicationDbContext>()
-      .AddAccessRightBasedAuthorization<ApplicationDbContext>()
+      .AddAccessRightBasedAuthorization()
       .AddAuthorizationCoreUI(options => options.FriendlyAreaName = "Admin");
 ``` 
 
