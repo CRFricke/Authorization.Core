@@ -20,10 +20,10 @@ The following links are available on this page:
 
   |**Link**|**Action**|
   |---|---|
-  |Create New| Displays Create Role page which is used to configure a new Role.|
-  |Edit|Displays Edit Role page which is used to edit the associated Role.|
-  |Details|Displays Role Details page which is used to view the details of the associated Role.|
-  |Delete|Displays Delete Role page which can be used to delete the associated Role.|
+  |Create New| Displays the Create Role page which is used to configure a new Role.|
+  |Edit|Displays the Edit Role page which is used to edit the associated Role.|
+  |Details|Displays the Role Details page which is used to view the details of the associated Role.|
+  |Delete|Displays the Delete Role page which can be used to delete the associated Role.|
 
 &nbsp;
 ![Role Management Page](../assets/Role-Management-Page.png)
