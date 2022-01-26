@@ -62,7 +62,7 @@ Management page.
 
 ## Delete User Page
 
-The Delete User page is used to delete the selected User. In addition to the User's personal information,  
+The Delete User page is used to delete the selected User. In addition to the User's personal information, 
 the page lists any Roles that are assigned to the User.
 
 The page will not allow a system User to be deleted (a warning message is displayed and the Delete button 
