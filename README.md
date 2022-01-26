@@ -23,9 +23,9 @@ provide similar functionality for your application.
 If you will be installing the Authorization.Core.UI package, you can skip ahead to the next section. 
 Otherwise, you can use the following steps to install and configure the Core package.
 
-1.   [Install the Authorization.Core package](docs/Install-Core-Package.md)
-2.   [Configure your Roles and Users](docs/Configure-Core-Roles-and-Users.md)
-3.   [Testing and Enforcing Authorization](docs/Enforcing-Authorization.md)
+1. [Install the Authorization.Core package](docs/Install-Core-Package.md)
+2. [Configure your Roles and Users](docs/Configure-Core-Roles-and-Users.md)
+3. [Testing and Enforcing Authorization](docs/Enforcing-Authorization.md)
 
 ## The Authorization.Core.UI Package
 
@@ -37,5 +37,11 @@ classes that derive from `AuthDbContext` and `AuthDbContext<TUser, TRole>` respe
 
 The following steps can be used to install and configure the package.
 
-1.   [Installing the Authorization.Core.UI package](docs/Install-UI-Package.md)
-2.   [Configure your Roles and Users](docs/Configure-UI-Roles-and-Users.md)
+1. [Installing the Authorization.Core.UI package](docs/Install-UI-Package.md)
+2. [Configure your Roles and Users](docs/Configure-UI-Roles-and-Users.md)
+3. [Testing and Enforcing Authorization](docs/Enforcing-Authorization.md)
+
+The following sections describe the UI package's management pages.
+
+- [Role Management Pages](docs/UI-Role-Management-Page.md)
+- [User Management Pages](docs/UI-User-Management-Page.md)
