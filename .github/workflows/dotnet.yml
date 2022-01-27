@@ -11,6 +11,9 @@ on:
     paths-ignore: ['**/*.md']
     tags: ['v*']
 
+  release:
+    types: [published]
+
 jobs:
   build:
 
@@ -58,6 +61,10 @@ jobs:
       if: ${{github.ref_type == 'tag'}}
       run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
-    - name: Upload NuGet packages
+    - name: Upload NuGet packages to GitHub
       if: ${{github.ref_type == 'tag'}}
       run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload packages to NuGet.org
+      if: ${{github.event_name == 'release'}}
+      run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
