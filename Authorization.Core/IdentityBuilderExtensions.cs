@@ -80,9 +80,9 @@ namespace CRFricke.Authorization.Core
         /// <returns>
         /// <em>true</em>, if the <see cref="Type"/> derives from the base Type; otherwise, <em>false</em>.
         /// </returns>
-        private static bool TypeDerivesFrom(Type type, Type baseType)
+        private static bool TypeDerivesFrom(Type? type, Type baseType)
         {
-            do
+            while (type != null)
             {
                 if (type.Name == baseType.Name)
                 {
@@ -101,7 +101,7 @@ namespace CRFricke.Authorization.Core
                 }
 
                 type = type.BaseType;
-            } while (type != null);
+            };
 
             return false;
         }

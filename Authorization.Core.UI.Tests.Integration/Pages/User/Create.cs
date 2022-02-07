@@ -2,6 +2,7 @@
 using Authorization.Core.UI.Tests.Integration.Extensions;
 using Authorization.Core.UI.Tests.Integration.Infrastructure;
 using Authorization.Core.UI.Tests.Integration.Models;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.User
 
         internal async Task<Index> ClickCreateButtonAsync(UserModel userModel)
         {
-            return await ClickCreateButtonAsync(userModel, new string[] { });
+            return await ClickCreateButtonAsync(userModel, Array.Empty<string>());
         }
 
         internal async Task<Index> ClickCreateButtonAsync(UserModel userModel, params string[] roleNames)
@@ -52,7 +53,7 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.User
             return new Index(Client, document, Context);
         }
 
-        private Dictionary<string, string> FillCreateForm(UserModel userModel, string[] roleNames)
+        private static Dictionary<string, string> FillCreateForm(UserModel userModel, string[] roleNames)
         {
             return new Dictionary<string, string>()
             {

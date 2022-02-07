@@ -20,7 +20,7 @@ namespace CRFricke.Authorization.Core
             /// <summary>
             /// Returns a list of all GUIDs defined for Role entities.
             /// </summary>
-            public static readonly List<string> DefinedGuids = new List<string>
+            public static readonly List<string> DefinedGuids = new()
             {
                 Administrator
             };
@@ -42,7 +42,7 @@ namespace CRFricke.Authorization.Core
             /// <summary>
             /// Returns a list of all GUIDs defined for User entities.
             /// </summary>
-            public static readonly List<string> DefinedGuids = new List<string>
+            public static readonly List<string> DefinedGuids = new()
             {
                 Administrator
             };

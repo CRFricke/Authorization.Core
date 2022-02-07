@@ -26,7 +26,7 @@ namespace Authorization.Core.UI.Test.Web
             /// <summary>
             /// Returns a list of all GUIDs defined for role entities.
             /// </summary>
-            public static readonly List<string> DefinedGuids = new List<string>
+            public static readonly List<string> DefinedGuids = new()
             {
                 CalendarManager, DocumentManager
             };
@@ -53,7 +53,7 @@ namespace Authorization.Core.UI.Test.Web
             /// <summary>
             /// Returns a list of all GUIDs defined for user entities.
             /// </summary>
-            public static readonly List<string> DefinedGuids = new List<string>
+            public static readonly List<string> DefinedGuids = new()
             {
                 CalendarGuy, DocumentGuy
             };

@@ -670,11 +670,13 @@ namespace Authorization.Core.UI.Tests
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
             );
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
                 db.UserClaims == new IdentityUserClaim<string>[] { }.AsQueryable().BuildMockDbSet().Object &&
                 db.Users == new ApplicationUser[] { }.AsQueryable().BuildMockDbSet().Object
                 );
+#pragma warning restore CA2012 // Use ValueTasks correctly
 
             var logger = new TestLogger<DeleteModel>();
 
@@ -758,8 +760,8 @@ namespace Authorization.Core.UI.Tests
         {
             var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            var dbsUserClaims = new IdentityUserClaim<string>[0].AsQueryable().BuildMockDbSet().Object;
-            var dbsUsers = new ApplicationUser[0].AsQueryable().BuildMockDbSet().Object;
+            var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
+            var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
 
             var authManager = new Mock<IAuthorizationManager>();
             authManager
@@ -767,6 +769,7 @@ namespace Authorization.Core.UI.Tests
                 .Returns(Task.FromResult(AuthorizationResult.Success()));
             authManager.Setup(am => am.RefreshRole(role.Id));
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
                 db.UserClaims == dbsUserClaims &&
@@ -774,6 +777,7 @@ namespace Authorization.Core.UI.Tests
                 db.Roles.Remove(It.IsAny<ApplicationRole>()) == null &&
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
+#pragma warning restore CA2012 // Use ValueTasks correctly
 
             var logger = new TestLogger<DeleteModel>();
 
@@ -798,8 +802,8 @@ namespace Authorization.Core.UI.Tests
 
             var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            var dbsUserClaims = new IdentityUserClaim<string>[0].AsQueryable().BuildMockDbSet().Object;
-            var dbsUsers = new ApplicationUser[0].AsQueryable().BuildMockDbSet().Object;
+            var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
+            var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
 
             var authManager = new Mock<IAuthorizationManager>();
             authManager
@@ -919,6 +923,7 @@ namespace Authorization.Core.UI.Tests
                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
                 db.UserClaims == new IdentityUserClaim<string>[0].AsQueryable().BuildMockDbSet().Object &&
@@ -926,6 +931,7 @@ namespace Authorization.Core.UI.Tests
                 db.Roles.Remove(role) == null &&
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
+#pragma warning restore CA2012 // Use ValueTasks correctly
 
             var logger = new TestLogger<DeleteModel>();
 

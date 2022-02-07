@@ -23,7 +23,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="claimValue">The claim value.</param>
         /// <returns>A new IdentityRoleClaim with the specified values.</returns>
         public static IdentityRoleClaim<string> CreateRoleClaim(string roleId, string claimValue)
-            => new IdentityRoleClaim<string> { RoleId = roleId, ClaimType = ClaimType, ClaimValue = claimValue };
+            => new() { RoleId = roleId, ClaimType = ClaimType, ClaimValue = claimValue };
 
         /// <summary>
         /// Creates a new IdentityUserClaim using the specified User ID and claim value.
@@ -32,7 +32,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="claimValue">The claim value.</param>
         /// <returns>A new IdentityUserClaim with the specified values.</returns>
         public static IdentityUserClaim<string> CreateUserClaim(string userId, string claimValue)
-            => new IdentityUserClaim<string> { UserId = userId, ClaimType = ClaimTypes.Role, ClaimValue = claimValue };
+            => new() { UserId = userId, ClaimType = ClaimTypes.Role, ClaimValue = claimValue };
 
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace CRFricke.Authorization.Core
             /// <summary>
             /// Returns a list of all Claims defined for Role entities.
             /// </summary>
-            public static readonly List<string> DefinedClaims = new List<string>
+            public static readonly List<string> DefinedClaims = new()
             {
                 Create, Delete, Read, Update, List, UpdateClaims
             };
@@ -124,7 +124,7 @@ namespace CRFricke.Authorization.Core
             /// <summary>
             /// Returns a list of all Claims defined for User entities.
             /// </summary>
-            public static readonly List<string> DefinedClaims = new List<string>
+            public static readonly List<string> DefinedClaims = new()
             {
                 Create, Delete, Read, Update, List, UpdateClaims
             };

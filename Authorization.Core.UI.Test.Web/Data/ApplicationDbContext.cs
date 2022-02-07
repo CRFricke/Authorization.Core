@@ -31,7 +31,9 @@ namespace Authorization.Core.UI.Test.Web.Data
             base.OnModelCreating(builder);
         }
 
+
         /// <inheritdoc/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
         {
             await base.SeedDatabaseAsync(serviceProvider);

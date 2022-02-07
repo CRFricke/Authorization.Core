@@ -25,7 +25,7 @@ namespace CRFricke.Authorization.Core.UI
             /// <summary>
             /// Returns a list of all GUIDs defined for Role entities.
             /// </summary>
-            public static readonly List<string> DefinedGuids = new List<string>
+            public static readonly List<string> DefinedGuids = new()
             {
                 RoleManager, UserManager
             };

@@ -49,11 +49,12 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
             return Page();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfClaimList)
         {
             RoleModel.InitRoleClaims(_authManager)
                 .SetAssignedClaims(
-                    hfClaimList?.Split(',') ?? new string[0]
+                    hfClaimList?.Split(',') ?? Array.Empty<string>()
                     );
 
             if (!ModelState.IsValid)
@@ -100,7 +101,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
 
         }
 
-        private TRole CreateRole(RoleModel model)
+        private static TRole CreateRole(RoleModel model)
         {
             var normalizer = new UpperInvariantLookupNormalizer();
 

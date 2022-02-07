@@ -24,7 +24,7 @@ namespace CRFricke.Authorization.Core
         {
             AuthorizationResult result;
 
-            if (!(resource is IRequiresAuthorization))
+            if (resource is not IRequiresAuthorization)
             {
                 result = await _authorizationManager.AuthorizeAsync(context.User, requirement);
                 if (result.Succeeded)

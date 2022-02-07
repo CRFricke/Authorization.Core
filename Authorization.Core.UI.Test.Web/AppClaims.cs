@@ -36,7 +36,7 @@ namespace Authorization.Core.UI.Test.Web
             /// <summary>
             /// Returns a list of all Claims defined for Bulletin entities.
             /// </summary>
-            public static readonly List<string> DefinedClaims = new List<string>
+            public static readonly List<string> DefinedClaims = new()
             {
                 Upload, Delete, Read, List
             };
@@ -78,7 +78,7 @@ namespace Authorization.Core.UI.Test.Web
             /// <summary>
             /// Returns a list of all Claims defined for Calendar entities.
             /// </summary>
-            public static readonly List<string> DefinedClaims = new List<string>
+            public static readonly List<string> DefinedClaims = new()
             {
                 Create, Delete, Read, Update, List
             };
@@ -115,7 +115,7 @@ namespace Authorization.Core.UI.Test.Web
             /// <summary>
             /// Returns a list of all Claims defined for Document entities.
             /// </summary>
-            public static readonly List<string> DefinedClaims = new List<string>
+            public static readonly List<string> DefinedClaims = new()
             {
                 Upload, Delete, Read, List
             };
@@ -157,7 +157,7 @@ namespace Authorization.Core.UI.Test.Web
             /// <summary>
             /// Returns a list of all Claims defined for News entities.
             /// </summary>
-            public static readonly List<string> DefinedClaims = new List<string>
+            public static readonly List<string> DefinedClaims = new()
             {
                 Create, Delete, Read, Update, List
             };

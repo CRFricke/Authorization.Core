@@ -14,7 +14,7 @@ namespace Authorization.Core.UI.Tests
         /// </summary>
         /// <param name="role">The <see cref="ApplicationRole"/> object to be used to initialize the <see cref="RoleModel"/>.</param>
         /// <returns>The new <see cref="RoleModel"/> object.</returns>
-        internal RoleModel CreateModelFromRole(ApplicationRole role)
+        internal static RoleModel CreateModelFromRole(ApplicationRole role)
         {
             return new RoleModel { Id = role.Id, Description = role.Description, Name = role.Name };
         }
@@ -24,7 +24,7 @@ namespace Authorization.Core.UI.Tests
         /// </summary>
         /// <param name="role">The <see cref="ApplicationUser"/> object to be used to initialize the <see cref="UserModel"/>.</param>
         /// <returns>The new <see cref="UserModel"/> object.</returns>
-        internal UserModel CreateModelFromUser(ApplicationUser user)
+        internal static UserModel CreateModelFromUser(ApplicationUser user)
         {
             return new UserModel {
                 Id = user.Id, AccessFailedCount = user.AccessFailedCount, Email = user.Email, EmailConfirmed = user.EmailConfirmed,
@@ -37,7 +37,7 @@ namespace Authorization.Core.UI.Tests
         /// Returns the list of defined claims.
         /// </summary>
         /// <returns>The list of defined claims.</returns>
-        internal List<string> GetDefinedClaims()
+        internal static List<string> GetDefinedClaims()
         {
             return new List<string>
             {
@@ -50,7 +50,7 @@ namespace Authorization.Core.UI.Tests
         /// Returns the list of defined Guids.
         /// </summary>
         /// <returns>The list of defined Guids.</returns>
-        internal List<string> GetDefinedGuids()
+        internal static List<string> GetDefinedGuids()
         {
             return new List<string>
             {

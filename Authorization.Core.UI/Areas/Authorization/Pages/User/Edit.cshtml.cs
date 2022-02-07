@@ -69,10 +69,11 @@ namespace CRFricke.Authorization.Core.UI.Pages.User
             return Page();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfRoleList)
         {
             (await UserModel.InitRoleInfoAsync(_repository))
-                .SetAssignedClaims(hfRoleList?.Split(',') ?? new string[0]);
+                .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
 
             if (!ModelState.IsValid)
             {
