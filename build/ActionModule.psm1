@@ -61,17 +61,17 @@ function Get-VersionVariables {
 
     if ($Major -eq $null)
     {
-        throw "Error: `$Major variable could not be set. (Is VER_MAJOR_DEFAULT environment variable specified?)"
+        throw "Error: `$Major variable could not be set. (Is Version.Major specified in ConfigSettings.json?)"
     }
 
     if ($Minor -eq $null)
     {
-        throw "Error: `$Minor variable could not be set. (Is VER_MINOR_DEFAULT environment variable specified?)"
+        throw "Error: `$Minor variable could not be set. (Is Version.Minor specified in ConfigSettings.json?)"
     }
 
     if ($Patch -eq $null)
     {
-        throw "Error: `$Patch variable could not be set. (Is VER_PATCH_DEFAULT environment variable specified?)"
+        throw "Error: `$Patch variable could not be set. (Is Version.Patch specified in ConfigSettings.json?)"
     }
 
     Enter-ActionOutputGroup "Dump Get-VersionVariables Output Variables"
