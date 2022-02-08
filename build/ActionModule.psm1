@@ -19,6 +19,19 @@ function Get-VersionVariables {
 
     Write-Host "`$VersionString: '$VersionString'"
 
+	$configPath = $PSScriptRoot + "\ConfigSettings.json"
+	if (-Not (Test-Path $configPath))
+	{
+		throw "Error: Config file '$configPath' not found!";
+	}
+
+	$configSettings = Get-Content -Raw -Path $configPath | ConvertFrom-Json
+
+	if (-Not $configSettings.Version)
+	{
+		Throw "Version section not found in 'ConfigSettings.json' file!";
+	}
+
     if ($env:GITHUB_REF_TYPE -eq 'tag')
     {
         # Parse via regex
@@ -27,9 +40,9 @@ function Get-VersionVariables {
 
     if (!$matches)
     {
-        $Major = $env:VER_MAJOR_DEFAULT
-        $Minor = $env:VER_MINOR_DEFAULT
-        $Patch = $env:VER_PATCH_DEFAULT
+        $Major = $configSettings.Version.Major
+        $Minor = $configSettings.Version.Minor
+        $Patch = $configSettings.Version.Patch
         $PreRelease = "build"
     }
     else
@@ -48,17 +61,17 @@ function Get-VersionVariables {
 
     if ($Major -eq $null)
     {
-        throw "Error: `$Major variable could not be set. (Is VER_MAJOR_DEFAULT environment variable specified?)"
+        throw "Error: `$Major variable could not be set. (Is Version.Major specified in ConfigSettings.json?)"
     }
 
     if ($Minor -eq $null)
     {
-        throw "Error: `$Minor variable could not be set. (Is VER_MINOR_DEFAULT environment variable specified?)"
+        throw "Error: `$Minor variable could not be set. (Is Version.Minor specified in ConfigSettings.json?)"
     }
 
     if ($Patch -eq $null)
     {
-        throw "Error: `$Patch variable could not be set. (Is VER_PATCH_DEFAULT environment variable specified?)"
+        throw "Error: `$Patch variable could not be set. (Is Version.Patch specified in ConfigSettings.json?)"
     }
 
     Enter-ActionOutputGroup "Dump Get-VersionVariables Output Variables"
