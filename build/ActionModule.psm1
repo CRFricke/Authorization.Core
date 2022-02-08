@@ -19,6 +19,19 @@ function Get-VersionVariables {
 
     Write-Host "`$VersionString: '$VersionString'"
 
+	$configPath = $PSScriptRoot + "\ConfigSettings.json"
+	if (-Not (Test-Path $configPath))
+	{
+		throw "Error: Config file '$configPath' not found!";
+	}
+
+	$configSettings = Get-Content -Raw -Path $configPath | ConvertFrom-Json
+
+	if (-Not $configSettings.Version)
+	{
+		throw "Error: Version section not found in 'ConfigSettings.json' file!";
+	}
+
     if ($env:GITHUB_REF_TYPE -eq 'tag')
     {
         # Parse via regex
@@ -27,9 +40,9 @@ function Get-VersionVariables {
 
     if (!$matches)
     {
-        $Major = $env:VER_MAJOR_DEFAULT
-        $Minor = $env:VER_MINOR_DEFAULT
-        $Patch = $env:VER_PATCH_DEFAULT
+        $Major = $configSettings.Version.Major
+        $Minor = $configSettings.Version.Minor
+        $Patch = $configSettings.Version.Patch
         $PreRelease = "build"
     }
     else
