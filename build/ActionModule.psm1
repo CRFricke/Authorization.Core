@@ -22,14 +22,14 @@ function Get-VersionVariables {
 	$configPath = $PSScriptRoot + "\ConfigSettings.json"
 	if (-Not (Test-Path $configPath))
 	{
-		throw "Error: Config file '$configPath' not found!";
+		throw "Config file '$configPath' not found!";
 	}
 
 	$configSettings = Get-Content -Raw -Path $configPath | ConvertFrom-Json
 
 	if (-Not $configSettings.Version)
 	{
-		Throw "Version section not found in 'ConfigSettings.json' file!";
+		throw "Version section not found in 'ConfigSettings.json' file!";
 	}
 
     if ($env:GITHUB_REF_TYPE -eq 'tag')
@@ -61,20 +61,29 @@ function Get-VersionVariables {
 
     if ($Major -eq $null)
     {
-        throw "Error: `$Major variable could not be set. (Is Version.Major specified in ConfigSettings.json?)"
+        throw "`$Major variable could not be set. (Is Version.Major specified in ConfigSettings.json?)"
     }
 
     if ($Minor -eq $null)
     {
-        throw "Error: `$Minor variable could not be set. (Is Version.Minor specified in ConfigSettings.json?)"
+        throw "`$Minor variable could not be set. (Is Version.Minor specified in ConfigSettings.json?)"
     }
 
     if ($Patch -eq $null)
     {
-        throw "Error: `$Patch variable could not be set. (Is Version.Patch specified in ConfigSettings.json?)"
+        throw "`$Patch variable could not be set. (Is Version.Patch specified in ConfigSettings.json?)"
     }
 
-    Enter-ActionOutputGroup "Dump Get-VersionVariables Output Variables"
+    if ($env:GITHUB_REF_TYPE -eq 'tag')
+	{
+		If ( ($Major -ne $configSettings.Version.Major) -or ($Minor -ne $configSettings.Version.Minor) -or ($Patch -ne $configSettings.Version.Patch) )
+		{
+			$configValues = $configSettings.Version.Major.ToString() + "." + $configSettings.Version.Minor.ToString() + "." + $configSettings.Version.Patch.ToString()
+			throw "Specified Git tag does not match Version values in config file ($configValues). Are you pushing to correct branch?"
+		}
+	}
+
+    Enter-ActionOutputGroup "Dump Output Variables"
 
     Write-Host "`$Tag_Major: $Major"
     $env:TAG_MAJOR = $Major
