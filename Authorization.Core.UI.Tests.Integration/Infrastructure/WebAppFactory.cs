@@ -25,7 +25,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
         internal const string AppUserEmail = "AppUser@company.com";
         internal const string AppUserPassword = "AppUserP@ssw0rd!";
 
-        private readonly SqliteConnection _connection = new SqliteConnection($"DataSource=:memory:");
+        private readonly SqliteConnection _connection = new($"DataSource=:memory:");
 
         public WebAppFactory()
         {
@@ -70,7 +70,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
             return result;
         }
 
-        public void EnsureDatabaseCreated(IServiceProvider services)
+        public static void EnsureDatabaseCreated(IServiceProvider services)
         {
             using var scope = services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -78,7 +78,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
             SeedDatabase(dbContext);
         }
 
-        private void SeedDatabase(ApplicationDbContext dbContext)
+        private static void SeedDatabase(ApplicationDbContext dbContext)
         {
             var role = dbContext.Roles
                 .Where(ar => ar.Id == AppRoleId)
@@ -108,7 +108,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
             var hasher = new PasswordHasher<ApplicationUser>();
             var normalizer = new UpperInvariantLookupNormalizer();
 
-            ApplicationUser user = new ApplicationUser
+            var user = new ApplicationUser
             {
                 Id = AppUserId,
                 Email = AppUserEmail,

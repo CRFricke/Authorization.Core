@@ -26,20 +26,19 @@ namespace CRFricke.Authorization.Core
             => FallbackPolicyProvider.GetDefaultPolicyAsync();
 
         /// <inheritdoc />
-        public Task<AuthorizationPolicy> GetFallbackPolicyAsync()
+        public Task<AuthorizationPolicy?> GetFallbackPolicyAsync()
             => FallbackPolicyProvider.GetFallbackPolicyAsync();
 
         /// <inheritdoc />
-        public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+        public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
-            RequiresClaimsAttribute.TryParse(policyName, out RequiresClaimsAttribute? requiresClaimsAttribute);
-            if (requiresClaimsAttribute != null)
+            if (RequiresClaimsAttribute.TryParse(policyName, out RequiresClaimsAttribute? requiresClaimsAttribute))
             {
                 var policy = new AuthorizationPolicyBuilder();
                 policy.AddRequirements(
                     new AppClaimRequirement(requiresClaimsAttribute.ClaimValues)
                     );
-                return Task.FromResult(policy.Build());
+                return Task.FromResult((AuthorizationPolicy?)policy.Build());
             }
 
             return FallbackPolicyProvider.GetPolicyAsync(policyName);

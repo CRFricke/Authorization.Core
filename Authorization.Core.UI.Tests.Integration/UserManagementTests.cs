@@ -27,7 +27,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         public WebAppFactory WebAppFactory { get; }
 
-        private readonly UserModel TesterUserModel = new UserModel
+        private readonly UserModel TesterUserModel = new()
         {
             Id = Guid.NewGuid().ToString(),
             Email = "TestUser@company.com",

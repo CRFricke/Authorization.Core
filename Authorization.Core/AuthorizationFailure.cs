@@ -65,7 +65,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">The claims that prevented authorization.</param>
         /// <returns>A new <see cref="AuthorizationFailure"/> object with a failure reason of "NotAuthorized".</returns>
         public static AuthorizationFailure NotAuthorized(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationFailure() { FailureReason = Reason.NotAuthorized, FailingClaims = failingClaims?.ToArray() };
+            => new() { FailureReason = Reason.NotAuthorized, FailingClaims = failingClaims?.ToArray() };
 
         /// <summary>
         /// Returns a new <see cref="AuthorizationFailure"/> object with a failure reason of "Elevation".
@@ -73,7 +73,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">The claims that prevented authorization.</param>
         /// <returns>A new <see cref="AuthorizationFailure"/> object with a failure reason of "Elevation".</returns>
         public static AuthorizationFailure Elevation(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationFailure() { FailureReason = Reason.Elevation, FailingClaims = failingClaims?.ToArray() };
+            => new() { FailureReason = Reason.Elevation, FailingClaims = failingClaims?.ToArray() };
 
         /// <summary>
         /// Returns a new <see cref="AuthorizationFailure"/> object with a failure reason of "NoUserId".
@@ -81,7 +81,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">The claims that prevented authorization.</param>
         /// <returns>A new <see cref="AuthorizationFailure"/> object with a failure reason of "NoUserId".</returns>
         public static AuthorizationFailure NoUserId(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationFailure() { FailureReason = Reason.NoUserId, FailingClaims = failingClaims?.ToArray() };
+            => new() { FailureReason = Reason.NoUserId, FailingClaims = failingClaims?.ToArray() };
 
         /// <summary>
         /// Returns a new <see cref="AuthorizationFailure"/> object with a failure reason of "SystemObject".
@@ -89,6 +89,6 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">The claims that prevented authorization.</param>
         /// <returns>A new <see cref="AuthorizationFailure"/> object with a failure reason of "SystemObject".</returns>
         public static AuthorizationFailure SystemObject(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationFailure() { FailureReason = Reason.SystemObject, FailingClaims = failingClaims?.ToArray() };
+            => new() { FailureReason = Reason.SystemObject, FailingClaims = failingClaims?.ToArray() };
     }
 }

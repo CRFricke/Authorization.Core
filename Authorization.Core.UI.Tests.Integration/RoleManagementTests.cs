@@ -27,7 +27,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         public WebAppFactory WebAppFactory { get; }
 
-        private readonly RoleModel ListerRoleModel = new RoleModel
+        private readonly RoleModel ListerRoleModel = new()
         {
             Name = "Lister",
             Description = "Can list things"
@@ -234,7 +234,7 @@ namespace Authorization.Core.UI.Tests.Integration
             var client = WebAppFactory.CreateClient();
 
             await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var edit = (await Pages.Role.Edit.CreateAsync(client, roleId)).SetClaims(new string[] { });
+            var edit = (await Pages.Role.Edit.CreateAsync(client, roleId)).SetClaims(Array.Empty<string>());
             edit = await edit.ClickSaveButtonExpectingErrorAsync();
             Assert.Contains("Can not update Role", edit.GetValidationSummaryText());
         }

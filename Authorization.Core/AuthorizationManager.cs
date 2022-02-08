@@ -21,6 +21,7 @@ namespace CRFricke.Authorization.Core
     /// </summary>
     /// <typeparam name="TUser">The <see cref="Type"/> of user objects. The Type must be or extend from <see cref="AuthUser"/>.</typeparam>
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects. The Type must be or extend from <see cref="AuthRole"/>.</typeparam>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
     public sealed class AuthorizationManager<TUser, TRole> : IAuthorizationManager
         where TUser : AuthUser
         where TRole : AuthRole
@@ -30,7 +31,7 @@ namespace CRFricke.Authorization.Core
         /// </summary>
         static AuthorizationManager()
         {
-            List<Type> classTypes = new List<Type>();
+            List<Type> classTypes = new();
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
@@ -44,7 +45,11 @@ namespace CRFricke.Authorization.Core
                     // Experienced error loading Types for 'Microsoft.EntityFrameworkCore.Relational, Version=3.1.21.0' during testing.
                     // We can probably ignore any assemblies that cause this Exception, but to be safe we'll process the Types that were successfully loaded.
 
-                    classTypes.AddRange(ex.Types.Where(t => t != null && t.IsVisible && !t.IsInterface));
+                    if (ex.Types != null)
+                    {
+                        var x = ex.Types.Where(t => t != null && t.IsVisible && !t.IsInterface).Cast<Type>();
+                        classTypes.AddRange(x);
+                    }
                 }
                 catch (NotSupportedException)
                 { 
@@ -143,8 +148,8 @@ namespace CRFricke.Authorization.Core
         /// </summary>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         internal AuthorizationManager()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <summary>
         /// Creates a new instance of the AuthorizationManager class using the specified parameters.
@@ -169,6 +174,7 @@ namespace CRFricke.Authorization.Core
         List<string> IAuthorizationManager.DefinedGuids => DefinedGuids;
 
 
+
         /// <summary>
         /// Returns an indication of whether the specified <paramref name="principal"/> meets the specified <paramref name="claimRequirement"/> 
         /// for the specified <paramref name="resource"/>.
@@ -188,14 +194,14 @@ namespace CRFricke.Authorization.Core
 
             if (principal == null) throw new ArgumentNullException(nameof(principal));
             if (claimRequirement == null) throw new ArgumentNullException(nameof(claimRequirement));
-            if (!(resource is IRequiresAuthorization raObject))
+            if (resource is not IRequiresAuthorization raObject)
                 throw new ArgumentException($"Argument does not implement {nameof(IRequiresAuthorization)} interface.", nameof(resource));
 
             var principalId = principal.UserId();
             if (principalId == null)
             {
                 _logger.LogInformation(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.Identity.Name}' - user ID is null."
+                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.UserName()}' - user ID is null."
                     );
                 return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
             }
@@ -205,9 +211,9 @@ namespace CRFricke.Authorization.Core
             {
                 // Yes - fail requests for restricted claims
                 var failedClaims = claimRequirement.ClaimValues.Intersect(RestrictedClaims);
-                if (failedClaims.Count() > 0)
+                if (failedClaims.Any())
                 {
-                    var userName = principal.Identity.Name;
+                    var userName = principal.UserName();
                     var resourceType = resource.GetType().Name;
                     var failedClaim = failedClaims.First();
 
@@ -254,7 +260,7 @@ namespace CRFricke.Authorization.Core
             if (userId == null)
             {
                 _logger.LogInformation(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.Identity.Name}' - user ID is null."
+                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.UserName()}' - user ID is null."
                     );
                 return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
             }
@@ -278,7 +284,7 @@ namespace CRFricke.Authorization.Core
             if (principalRoles.Contains(SysGuids.Role.Administrator))
             {
                 _logger.LogDebug(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" met for user '{principal.Identity.Name}' via {nameof(SysGuids.Role.Administrator)} role."
+                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" met for user '{principal.UserName()}' via {nameof(SysGuids.Role.Administrator)} role."
                     );
                 return AuthorizationResult.Success();
             }
@@ -287,7 +293,7 @@ namespace CRFricke.Authorization.Core
             if (claimRequirement.ClaimValues.IsSubsetOf(principalClaims))
             {
                 _logger.LogDebug(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" met for user '{principal.Identity.Name}'."
+                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" met for user '{principal.UserName()}'."
                     );
                 return AuthorizationResult.Success();
             }
@@ -345,7 +351,7 @@ namespace CRFricke.Authorization.Core
             }
 
             var principalClaims = await GetRoleClaimsAsync(principalRoles);
-            var roleClaims = GetRoleClaims(role);
+            var roleClaims = AuthorizationManager<TUser, TRole>.GetRoleClaims(role);
 
             if (roleClaims.IsSubsetOf(principalClaims))
             {
@@ -362,7 +368,7 @@ namespace CRFricke.Authorization.Core
         /// </summary>
         /// <param name="role">The Role whose claims are to be retrived.</param>
         /// <returns>A HashSet containing the IDs of the associated claims.</returns>
-        private HashSet<string> GetRoleClaims(TRole role)
+        private static HashSet<string> GetRoleClaims(TRole role)
         {
             return (
                 from ar in role.Claims

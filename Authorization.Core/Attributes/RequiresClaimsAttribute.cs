@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CRFricke.Authorization.Core.Attributes
 {
@@ -43,7 +44,7 @@ namespace CRFricke.Authorization.Core.Attributes
         /// <param name="policyName">The policy name string to be parsed.</param>
         /// <param name="requiresClaimsAttribute">If successful, the new RequiresClaimAttribute instance; otherwise, <code>null</code>.</param>
         /// <returns><em>true</em>, if the parse operation was successful; otherwise, <em>false</em>.</returns>
-        internal static bool TryParse(string policyName, out RequiresClaimsAttribute? requiresClaimsAttribute)
+        internal static bool TryParse(string policyName, [NotNullWhen(true)] out RequiresClaimsAttribute? requiresClaimsAttribute)
         {
             var segments = policyName.Split(PolicyDelimeter);
             if (segments.Length == 2)

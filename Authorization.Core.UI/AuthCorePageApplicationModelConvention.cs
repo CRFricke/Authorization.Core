@@ -36,7 +36,7 @@ namespace CRFricke.Authorization.Core.UI
                 .GetTypeInfo();
         }
 
-        private void ValidateType(Type template)
+        private static void ValidateType(Type template)
         {
             if (template.IsAbstract || !template.IsGenericTypeDefinition)
             {

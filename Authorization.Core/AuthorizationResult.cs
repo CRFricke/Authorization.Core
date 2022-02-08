@@ -39,7 +39,7 @@ namespace CRFricke.Authorization.Core
         /// Returns an AuthorizationResult object indicating success.
         /// </summary>
         /// <returns></returns>
-        public static AuthorizationResult Success() => new AuthorizationResult { Succeeded = true };
+        public static AuthorizationResult Success() => new() { Succeeded = true };
 
         /// <summary>
         /// Creates an AuthorizationResult object indicating an authorization failure, with a list of failing claims if applicable.
@@ -47,7 +47,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">An optional collection of the required claims which were not met.</param>
         /// <returns>An AuthorizationResult object describing the reason for the failure.</returns>
         public static AuthorizationResult Failed(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationResult { Failure = AuthorizationFailure.NotAuthorized(failingClaims) };
+            => new() { Failure = AuthorizationFailure.NotAuthorized(failingClaims) };
 
         /// <summary>
         /// Creates an AuthorizationResult object indicating an attempt to elevate privileges, with a list of the offending claims.
@@ -55,7 +55,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">A collection of the requested claims that would elevate privileges.</param>
         /// <returns>An AuthorizationResult object describing the elevation error.</returns>
         public static AuthorizationResult Elevation(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationResult { Failure = AuthorizationFailure.Elevation(failingClaims) };
+            => new() { Failure = AuthorizationFailure.Elevation(failingClaims) };
 
         /// <summary>
         /// Creates an AuthorizationResult object indicating a failure to determine the current user, with a list of the required claims.
@@ -63,7 +63,7 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">A collection of the required claims.</param>
         /// <returns>An AuthorizationResult object describing the reason for the failure.</returns>
         public static AuthorizationResult NoUserId(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationResult { Failure = AuthorizationFailure.NoUserId(failingClaims) };
+            => new() { Failure = AuthorizationFailure.NoUserId(failingClaims) };
 
         /// <summary>
         /// Creates an AuthorizationResult object indicating an invalid attempt to update a system object, with a list of the offending claims.
@@ -71,6 +71,6 @@ namespace CRFricke.Authorization.Core
         /// <param name="failingClaims">A collection of the requested claims that are privileged.</param>
         /// <returns>An AuthorizationResult object describing the reason for the failure.</returns>
         public static AuthorizationResult SystemObject(IEnumerable<string>? failingClaims = null)
-            => new AuthorizationResult { Failure = AuthorizationFailure.SystemObject(failingClaims) };
+            => new() { Failure = AuthorizationFailure.SystemObject(failingClaims) };
     }
 }

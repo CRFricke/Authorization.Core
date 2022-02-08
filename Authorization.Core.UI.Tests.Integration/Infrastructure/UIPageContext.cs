@@ -10,13 +10,13 @@
 
 
         public UIPageContext WithAuthenticatedUser() =>
-            new UIPageContext(this) { UserAuthenticated = true };
+            new(this) { UserAuthenticated = true };
 
         public UIPageContext WithAnonymousUser() =>
-            new UIPageContext(this) { UserAuthenticated = false };
+            new(this) { UserAuthenticated = false };
 
         public UIPageContext WithPasswordLogin() =>
-            new UIPageContext(this) { PasswordLoginEnabled = true };
+            new(this) { PasswordLoginEnabled = true };
 
 
         public bool PasswordLoginEnabled

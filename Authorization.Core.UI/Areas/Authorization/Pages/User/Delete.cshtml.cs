@@ -70,6 +70,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.User
             return Page();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string id)
         {
             if (id == null)

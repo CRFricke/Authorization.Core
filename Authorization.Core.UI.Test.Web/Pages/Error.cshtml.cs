@@ -16,7 +16,9 @@ namespace Authorization.Core.UI.Test.Web.Pages
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly ILogger<ErrorModel> _logger;
+#pragma warning restore IDE0052 // Remove unread private members
 
         public ErrorModel(ILogger<ErrorModel> logger)
         {
