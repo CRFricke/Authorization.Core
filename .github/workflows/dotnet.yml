@@ -24,6 +24,7 @@ jobs:
     - name: Get Build Version
       shell: pwsh
       run: |
+        Invoke-WebRequest -Uri https://raw.githubusercontent.com/crfricke/GitHub.Support/master/build/ActionModule.psm1 -OutFile .\build\ActionModule.psm1
         Import-Module .\build\ActionModule.psm1
         Get-VersionVariables $env:GITHUB_REF
         $Version = "$Tag_Major.$Tag_Minor.$Tag_Patch"
