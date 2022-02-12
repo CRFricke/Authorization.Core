@@ -5,7 +5,7 @@
         @foreach (var notification in Model.Notifications)
         {
             var textClass = notification.Severity == Severity.High ? "text-danger" : "text-success";
-            <h6 class="@textClass">@notification.Message</h6>
+            <h5 class="@textClass">@notification.Message</h5>
         }
     </div>
 }

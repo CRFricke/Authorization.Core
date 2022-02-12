@@ -1,5 +1,4 @@
-﻿using Authorization.Core.UI.Test.Web;
-using Authorization.Core.UI.Test.Web.Data;
+﻿using Authorization.Core.UI.Test.Web.Data;
 using Authorization.Core.UI.Tests.Integration.Extensions;
 using Authorization.Core.UI.Tests.Integration.Pages;
 using CRFricke.Authorization.Core;

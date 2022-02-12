@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
-namespace CRFricke.Authorization.Core.UI.Pages.Role
+namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
 {
     [RequiresClaims(SysClaims.Role.Read)]
     [PageImplementationType(typeof(DetailsModel<,>))]

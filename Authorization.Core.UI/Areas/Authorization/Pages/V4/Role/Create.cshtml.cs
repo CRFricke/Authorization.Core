@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace CRFricke.Authorization.Core.UI.Pages.Role
+namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
 {
     [RequiresClaims(SysClaims.Role.Create)]
     [PageImplementationType(typeof(CreateModel<,>))]

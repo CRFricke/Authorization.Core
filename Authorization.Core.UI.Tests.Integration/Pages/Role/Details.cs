@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Xunit;
 using System.Linq;
+using AngleSharp.Dom;
 
 namespace Authorization.Core.UI.Tests.Integration.Pages.Role
 {
@@ -33,12 +34,15 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.Role
 
         private void InitProperties()
         {
-            var ddElements = Document.QuerySelectorAll("dd");
-            Assert.Equal(3, ddElements.Length);
-
-            Id = ddElements[0].TextContent.Trim();
-            Name = ddElements[1].TextContent.Trim();
-            Description = ddElements[2].TextContent.Trim();
+            Id = Assert.IsAssignableFrom<IHtmlInputElement>(
+                Document.QuerySelectorAll("#RoleModel_Id").SingleOrDefault()
+                )?.Value.Trim();
+            Name = Assert.IsAssignableFrom<IHtmlInputElement>(
+                Document.QuerySelectorAll("#RoleModel_Name").SingleOrDefault()
+                )?.Value.Trim();
+            Description = Assert.IsAssignableFrom<IHtmlTextAreaElement>(
+               Document.QuerySelectorAll("#RoleModel_Description").SingleOrDefault()
+               )?.Value.Trim();
         }
 
         private void InitClaims()

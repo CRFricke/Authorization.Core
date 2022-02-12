@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace CRFricke.Authorization.Core.UI.Pages.User
+namespace CRFricke.Authorization.Core.UI.Pages.V4.User
 {
     [RequiresClaims(SysClaims.User.Create)]
     [PageImplementationType(typeof(CreateModel<,>))]

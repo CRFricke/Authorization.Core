@@ -73,9 +73,9 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.Role
         }
 
         internal string GetNotificationErrorText()
-            => Document.QuerySelectorAll("h6.text-danger").FirstOrDefault().TextContent;
+            => Document.QuerySelectorAll("h5.text-danger").FirstOrDefault().TextContent;
 
         internal string GetNotificationSuccessText()
-            => Document.QuerySelectorAll("h6.text-success").FirstOrDefault().TextContent;
+            => Document.QuerySelectorAll("h5.text-success").FirstOrDefault().TextContent;
     }
 }

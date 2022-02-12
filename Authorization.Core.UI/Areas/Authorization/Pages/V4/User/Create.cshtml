@@ -1,0 +1,152 @@
+﻿@page
+@model User.CreateModel
+@{
+    ViewData["Title"] = "Create User";
+}
+
+@section css {
+
+    <environment include="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" />
+    </environment>
+
+    <style>
+        .col-properties {
+            min-width: 25rem;
+            max-width: 30rem;
+        }
+    </style>
+}
+
+<div class="row">
+    <div class="col">
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+    </div>
+</div>
+<div class="row mx-sm-1">
+    <div class="col">
+        <form id="formCreate" method="post">
+            <div class="row mb-3">
+                <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
+                <div class="col-auto col-properties mr-sm-5 mb-3">
+                    <h5 class="form-text text-muted">Enter the user's details:</h5>
+                    <hr />
+                    <div class="form-group">
+                        <label asp-for="UserModel.Email" class="control-label" autocomplete="email" aria-required="true"></label>
+                        <input asp-for="UserModel.Email" class="form-control" />
+                        <span asp-validation-for="UserModel.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserModel.Password" class="control-label" autocomplete="new-password" aria-required="true"></label>
+                        <input asp-for="UserModel.Password" class="form-control" />
+                        <span asp-validation-for="UserModel.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserModel.ConfirmPassword" class="control-label" autocomplete="new-password" aria-required="true"></label>
+                        <input asp-for="UserModel.ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="UserModel.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserModel.GivenName" class="control-label"></label>
+                        <input asp-for="UserModel.GivenName" class="form-control" />
+                        <span asp-validation-for="UserModel.GivenName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserModel.Surname" class="control-label"></label>
+                        <input asp-for="UserModel.Surname" class="form-control" />
+                        <span asp-validation-for="UserModel.Surname" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserModel.PhoneNumber" class="control-label"></label>
+                        <input asp-for="UserModel.PhoneNumber" class="form-control" />
+                        <span asp-validation-for="UserModel.PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" asp-for="UserModel.LockoutEnabled" /> @Html.DisplayNameFor(model => model.UserModel.LockoutEnabled)
+                        </label>
+                    </div>
+                </div>
+                <div class="col">
+                    <h5 class="form-text text-muted text-center mb-3">Select the user's role assignments:</h5>
+                    <hr />
+                    <div class="mx-auto">
+                        <table class="table table-sm" data-order='[[1,"asc"]]'>
+                            <thead>
+                                <tr>
+                                    <th id="thSelect" class="col-auto" data-orderable="false">
+                                        <label asp-for="UserModel.Roles.ElementAt(0).IsAssigned"></label>
+                                    </th>
+                                    <th><label asp-for="UserModel.Roles.ElementAt(0).Name"></label></th>
+                                    <th><label asp-for="UserModel.Roles.ElementAt(0).Description"></label></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var role in Model.UserModel.Roles)
+                                    {
+                                        var checkedVal = (role.IsAssigned) ? "checked" : "";
+                                        <tr>
+                                            <td class="align-middle">
+                                                <input class="form-check ml-3" type="checkbox" @checkedVal />
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(x => role.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(x => role.Description)
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row align-items-center mb-3">
+                <div class="col-auto">
+                    <input id="btnCreate" type="submit" value="Create" class="btn btn-primary" /> |
+                </div>
+                <div class="col-auto">
+                    <a asp-page="Index">Back to List</a>
+                </div>
+            </div>
+
+            <input id="hfRoleList" name="hfRoleList" type="hidden" value="" />
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+
+    <environment include="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    </environment>
+
+    <script defer>
+        var dt = $('table').DataTable();
+
+        $("#btnCreate").click(function (event) {
+            var roles = [];
+
+            dt.column("#thSelect").nodes().to$().children("input:checked").each(function () {
+                roles.push(dt.row($(this).closest("tr")).data()[1]);
+            });
+
+            $("#hfRoleList").val(roles.join(','));
+            $("#formCreate").submit();
+        });
+    </script>
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

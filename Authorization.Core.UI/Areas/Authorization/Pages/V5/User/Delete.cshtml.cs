@@ -5,21 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace CRFricke.Authorization.Core.UI.Pages.Role
+namespace CRFricke.Authorization.Core.UI.Pages.V5.User
 {
-    [RequiresClaims(SysClaims.Role.Delete)]
+    [RequiresClaims(SysClaims.User.Delete)]
     [PageImplementationType(typeof(DeleteModel<,>))]
     public abstract class DeleteModel : ModelBase
     {
         [BindProperty]
-        public bool IsSystemRole { get; protected set; }
+        public bool IsSystemUser { get; protected set; }
 
         [BindProperty]
-        public RoleModel RoleModel { get; set; }
+        public UserModel UserModel { get; set; }
 
         public virtual Task<IActionResult> OnGetAsync(string id) => throw new NotImplementedException();
 
@@ -34,6 +32,11 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
         private readonly ILogger<DeleteModel> _logger;
         private readonly IRepository<TUser, TRole> _repository;
 
+        /// <summary>
+        /// Creates a new EditModel<TUser> class instance using the specified authorization manager and repository.
+        /// </summary>
+        /// <param name="authManager">The AuthorizationManager instance to be used to initialize the EditModel.</param>
+        /// <param name="repository">The repository instance to be used to initialize the EditModel.</param>
         public DeleteModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository, ILogger<DeleteModel> logger)
         {
             _authManager = authManager;
@@ -48,22 +51,21 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
                 return NotFound();
             }
 
-            var role = await _repository.Roles
-                .Include(ar => ar.Claims)
+            var user = await _repository.Users
+                .Include(au => au.Claims)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (role == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            IsSystemRole = _authManager.DefinedGuids.Contains(role.Id);
+            IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
 
-            RoleModel = await new RoleModel()
-                .InitRoleClaims(_authManager)
-                .InitFromRole(role)
-                .InitRoleUsersAsync(_repository);
+            UserModel = (await new UserModel()
+                .InitRoleInfoAsync(_repository))
+                .InitFromUser(user);
 
             return Page();
         }
@@ -76,68 +78,61 @@ namespace CRFricke.Authorization.Core.UI.Pages.Role
                 return NotFound();
             }
 
-            var role = await _repository.Roles.FindAsync(id);
-            if (role == null)
+            var user = await _repository.Users
+                .Include(au => au.Claims)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (user == null)
             {
                 SendNotification(typeof(IndexModel), Severity.High,
-                    $"Error: Role '{RoleModel.Name}' was not found in the database. Another user may have deleted it."
+                    $"Error: User '{UserModel.Email}' was not found in the database. Another user may have deleted it."
                     );
 
                 return RedirectToPage(IndexModel.PageName);
             }
 
-            await RoleModel.InitRoleUsersAsync(_repository);
-
-            var result = await _authManager.AuthorizeAsync(User, role, new AppClaimRequirement(SysClaims.Role.Delete));
+            var result = await _authManager.AuthorizeAsync(User, user, new AppClaimRequirement(SysClaims.User.Delete));
             if (!result.Succeeded)
             {
-                var message = "System Roles may not be deleted.";
-                ModelState.AddModelError(string.Empty, "Can not delete Role:");
+                var message = "System accounts may not be deleted.";
+                ModelState.AddModelError(string.Empty, "Can not delete User:");
                 ModelState.AddModelError(string.Empty, message);
 
-                _logger.LogError($"Could not delete {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}'): {message}");
+                _logger.LogError($"Could not delete {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}'): {message}");
 
+                await UserModel.InitRoleInfoAsync(_repository);
                 return Page();
             }
 
-            var userClaims = await (
-                from uc in _repository.UserClaims
-                join au in _repository.Users on uc.UserId equals au.Id
-                where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == RoleModel.Name
-                select uc
-                ).ToArrayAsync();
-
             try
             {
-                _repository.UserClaims.RemoveRange(userClaims);
-                _repository.Roles.Remove(role);
+                _repository.Users.Remove(user);
                 await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Could not delete Role:");
+                ModelState.AddModelError(string.Empty, "Could not delete User:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not delete {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}').");
+                _logger.LogError(ex, $"Could not delete {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}').");
+            }
 
+            if (!ModelState.IsValid)
+            {
+                await UserModel.InitRoleInfoAsync(_repository);
                 return Page();
             }
 
-            // Remove any users that were assigned this role from the UserClaim cache
-            foreach (var claim in userClaims)
-            {
-                _authManager.RefreshUser(claim.UserId);
-            }
-
-            // Remove Role from RoleClaim cache
-            _authManager.RefreshRole(role.Id);
+            // Remove User from UserClaims cache
+            _authManager.RefreshUser(user.Id);
 
             SendNotification(
                 typeof(IndexModel), Severity.Normal,
-                $"Role '{role.Name}' successfully deleted."
+                $"User '{user.Email}' successfully deleted."
                 );
 
-            _logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' (ID '{role.Id}') was deleted.");
+            _logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' (ID '{user.Id}') was deleted.");
+
 
             return RedirectToPage(IndexModel.PageName);
         }

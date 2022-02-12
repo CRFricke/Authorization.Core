@@ -1,8 +1,8 @@
 ﻿using Authorization.Core.UI.Tests.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
+using CRFricke.Authorization.Core.UI.Pages.V4.Role;
 using CRFricke.Authorization.Core.UI.Models;
-using CRFricke.Authorization.Core.UI.Pages.Role;
 using CRFricke.Test.Support.Fakes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
