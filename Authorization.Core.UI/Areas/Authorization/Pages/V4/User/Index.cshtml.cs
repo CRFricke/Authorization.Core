@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CRFricke.Authorization.Core.UI.Pages.User
+namespace CRFricke.Authorization.Core.UI.Pages.V4.User
 {
     [RequiresClaims(SysClaims.User.List)]
     [PageImplementationType(typeof(IndexModel<,>))]

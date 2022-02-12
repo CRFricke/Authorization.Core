@@ -2,6 +2,7 @@
 using Authorization.Core.UI.Tests.Integration.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Xunit;
 
@@ -46,32 +47,53 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.User
 
         private void InitProperties()
         {
-            var ddElements = Document.QuerySelectorAll("dd");
-            Assert.Equal(10, ddElements.Length);
+            var fcElements = Document.QuerySelectorAll(".form-control");
 
-            Id = ddElements[0].TextContent.Trim();
-            Email = ddElements[1].TextContent.Trim();
-            GivenName = ddElements[2].TextContent.Trim();
-            Surname = ddElements[3].TextContent.Trim();
-            PhoneNumber = ddElements[4].TextContent.Trim();
+            Id = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_Id")
+                )?.Value.Trim();
+            Email = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_Email")
+                )?.Value.Trim();
+            GivenName = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_GivenName")
+                )?.Value.Trim();
+            Surname = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_Surname")
+                )?.Value.Trim();
+            PhoneNumber = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_PhoneNumber")
+                )?.Value.Trim();
 
-            if (!string.IsNullOrWhiteSpace(ddElements[5].TextContent))
+            var hie = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_LockoutEnd")
+                );
+            if (!string.IsNullOrWhiteSpace(hie?.Value))
             {
-                Assert.True(DateTimeOffset.TryParse(ddElements[5].TextContent.Trim(), out DateTimeOffset lockoutEnd));
+                Assert.True(DateTimeOffset.TryParse(hie.Value.Trim(), out DateTimeOffset lockoutEnd));
                 LockoutEnd = lockoutEnd;
             }
 
-            Assert.True(int.TryParse(ddElements[6].TextContent.Trim(), out int accessFailedCount));
-            AccessFailedCount = accessFailedCount;
+            hie = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fcElements.SingleOrDefault(e => e.Id == "UserModel_AccessFailedCount")
+                );
+            if (!string.IsNullOrWhiteSpace(hie?.Value))
+            {
+                Assert.True(int.TryParse(hie.Value.Trim(), out int accessFailedCount));
+                AccessFailedCount = accessFailedCount;
+            }
 
-            var checkBox = Assert.IsAssignableFrom<IHtmlInputElement>(ddElements[7].FirstElementChild);
-            EmailConfirmed = checkBox.IsChecked;
+            var fciElements = Document.QuerySelectorAll(".form-check-input");
 
-            checkBox = Assert.IsAssignableFrom<IHtmlInputElement>(ddElements[8].FirstElementChild);
-            PhoneNumberConfirmed = checkBox.IsChecked;
-
-            checkBox = Assert.IsAssignableFrom<IHtmlInputElement>(ddElements[9].FirstElementChild);
-            LockoutEnabled = checkBox.IsChecked;
+            EmailConfirmed = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fciElements.SingleOrDefault(e => e.Id == "UserModel_EmailConfirmed")
+                )?.IsChecked ?? false;
+            PhoneNumberConfirmed = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fciElements.SingleOrDefault(e => e.Id == "UserModel_PhoneNumberConfirmed")
+                )?.IsChecked ?? false;
+            LockoutEnabled = Assert.IsAssignableFrom<IHtmlInputElement>(
+                fciElements.SingleOrDefault(e => e.Id == "UserModel_LockoutEnabled")
+                )?.IsChecked ?? false;
         }
 
         private void InitClaims()

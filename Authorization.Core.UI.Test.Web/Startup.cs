@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Authorization.Core.UI.Test.Web
+namespace Authorization.Core.UI.Tests.Integration.Infrastructure
 {
     public class Startup
     {
