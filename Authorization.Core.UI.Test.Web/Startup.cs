@@ -1,15 +1,18 @@
 using Authorization.Core.UI.Test.Web.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
-namespace Authorization.Core.UI.Tests.Integration.Infrastructure
+namespace Authorization.Core.UI.Test.Web
 {
+    /// <summary>
+    /// Contains the configuration routines for the web appliction.
+    /// </summary>
+    /// <remarks>
+    /// IMPORTANT: When using the .Net 6.0 minimal API, configuration is performed in Program.cs. 
+    /// It remains here because it is required by the WebApplicationFactory contained in the 
+    /// integration test project. THIS CLASS IS NOT USED BY Authorization.Core.UI.Test.Web.
+    /// </remarks>
     public class Startup
     {
         public Startup(IConfiguration configuration)

@@ -32,8 +32,8 @@ namespace CRFricke.Authorization.Core.UI
         /// <param name="configUIOptions">Configures the <see cref="AuthCoreUIOptions"/></param>
         /// <returns>The same <see cref="IdentityBuilder"/> so multiple calls can be chained.</returns>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the <see cref="ApplicationPartManager"/> cannot be loaded.
-        /// This usually happens if the .AddAuthorizationCoreUI is placed before the .AddDefaultIdentity statement.
+        /// Thrown when the <see cref="ApplicationPartManager"/> service cannot be loaded. The service should be added 
+        /// during processing of the .AddDefaultIdentity statement.
         /// </exception>
         public static IdentityBuilder AddAuthorizationCoreUI(this IdentityBuilder builder, Action<AuthCoreUIOptions> configUIOptions)
         {
