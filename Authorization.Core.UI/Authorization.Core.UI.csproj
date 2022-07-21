@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CRFricke.Authorization.Core" Version="6.0.0-beta1.0" />
+    <PackageReference Include="CRFricke.Authorization.Core" Version="6.0.0-beta1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
