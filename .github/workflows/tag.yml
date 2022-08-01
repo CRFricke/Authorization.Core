@@ -54,7 +54,7 @@ jobs:
       run: dotnet pack **/Authorization.Core.csproj --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
     - name: Upload Authorization.Core NuGet package to GitHub
-      run: dotnet nuget push "**/CRFricke.Authorization.Core.*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push "**/CRFricke.Authorization.Core.*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
 
     - name: Update Authorization.Core References
       run: |
@@ -65,4 +65,4 @@ jobs:
       run: dotnet pack **/Authorization.Core.UI.csproj --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
     - name: Upload Authorization.Core.UI NuGet package to GitHub
-      run: dotnet nuget push "**/CRFricke.Authorization.Core.UI.*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push "**/CRFricke.Authorization.Core.UI.*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
