@@ -41,7 +41,7 @@ jobs:
     - name: Update Authorization.Core References
       run: |
         dotnet remove **/Authorization.Core.UI.csproj reference **/Authorization.Core.csproj
-        dotnet add **/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $BUILD_VERSION --source https://nuget.pkg.github.com/CRFricke/index.json
+        dotnet add **/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $BUILD_VERSION
 
     - name: Restore dependencies
       run: dotnet restore
