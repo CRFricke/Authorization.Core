@@ -38,12 +38,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{D43E1E0C-52CC-4848-84AA-7C157BDBB286}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
-		tag.yml = tag.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{510D93A5-42D2-4035-8B8F-C1EE522F0449}"
-	ProjectSection(SolutionItems) = preProject
-		build\ConfigSettings.json = build\ConfigSettings.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests.Integration", "Authorization.Core.UI.Tests.Integration\Authorization.Core.UI.Tests.Integration.csproj", "{DB590DAC-BE17-456C-93CE-E0ECDD130736}"
@@ -97,7 +91,6 @@ Global
 		{FA413BEC-27EE-4E32-AF25-54DB50BE0859} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 		{31E52A25-70A5-4FA7-8E87-02AA511DB5BC} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 		{D43E1E0C-52CC-4848-84AA-7C157BDBB286} = {31E52A25-70A5-4FA7-8E87-02AA511DB5BC}
-		{510D93A5-42D2-4035-8B8F-C1EE522F0449} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 		{317DF210-7B4D-4AE6-980B-C832EB0BED05} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
