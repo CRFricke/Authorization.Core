@@ -38,13 +38,13 @@ jobs:
       env:
           NUGET_AUTH_TOKEN: ${{secrets.USER_PAT}}
 
+    - name: Restore dependencies
+      run: dotnet restore
+
     - name: Update Authorization.Core References
       run: |
         dotnet remove **/Authorization.Core.UI.csproj reference **/Authorization.Core.csproj
         dotnet add **/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $BUILD_VERSION
-
-    - name: Restore dependencies
-      run: dotnet restore
 
     - name: Build
       run: dotnet build --configuration $BUILD_CONFIG --no-restore /p:Version=$BUILD_VERSION
