@@ -9,7 +9,7 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      VERSION_DEFAULT: '3.1.0'
+      VERSION_DEFAULT: '3.1.1'
 
     runs-on: ubuntu-latest
 
