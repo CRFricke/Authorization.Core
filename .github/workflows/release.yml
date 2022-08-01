@@ -1,9 +1,8 @@
-name: .NET
+name: Release
 
 on:
-  push:
-    branches: [ '**' ]
-    paths-ignore: ['**/*.md']
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -22,9 +21,8 @@ jobs:
       shell: pwsh
       run: |
         Get-VersionVariables $env:GITHUB_REF
+        if ($Tag_PreRelease -or $Tag_Build) { throw "Invalid GITHUB_REF for release." }
         $Version = "$Tag_Major.$Tag_Minor.$Tag_Patch"
-        if ($Tag_PreRelease) { $Version += "-$Tag_PreRelease" }
-        if ($Tag_Build) { $Version += "+$Tag_Build" }
         Set-ActionVariable "BUILD_VERSION" "$Version"
         Write-Host "BUILD_VERSION: $Version"
 
@@ -40,6 +38,11 @@ jobs:
       env:
           NUGET_AUTH_TOKEN: ${{secrets.USER_PAT}}
 
+    - name: Update Authorization.Core References
+      run: |
+        dotnet remove **/Authorization.Core.UI.csproj reference **/Authorization.Core.csproj
+        dotnet add **/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $BUILD_VERSION --source https://nuget.pkg.github.com/CRFricke/index.json
+
     - name: Restore dependencies
       run: dotnet restore
 
@@ -48,3 +51,11 @@ jobs:
 
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
+
+    - name: Create NuGet packages
+      if: ${{github.ref_type == 'tag'}}
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
+
+    - name: Upload packages to NuGet.org
+      if: ${{github.event_name == 'release'}}
+      run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
