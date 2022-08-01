@@ -14,24 +14,26 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
+      VERSION_DEFAULT: '3.1.0'
 
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - name: Setup PowerShell
+      uses: CRFricke/Setup-PowerShell@v1.0.1
 
     - name: Get Build Version
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri https://raw.githubusercontent.com/crfricke/GitHub.Support/master/build/ActionModule.psm1 -OutFile .\build\ActionModule.psm1
-        Import-Module .\build\ActionModule.psm1
         Get-VersionVariables $env:GITHUB_REF
         $Version = "$Tag_Major.$Tag_Minor.$Tag_Patch"
         if ($Tag_PreRelease) { $Version += "-$Tag_PreRelease" }
         if ($Tag_Build) { $Version += "+$Tag_Build" }
         Set-ActionVariable "BUILD_VERSION" "$Version"
         Write-Host "BUILD_VERSION: $Version"
+
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -64,3 +66,10 @@ jobs:
     - name: Upload packages to NuGet.org
       if: ${{github.event_name == 'release'}}
       run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+
+    - name: Dump Environment Variables
+      run: |
+        Enter-ActionOutputGroup "Environment Variables"
+        Write-Output (Get-ChildItem -Path Env:\)
+        Exit-ActionOutputGroup
+      shell: pwsh
