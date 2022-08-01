@@ -38,6 +38,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{D43E1E0C-52CC-4848-84AA-7C157BDBB286}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+		.github\workflows\tag.yml = .github\workflows\tag.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests.Integration", "Authorization.Core.UI.Tests.Integration\Authorization.Core.UI.Tests.Integration.csproj", "{DB590DAC-BE17-456C-93CE-E0ECDD130736}"
