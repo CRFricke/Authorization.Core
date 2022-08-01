@@ -1,12 +1,8 @@
-name: .NET
+name: Tag
 
 on:
   push:
-    branches: [ '**' ]
-    paths-ignore: ['**/*.md']
-
-  release:
-    types: [published]
+    tags: ['v*']
 
 jobs:
   build:
@@ -52,14 +48,19 @@ jobs:
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
 
-    - name: Create NuGet packages
-      if: ${{github.ref_type == 'tag'}}
-      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
+    - name: Create Authorization.Core NuGet package
+      run: dotnet pack **/Authorization.Core.csproj --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
-    - name: Upload NuGet packages to GitHub
-      if: ${{github.ref_type == 'tag'}}
-      run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Authorization.Core NuGet package to GitHub
+      run: dotnet nuget push "**/Authorization.Core.*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload packages to NuGet.org
-      if: ${{github.event_name == 'release'}}
-      run: dotnet nuget push "**/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+    - name: Update Authorization.Core References
+      run: |
+        dotnet remove **/Authorization.Core.UI.csproj reference Authorization.Core.csproj
+        dotnet add **/Authorization.Core.UI.csproj package Authorization.Core
+
+    - name: Create Authorization.Core.UI NuGet package
+      run: dotnet pack **/Authorization.Core.UI.csproj --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
+
+    - name: Upload Authorization.Core.UI NuGet package to GitHub
+      run: dotnet nuget push "**/Authorization.Core.UI.*.nupkg" --skip-duplicate --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
