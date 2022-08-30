@@ -21,7 +21,6 @@ namespace CRFricke.Authorization.Core
     /// </summary>
     /// <typeparam name="TUser">The <see cref="Type"/> of user objects. The Type must be or extend from <see cref="AuthUser"/>.</typeparam>
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects. The Type must be or extend from <see cref="AuthRole"/>.</typeparam>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
     public sealed class AuthorizationManager<TUser, TRole> : IAuthorizationManager
         where TUser : AuthUser
         where TRole : AuthRole
@@ -201,7 +200,8 @@ namespace CRFricke.Authorization.Core
             if (principalId == null)
             {
                 _logger.LogDebug(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.UserName()}' - user ID is null."
+                    "{ClassName} for \"{AppClaimRequirement}\" not met for user '{UserName}' - user ID is null.",
+                    nameof(AppClaimRequirement), claimRequirement, principal.UserName()
                     );
                 return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
             }
@@ -218,7 +218,8 @@ namespace CRFricke.Authorization.Core
                     var failedClaim = failedClaims.First();
 
                     _logger.LogInformation(
-                        $"{nameof(AppClaimRequirement)} of \"{failedClaim}\" for {resourceType} '{raObject.Name}' not met by '{userName}' - restricted operation on system User or Role."
+                        "{ClassName} of \"{Claim}\" for {ResourceType} '{ObjectName}' not met by '{UserName}' - restricted operation on system User or Role.",
+                        nameof(AppClaimRequirement), failedClaim, resourceType, raObject.Name, userName
                         );
                     return AuthorizationResult.SystemObject(failedClaims);
                 }
@@ -260,7 +261,8 @@ namespace CRFricke.Authorization.Core
             if (userId == null)
             {
                 _logger.LogDebug(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.UserName()}' - user ID is null."
+                    "{ClassName} for \"{AppClaimRequirement}\" not met for user '{UserName}' - user ID is null.",
+                    nameof(AppClaimRequirement), claimRequirement, principal.UserName()
                     );
                 return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
             }
@@ -284,7 +286,8 @@ namespace CRFricke.Authorization.Core
             if (principalRoles.Contains(SysGuids.Role.Administrator))
             {
                 _logger.LogDebug(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" met for user '{principal.UserName()}' via {nameof(SysGuids.Role.Administrator)} role."
+                    "{ClassName} for \"{AppClaimRequirement}\" met for user '{UserName}' via {RoleName} role.",
+                    nameof(AppClaimRequirement), claimRequirement, principal.UserName(), nameof(SysGuids.Role.Administrator)
                     );
                 return AuthorizationResult.Success();
             }
@@ -293,7 +296,8 @@ namespace CRFricke.Authorization.Core
             if (claimRequirement.ClaimValues.IsSubsetOf(principalClaims))
             {
                 _logger.LogDebug(
-                    $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" met for user '{principal.UserName()}'."
+                    "{ClassName} for \"{AppClaimRequirement}\" met for user '{UserName}'.",
+                    nameof(AppClaimRequirement), claimRequirement, principal.UserName()
                     );
                 return AuthorizationResult.Success();
             }
