@@ -1,3 +1,7 @@
 ﻿@{
-    Layout = "/Pages/Shared/_Layout.cshtml";
+    var returnUrl = Context.Request.Query["returnUrl"].FirstOrDefault() ?? "/";
+    
+    Layout = (returnUrl.Contains("Admin"))
+        ? "/Areas/Admin/Pages/Shared/_Layout.cshtml"
+        : "/Pages/Shared/_Layout.cshtml";
 }

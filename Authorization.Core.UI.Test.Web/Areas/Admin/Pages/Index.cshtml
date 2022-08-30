@@ -1,0 +1,36 @@
+﻿@page
+@model Authorization.Core.UI.Test.Web.Areas.Admin.Pages.IndexModel
+@{
+    ViewData["Title"] = "Administration";
+}
+
+<div class="row">
+    <div class="col">
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <dl class="row">
+            <dt class="col-sm-2 text-sm-right">
+                <a asp-area="Admin" asp-page="/Calendar/Index">Calendar</a>
+            </dt>
+            <dd class="col-sm-10">
+                Allows you to manage the calendar events displayed on the web site.
+            </dd>
+            <dt class="col-sm-2 text-sm-right">
+                <a asp-area="Authorization" asp-page="/Role/Index">Roles</a>
+            </dt>
+            <dd class="col-sm-10">
+                Allows you to add and delete Roles. Also allows you to assign claims to the roles.
+            </dd>
+            <dt class="col-sm-2 text-sm-right">
+                <a asp-area="Authorization" asp-page="/User/Index">Users</a>
+            </dt>
+            <dd class="col-sm-10">
+                Allows you to add and delete Users. Also allows you to assign roles to the users.
+            </dd>
+        </dl>
+    </div>
+</div>
