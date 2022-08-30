@@ -16,8 +16,11 @@ namespace CRFricke.Authorization.Core
         /// Adds AccessRight based authorization services to the <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="builder">The <see cref="IdentityBuilder"/> instance this method extends.</param>
+        /// <param name="dbInitializationOption">
+        /// The <see cref="DbInitializationOption"/> to be used to initialize the database.
+        /// </param>
         /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
-        public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder)
+        public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder, DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
         {
             Type contextType;
 
@@ -55,7 +58,7 @@ namespace CRFricke.Authorization.Core
                 .AddSingleton<IAuthorizationPolicyProvider, AppClaimRequirementProvider>()
                 .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>()
                 .AddDbInitializer(options =>
-                    options.UseDbContext(contextType, DbInitializationOption.Migrate)
+                    options.UseDbContext(contextType, dbInitializationOption)
                     );
 
             return builder;
