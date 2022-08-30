@@ -200,7 +200,7 @@ namespace CRFricke.Authorization.Core
             var principalId = principal.UserId();
             if (principalId == null)
             {
-                _logger.LogInformation(
+                _logger.LogDebug(
                     $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.UserName()}' - user ID is null."
                     );
                 return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
@@ -259,7 +259,7 @@ namespace CRFricke.Authorization.Core
             var userId = principal.UserId();
             if (userId == null)
             {
-                _logger.LogInformation(
+                _logger.LogDebug(
                     $"{nameof(AppClaimRequirement)} for \"{claimRequirement}\" not met for user '{principal.UserName()}' - user ID is null."
                     );
                 return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
