@@ -106,7 +106,10 @@ namespace CRFricke.Authorization.Core.Data
                 };
 
                 await Roles.AddAsync(role);
-                logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' has been created.");
+                logger.LogInformation(
+                    "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
+                    typeof(TRole).Name, role.Name, role.Id
+                    );
             }
 
             var user = await Users.FindAsync(SysGuids.User.Administrator);
@@ -128,7 +131,10 @@ namespace CRFricke.Authorization.Core.Data
                 ((AuthUser)user).SetClaims(role.Name);
 
                 await Users.AddAsync(user);
-                logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' has been created.");
+                logger.LogInformation(
+                    "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
+                    typeof(TUser).Name, user.Email, user.Id
+                    );
             }
 
             try

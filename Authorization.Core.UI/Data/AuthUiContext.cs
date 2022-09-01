@@ -90,7 +90,10 @@ namespace CRFricke.Authorization.Core.UI.Data
                     role.Description = "Administrators have access to all portions of the application.";
 
                     Roles.Update(role);
-                    logger.LogInformation($"{role.GetType().Name} '{role.Name}' has been updated.");
+                    logger.LogInformation(
+                        "{RoleType} '{RoleName}' (ID: {RoleId}) has been updated.",
+                        typeof(TRole).Name, role.Name, role.Id
+                        );
                 }
             }
 
@@ -107,7 +110,10 @@ namespace CRFricke.Authorization.Core.UI.Data
                 ((AuthUiRole)role).SetClaims(SysClaims.Role.DefinedClaims);
 
                 await Roles.AddAsync(role);
-                logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' has been created.");
+                logger.LogInformation(
+                    "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
+                    typeof(TRole).Name, role.Name, role.Id
+                    );
             }
 
             role = await Roles.FindAsync(SysUiGuids.Role.UserManager);
@@ -123,7 +129,10 @@ namespace CRFricke.Authorization.Core.UI.Data
                 ((AuthUiRole)role).SetClaims(SysClaims.User.DefinedClaims);
 
                 await Roles.AddAsync(role);
-                logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' has been created.");
+                logger.LogInformation(
+                    "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
+                    typeof(TRole).Name, role.Name, role.Id
+                    );
             }
 
             try

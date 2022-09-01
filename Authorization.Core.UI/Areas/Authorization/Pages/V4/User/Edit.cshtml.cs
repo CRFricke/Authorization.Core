@@ -69,7 +69,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfRoleList)
         {
             (await UserModel.InitRoleInfoAsync(_repository))
@@ -105,22 +104,30 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
 
                     if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
                     {
-                        var message = "You may not update the Roles assigned to a system User.";
-                        ModelState.AddModelError(string.Empty, message);
+                        ModelState.AddModelError(string.Empty, "You may not update the Roles assigned to a system User.");
 
-                        _logger.LogInformation($"Could not update {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}'): {message}");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
+                            User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                            );
                         return Page();
                     }
 
                     if (User.UserId() != user.Id)
                     {
                         ModelState.AddModelError(string.Empty, "You can not give a User more privileges than you have.");
-                        _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to give {typeof(TUser).Name} elevated privileges.");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
+                            User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                            );
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "You can not elevate your own privileges.");
-                        _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to elevate their own privileges.");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to elevate their own privileges.",
+                             User.Identity.Name, User.UserId()
+                            );
                     }
 
                     return Page();
@@ -136,7 +143,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, "Could not update User:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not update {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not update {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
 
                 return Page();
             }
@@ -153,7 +163,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                     $"User '{user.Email}' successfully updated."
                     );
 
-                _logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' (ID '{user.Id}') was updated.");
+                _logger.LogInformation(
+                    "'{PrincipalEmail}' (ID '{PrincipalId}') updated {UserType} '{UserEmail}' (ID '{UserId}').",
+                     User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
             }
 
             return RedirectToPage(IndexModel.PageName);

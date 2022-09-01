@@ -49,7 +49,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfRoleList)
         {
             (await UserModel.InitRoleInfoAsync(_repository))
@@ -69,7 +68,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, "Can not create User:");
                 ModelState.AddModelError(string.Empty, "You can not create a User with more privileges than you have.");
 
-                _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to give {typeof(TUser).Name} elevated privileges.");
+                _logger.LogWarning(
+                    "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to create {UserType} with elevated privileges.",
+                    User.Identity.Name, User.UserId(), typeof(TUser).Name
+                    );
 
                 return Page();
             }
@@ -87,7 +89,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, "Could not create User:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not create {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not create {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
 
                 return Page();
             }
@@ -97,7 +102,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 $"User '{user.Email}' successfully created."
                 );
 
-            _logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' (ID '{user.Id}') was created.");
+            _logger.LogInformation(
+                "'{PrincipalEmail}' (ID '{PrincipalId}') created {UserType} '{UserEmail}' (ID '{UserId}').",
+                 User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                );
 
             return RedirectToPage(IndexModel.PageName);
         }

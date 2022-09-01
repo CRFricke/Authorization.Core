@@ -68,7 +68,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string id)
         {
             if (id == null)
@@ -91,11 +90,14 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
             var result = await _authManager.AuthorizeAsync(User, role, new AppClaimRequirement(SysClaims.Role.Delete));
             if (!result.Succeeded)
             {
-                var message = "System Roles may not be deleted.";
                 ModelState.AddModelError(string.Empty, "Can not delete Role:");
-                ModelState.AddModelError(string.Empty, message);
+                ModelState.AddModelError(string.Empty, "System Roles may not be deleted.");
 
-                _logger.LogError($"Could not delete {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}'): {message}");
+                _logger.LogWarning(
+                    "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
+                     User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    );
+
 
                 return Page();
             }
@@ -118,7 +120,11 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 ModelState.AddModelError(string.Empty, "Could not delete Role:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not delete {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID: {PrincipalId}) could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    );
+
 
                 return Page();
             }
@@ -137,7 +143,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 $"Role '{role.Name}' successfully deleted."
                 );
 
-            _logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' (ID '{role.Id}') was deleted.");
+            _logger.LogInformation(
+                "'{PrincipalEmail}' (ID: {PrincipalId}) deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
+                User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                );
 
             return RedirectToPage(IndexModel.PageName);
         }
