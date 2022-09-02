@@ -15,13 +15,6 @@
     <environment exclude="Development">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.4/datatables.min.css" />
     </environment>
-
-    <style>
-        .col-properties {
-            min-width: 25rem;
-            max-width: 30rem;
-        }
-    </style>
 }
 
 <div class="row">
@@ -31,64 +24,60 @@
     </div>
 </div>
 <div class="row mx-sm-1">
-    <div class="col col-properties me-sm-5 mb-3">
+    <div class="col-auto col-properties me-sm-5 mb-3">
         <h5 class="text-muted">The user's properties:</h5>
         <hr />
         <div class="form-floating">
-            <input asp-for="UserModel.Id" class="form-control" disabled />
-            <label asp-for="UserModel.Id" class="control-label"></label>
-            <span asp-validation-for="UserModel.Email" class="text-danger"></span>
+            <input class="form-control" id="UserModel_Id" type="text" value="@Model.UserModel.Id" disabled />
+            <label class="control-label" asp-for="UserModel.Id"></label>
         </div>
         <div class="form-floating">
-            <input asp-for="UserModel.Email" class="form-control" disabled />
-            <label asp-for="UserModel.Email" class="control-label"></label>
-            <span asp-validation-for="UserModel.Email" class="text-danger"></span>
+            <input class="form-control" id="UserModel_Email" type="text" value="@Model.UserModel.Email" disabled />
+            <label class="control-label"> asp-for="UserModel.Email"</label>
         </div>
         <div class="form-floating">
-            <input asp-for="UserModel.GivenName" class="form-control" disabled />
-            <label asp-for="UserModel.GivenName" class="control-label"></label>
-            <span asp-validation-for="UserModel.GivenName" class="text-danger"></span>
+            <input class="form-control" id="UserModel_GivenName" type="text" value="@Model.UserModel.GivenName" disabled />
+            <label class="control-label" asp-for="UserModel.GivenName"></label>
         </div>
         <div class="form-floating">
-            <input asp-for="UserModel.Surname" class="form-control" disabled />
-            <label asp-for="UserModel.Surname" class="control-label"></label>
-            <span asp-validation-for="UserModel.Surname" class="text-danger"></span>
+            <input class="form-control" id="UserModel_Surname" type="text" value="@Model.UserModel.Surname" disabled />
+            <label class="control-label" asp-for="UserModel.Surname"></label>
         </div>
         <div class="form-floating">
-            <input asp-for="UserModel.PhoneNumber" class="form-control" disabled />
-            <label asp-for="UserModel.PhoneNumber" class="control-label"></label>
-            <span asp-validation-for="UserModel.PhoneNumber" class="text-danger"></span>
+            <input class="form-control" id="UserModel_PhoneNumber" type="text" value="@Model.UserModel.PhoneNumber" disabled />
+            <label class="control-label" asp-for="UserModel.PhoneNumber"></label>
         </div>
         <div class="form-floating">
-            <input asp-for="UserModel.LockoutEnd" class="form-control" disabled />
-            <label asp-for="UserModel.LockoutEnd" class="control-label"></label>
-            <span asp-validation-for="UserModel.LockoutEnd" class="text-danger"></span>
+            <input class="form-control" id="UserModel_LockoutEnd" type="text" value="@Model.UserModel.LockoutEnd" disabled />
+            <label class="control-label" asp-for="UserModel.LockoutEnd"></label>
         </div>
         <div class="form-floating">
-            <input asp-for="UserModel.AccessFailedCount" class="form-control" disabled />
-            <label asp-for="UserModel.AccessFailedCount" class="control-label"></label>
-            <span asp-validation-for="UserModel.AccessFailedCount" class="text-danger"></span>
+            <input class="form-control" id="UserModel_AccessFailedCount" type="text" value="@Model.UserModel.AccessFailedCount" disabled />
+            <label class="control-label" asp-for="UserModel.AccessFailedCount"></label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input" asp-for="UserModel.EmailConfirmed" disabled />
+                <input class="form-check-input" id="UserModel_EmailConfirmed" type="checkbox" disabled
+                    @(Model.UserModel.EmailConfirmed ? "Checked" : "") />
                 @Html.DisplayNameFor(model => model.UserModel.EmailConfirmed)
             </label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input" asp-for="UserModel.PhoneNumberConfirmed" disabled />
+                <input class="form-check-input" id="UserModel_PhoneNumberConfirmed" type="checkbox" disabled
+                    @(Model.UserModel.PhoneNumberConfirmed ? "Checked" : "") /> 
                 @Html.DisplayNameFor(model => model.UserModel.PhoneNumberConfirmed)
             </label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input" asp-for="UserModel.LockoutEnabled" disabled />
+                <input class="form-check-input" id="UserModel_LockoutEnabled" type="checkbox" disabled
+                    @(Model.UserModel.LockoutEnabled ? "Checked" : "") />
                 @Html.DisplayNameFor(model => model.UserModel.LockoutEnabled)
             </label>
         </div>
     </div>
-    <div class="col">
+    <div class="col col-roles mb-3">
         <h5 class="text-center text-muted mb-3">The user's role assignments:</h5>
         <hr />
         <div class="mx-auto">
@@ -127,11 +116,8 @@
 </div>
 <div class="row mx-sm-1">
     <div class="col-auto">
-        <a class="@classEdit" asp-page="./Edit" asp-route-id="@Model.UserModel.Id">Edit</a>
-    </div>
-    <div class="col-auto px-0">|</div>
-    <div class="col-auto">
-        <a asp-page="./Index">Back to List</a>
+        <a class="btn btn-primary @classEdit" asp-page="./Edit" asp-route-id="@Model.UserModel.Id">Edit</a>
+        <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
     </div>
 </div>
 

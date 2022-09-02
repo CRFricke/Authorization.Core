@@ -12,22 +12,6 @@
     <environment exclude="Development">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.4/datatables.min.css" />
     </environment>
-
-    <style>
-        .col-properties {
-            min-width: 25rem;
-            max-width: 30rem;
-        }
-
-        .col-role-claims {
-            min-width: 25rem;
-            max-width: 35rem;
-        }
-
-        .form-floating textarea.form-control {
-            height: 10rem;
-        }
-    </style>
 }
 
 <div class="row">
@@ -36,72 +20,71 @@
         <hr />
     </div>
 </div>
-<div class="row mx-sm-1">
-    <div class="col">
-        <form id="formCreate" method="post">
-            <div class="row">
-                <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
-                <div class="col col-properties me-sm-5 mb-3">
-                    <h5 class="text-muted">Enter the role's details:</h5>
-                    <hr />
-                    <div class="form-floating">
-                        <input asp-for="RoleModel.Name" class="form-control" aria-required="true"/>
-                        <label asp-for="RoleModel.Name" class="control-label"></label>
-                        <span asp-validation-for="RoleModel.Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <textarea asp-for="RoleModel.Description" class="form-control"></textarea>
-                        <label asp-for="RoleModel.Description" class="control-label"></label>
-                        <span asp-validation-for="RoleModel.Description" class="text-danger"></span>
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <input id="btnCreate" type="submit" value="Create" class="btn btn-primary" />
-                        </div>
-                        <div class="col-auto px-0">|</div>
-                        <div class="col-auto">
-                            <a asp-page="Index">Back to List</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col col-role-claims">
-                    <h5 class="text-muted text-center mb-3">Select the role's claim assignments:</h5>
-                    <hr />
-                    <div class="mx-auto">
-                        <table class="table table-sm" data-order='[[1,"asc"]]'>
-                            <thead>
-                                <tr>
-                                    <th id="thSelect" class="col-auto" data-orderable="false">
-                                        <label asp-for="RoleModel.RoleClaims.ElementAt(0).IsAssigned"></label>
-                                    </th>
-                                    <th><label asp-for="RoleModel.RoleClaims.ElementAt(0).Claim"></label></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    foreach (var claim in Model.RoleModel.RoleClaims)
-                                    {
-                                        var checkedVal = (claim.IsAssigned) ? "checked" : "";
-                                        <tr>
-                                            <td class="align-middle">
-                                                <input class="form-check ms-3" type="checkbox" @checkedVal />
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(x => claim.Claim)
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+<form id="formCreate" method="post">
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
+        <div class="col col-properties me-sm-5 mb-3">
+            <h5 class="text-muted">Enter the role's details:</h5>
+            <hr />
+            <div class="form-floating">
+                <input asp-for="RoleModel.Name" class="form-control" aria-required="true"/>
+                <label asp-for="RoleModel.Name" class="control-label"></label>
+                <span asp-validation-for="RoleModel.Name" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea class="form-control textarea-tall" id="RoleModel_Description" name="RoleModel.Description">@Model.RoleModel.Description</textarea>
+                <label asp-for="RoleModel.Description" class="control-label"></label>
+                <span asp-validation-for="RoleModel.Description" class="text-danger"></span>
+            </div>
+            <div class="row d-none d-sm-block align-items-center mt-3">
+                <div class="col-auto">
+                    <input class="btn btn-primary" id="btnCreate" type="submit" value="Create" />
+                    <a class="btn btn-secondary" asp-page="Index">Cancel</a>
                 </div>
             </div>
-
-            <input id="hfClaimList" name="hfClaimList" type="hidden" value="" />
-        </form>
+        </div>
+        <div class="col col-claims">
+            <h5 class="text-muted text-center mb-3">Select the role's claim assignments:</h5>
+            <hr />
+            <div class="mx-auto">
+                <table class="table table-sm" data-order='[[1,"asc"]]'>
+                    <thead>
+                        <tr>
+                            <th id="thSelect" class="col-auto" data-orderable="false">
+                                <label asp-for="RoleModel.RoleClaims.ElementAt(0).IsAssigned"></label>
+                            </th>
+                            <th><label asp-for="RoleModel.RoleClaims.ElementAt(0).Claim"></label></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var claim in Model.RoleModel.RoleClaims)
+                            {
+                                var checkedVal = (claim.IsAssigned) ? "checked" : "";
+                                <tr>
+                                    <td class="align-middle">
+                                        <input class="form-check ms-3" type="checkbox" @checkedVal />
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(x => claim.Claim)
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="row d-block d-sm-none align-items-center mt-3">
+                <div class="col-auto">
+                    <input class="btn btn-primary" id="btnCreate" type="submit" value="Create" />
+                    <a class="btn btn-secondary" asp-page="Index">Cancel</a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <input id="hfClaimList" name="hfClaimList" type="hidden" value="" />
+</form>
 
 @section Scripts {
 

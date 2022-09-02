@@ -68,7 +68,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfClaimList)
         {
             RoleModel.InitRoleClaims(_authManager)
@@ -106,16 +105,21 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
 
                     if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
                     {
-                        var message = "You may not update the Claims assigned to a system Role.";
-                        ModelState.AddModelError(string.Empty, message);
+                        ModelState.AddModelError(string.Empty, "You may not update the Claims assigned to a system Role.");
 
-                        _logger.LogInformation($"Could not update {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}'): {message}");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
+                            User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                            );
                         return Page();
                     }
 
                     ModelState.AddModelError(string.Empty, "You can not give a Role more privileges than you have.");
 
-                    _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to give {typeof(TRole).Name} elevated privileges.");
+                    _logger.LogWarning(
+                        "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
+                        User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                        );
                     return Page();
                 }
             }
@@ -129,7 +133,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
                 ModelState.AddModelError(string.Empty, "Could not update Role:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not update {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID: {PrincipalId}) could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    );
 
                 return Page();
             }
@@ -146,7 +153,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
                     $"Role '{role.Name}' was successfully updated."
                     );
 
-                _logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' (ID '{role.Id}') was updated.");
+                _logger.LogInformation(
+                    "'{PrincipalEmail}' (ID: {PrincipalId}) updated {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    );
             }
 
             return RedirectToPage(IndexModel.PageName);

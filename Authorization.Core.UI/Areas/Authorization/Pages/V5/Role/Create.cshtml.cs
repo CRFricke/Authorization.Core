@@ -49,7 +49,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfClaimList)
         {
             RoleModel.InitRoleClaims(_authManager)
@@ -70,7 +69,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 ModelState.AddModelError(string.Empty, "Can not create Role:");
                 ModelState.AddModelError(string.Empty, "You can not create a Role with more privileges than you have.");
 
-                _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to create {typeof(TRole).Name} with elevated privileges.");
+                _logger.LogWarning(
+                    "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to create {RoleType} with elevated privileges.",
+                    User.Identity.Name, User.UserId(), typeof(TRole).Name
+                    );
 
                 return Page();
             }
@@ -85,7 +87,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 ModelState.AddModelError(string.Empty, "Could not create Role:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not create {typeof(TRole).Name} '{role.Name}' (ID '{role.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID: {PrincipalId}) could not create {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    );
 
                 return Page();
             }
@@ -95,7 +100,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 $"Role '{role.Name}' successfully created."
                 );
 
-            _logger.LogInformation($"{typeof(TRole).Name} '{role.Name}' (ID '{role.Id}') was created.");
+            _logger.LogInformation(
+                "'{PrincipalEmail}' (ID: {PrincipalId}) created {RoleType} '{RoleName}' (ID: {RoleId}).",
+                User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                );
 
             return RedirectToPage(IndexModel.PageName);
 

@@ -70,7 +70,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string id)
         {
             if (id == null)
@@ -94,11 +93,13 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
             var result = await _authManager.AuthorizeAsync(User, user, new AppClaimRequirement(SysClaims.User.Delete));
             if (!result.Succeeded)
             {
-                var message = "System accounts may not be deleted.";
                 ModelState.AddModelError(string.Empty, "Can not delete User:");
-                ModelState.AddModelError(string.Empty, message);
+                ModelState.AddModelError(string.Empty, "System accounts may not be deleted.");
 
-                _logger.LogError($"Could not delete {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}'): {message}");
+                _logger.LogWarning(
+                    "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
 
                 await UserModel.InitRoleInfoAsync(_repository);
                 return Page();
@@ -114,7 +115,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, "Could not delete User:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not delete {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
             }
 
             if (!ModelState.IsValid)
@@ -131,8 +135,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 $"User '{user.Email}' successfully deleted."
                 );
 
-            _logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' (ID '{user.Id}') was deleted.");
-
+            _logger.LogInformation(
+                "'{PrincipalEmail}' (ID '{PrincipalId}') deleted {UserType} '{UserEmail}' (ID '{UserId}').",
+                User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                );
 
             return RedirectToPage(IndexModel.PageName);
         }

@@ -33,7 +33,6 @@ namespace Authorization.Core.UI.Test.Web.Data
 
 
         /// <inheritdoc/>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
         {
             await base.SeedDatabaseAsync(serviceProvider);
@@ -53,7 +52,10 @@ namespace Authorization.Core.UI.Test.Web.Data
                 }.SetClaims(AppClaims.Calendar.DefinedClaims);
 
                 await Roles.AddAsync(role);
-                logger.LogInformation($"{nameof(ApplicationRole)} '{role.Name}' has been created.");
+                logger.LogInformation(
+                    "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
+                    nameof(ApplicationRole), role.Name, role.Id
+                    );
             }
 
             var user = await Users.FindAsync(AppGuids.User.CalendarGuy);
@@ -76,7 +78,10 @@ namespace Authorization.Core.UI.Test.Web.Data
                 }.SetClaims(new[] { role.Name });
 
                 await Users.AddAsync(user);
-                logger.LogInformation($"{nameof(ApplicationUser)} '{user.Email}' has been created.");
+                logger.LogInformation(
+                    "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
+                    nameof(ApplicationUser), user.Email, user.Id
+                    );
             }
 
             role = await Roles.FindAsync(AppGuids.Role.DocumentManager);
@@ -91,7 +96,10 @@ namespace Authorization.Core.UI.Test.Web.Data
                 }.SetClaims(AppClaims.Document.DefinedClaims);
 
                 await Roles.AddAsync(role);
-                logger.LogInformation($"{nameof(ApplicationRole)} '{role.Name}' has been created.");
+                logger.LogInformation(
+                    "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
+                    nameof(ApplicationRole), role.Name, role.Id
+                    );
             }
 
             user = await Users.FindAsync(AppGuids.User.DocumentGuy);
@@ -114,7 +122,10 @@ namespace Authorization.Core.UI.Test.Web.Data
                 }.SetClaims(new[] { role.Name });
 
                 await Users.AddAsync(user);
-                logger.LogInformation($"{nameof(ApplicationUser)} '{user.Email}' has been created.");
+                logger.LogInformation(
+                    "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
+                    nameof(ApplicationUser), user.Email, user.Id
+                    );
             }
 
             try

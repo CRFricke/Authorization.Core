@@ -16,7 +16,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
         public bool IsSystemUser { get; protected set; }
 
         [BindProperty]
-        public UserModel UserModel { get; set; }
+        public UserModel Input { get; set; }
 
         public virtual Task<IActionResult> OnGetAsync(string id) => throw new NotImplementedException();
 
@@ -62,17 +62,16 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
 
             IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
 
-            UserModel = (await new UserModel()
+            Input = (await new UserModel()
                 .InitRoleInfoAsync(_repository))
                 .InitFromUser(user);
 
             return Page();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
         public override async Task<IActionResult> OnPostAsync(string hfRoleList)
         {
-            (await UserModel.InitRoleInfoAsync(_repository))
+            (await Input.InitRoleInfoAsync(_repository))
                 .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
 
             if (!ModelState.IsValid)
@@ -82,21 +81,21 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
 
             var user = await _repository.Users
                 .Include(au => au.Claims)
-                .FirstOrDefaultAsync(m => m.Id == UserModel.Id);
+                .FirstOrDefaultAsync(m => m.Id == Input.Id);
 
             if (user == null)
             {
                 SendNotification(typeof(IndexModel), Severity.High,
-                    $"Error: User '{UserModel.Email}' was not found in the database. Another user may have deleted it."
+                    $"Error: User '{Input.Email}' was not found in the database. Another user may have deleted it."
                     );
 
                 return RedirectToPage(IndexModel.PageName);
             }
 
             var rowsUpdated = 0;
-            UserModel.UpdateUser(user);
+            Input.UpdateUser(user);
 
-            if (UserModel.ClaimsUpdated)
+            if (Input.ClaimsUpdated)
             {
                 var result = await _authManager.AuthorizeAsync(User, user, new AppClaimRequirement(SysClaims.User.UpdateClaims));
                 if (!result.Succeeded)
@@ -105,22 +104,30 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
 
                     if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
                     {
-                        var message = "You may not update the Roles assigned to a system User.";
-                        ModelState.AddModelError(string.Empty, message);
+                        ModelState.AddModelError(string.Empty, "You may not update the Roles assigned to a system User.");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
+                            User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                            );
 
-                        _logger.LogInformation($"Could not update {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}'): {message}");
                         return Page();
                     }
 
                     if (User.UserId() != user.Id)
                     {
                         ModelState.AddModelError(string.Empty, "You can not give a User more privileges than you have.");
-                        _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to give {typeof(TUser).Name} elevated privileges.");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
+                            User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                            );
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "You can not elevate your own privileges.");
-                        _logger.LogInformation($"User '{User.Identity.Name}' (ID '{User.UserId()}') attempted to elevate their own privileges.");
+                        _logger.LogWarning(
+                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to elevate their own privileges.",
+                             User.Identity.Name, User.UserId()
+                            );
                     }
 
                     return Page();
@@ -136,14 +143,17 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
                 ModelState.AddModelError(string.Empty, "Could not update User:");
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-                _logger.LogError(ex, $"Could not update {typeof(TUser).Name} '{user.Email}' (ID '{user.Id}').");
+                _logger.LogError(
+                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not update {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
 
                 return Page();
             }
 
             if (rowsUpdated > 0)
             {
-                if (UserModel.ClaimsUpdated)
+                if (Input.ClaimsUpdated)
                 {
                     _authManager.RefreshUser(user.Id);
                 }
@@ -153,7 +163,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
                     $"User '{user.Email}' successfully updated."
                     );
 
-                _logger.LogInformation($"{typeof(TUser).Name} '{user.Email}' (ID '{user.Id}') was updated.");
+                _logger.LogInformation(
+                    "'{PrincipalEmail}' (ID '{PrincipalId}') updated {UserType} '{UserEmail}' (ID '{UserId}').",
+                     User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    );
             }
 
             return RedirectToPage(IndexModel.PageName);
