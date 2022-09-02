@@ -1,0 +1,14 @@
+﻿.col-properties {
+    min-width: 25rem;
+    max-width: 30rem;
+}
+
+.col-claims,
+.col-users {
+    min-width: 25rem;
+    max-width: 35rem;
+}
+
+.textarea-tall {
+    height: 10rem;
+}

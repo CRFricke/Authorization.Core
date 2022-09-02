@@ -12,7 +12,7 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.User
 {
     public class Edit : BasePage
     {
-        private const string IdPrefix = "UserModel_";
+        private const string IdPrefix = "Input_";
         internal const string Title = "Edit User";
 
         private readonly IHtmlFormElement _formEdit;

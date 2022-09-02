@@ -57,13 +57,13 @@ namespace Authorization.Core.UI.Tests.Integration.Pages.User
         {
             return new Dictionary<string, string>()
             {
-                ["UserModel_Email"] = userModel.Email,
-                ["UserModel_Password"] = userModel.Password,
-                ["UserModel_ConfirmPassword"] = userModel.Password,
-                ["UserModel_GivenName"] = userModel.GivenName,
-                ["UserModel_Surname"] = userModel.Surname,
-                ["UserModel_PhoneNumber"] = userModel.PhoneNumber,
-                ["UserModel_LockoutEnabled"] = userModel.LockoutEnabled.ToString(),
+                ["Input_Email"] = userModel.Email,
+                ["Input_Password"] = userModel.Password,
+                ["Input_ConfirmPassword"] = userModel.Password,
+                ["Input_GivenName"] = userModel.GivenName,
+                ["Input_Surname"] = userModel.Surname,
+                ["Input_PhoneNumber"] = userModel.PhoneNumber,
+                ["Input_LockoutEnabled"] = userModel.LockoutEnabled.ToString(),
                 ["hfRoleList"] = string.Join(',', roleNames)
             };
         }

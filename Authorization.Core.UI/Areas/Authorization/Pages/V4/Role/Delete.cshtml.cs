@@ -104,7 +104,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
             var userClaims = await (
                 from uc in _repository.UserClaims
                 join au in _repository.Users on uc.UserId equals au.Id
-                where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == RoleModel.Name
+                where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == role.Name
                 select uc
                 ).ToArrayAsync();
 

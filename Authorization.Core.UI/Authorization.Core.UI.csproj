@@ -44,6 +44,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Areas\Authorization\Pages\V5\Role\*.cshtml.css" CssScope="b-role-mgmt" />
+    <None Update="Areas\Authorization\Pages\V5\User\*.cshtml.css" CssScope="b-user-mgmt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

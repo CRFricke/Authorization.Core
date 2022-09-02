@@ -50,7 +50,7 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure
             {
                 sc.SetupTestDatabase<ApplicationDbContext>(_connection)
                     .AddMvc()
-                    // Mark the cookie as essential for right now, as Identity uses it on
+                    // Mark the cookie as essential for right now, as Identity uses it in
                     // several places to pass important data in post-redirect-get flows.
                     .AddCookieTempDataProvider(o => o.Cookie.IsEssential = true);
             });

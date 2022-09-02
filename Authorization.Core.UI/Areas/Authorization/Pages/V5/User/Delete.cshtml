@@ -19,13 +19,6 @@
     <environment exclude="Development">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.11.4/datatables.min.css" />
     </environment>
-
-    <style>
-        .col-properties {
-            min-width: 25rem;
-            max-width: 30rem;
-        }
-    </style>
 }
 
 <div class="row align-items-center">
@@ -39,124 +32,116 @@
         <hr class="mt-2" />
     </div>
 </div>
-<div class="row mx-sm-1">
-    <div class="col-12">
+<form id="formDelete" method="post">
+    <div class="row">
         <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
-    </div>
-    <div class="col col-properties me-sm-5 mb-3">
-        <h5 class="text-muted">The user's properties:</h5>
-        <hr />
-        <div class="form-floating">
-            <input asp-for="UserModel.Id" class="form-control" disabled />
-            <label asp-for="UserModel.Id" class="control-label"></label>
-            <span asp-validation-for="UserModel.Email" class="text-danger"></span>
-        </div>
-        <div class="form-floating">
-            <input asp-for="UserModel.Email" class="form-control" disabled />
-            <label asp-for="UserModel.Email" class="control-label"></label>
-            <span asp-validation-for="UserModel.Email" class="text-danger"></span>
-        </div>
-        <div class="form-floating">
-            <input asp-for="UserModel.GivenName" class="form-control" disabled />
-            <label asp-for="UserModel.GivenName" class="control-label"></label>
-            <span asp-validation-for="UserModel.GivenName" class="text-danger"></span>
-        </div>
-        <div class="form-floating">
-            <input asp-for="UserModel.Surname" class="form-control" disabled />
-            <label asp-for="UserModel.Surname" class="control-label"></label>
-            <span asp-validation-for="UserModel.Surname" class="text-danger"></span>
-        </div>
-        <div class="form-floating">
-            <input asp-for="UserModel.PhoneNumber" class="form-control" disabled />
-            <label asp-for="UserModel.PhoneNumber" class="control-label"></label>
-            <span asp-validation-for="UserModel.PhoneNumber" class="text-danger"></span>
-        </div>
-        <div class="form-floating">
-            <input asp-for="UserModel.LockoutEnd" class="form-control" disabled />
-            <label asp-for="UserModel.LockoutEnd" class="control-label"></label>
-            <span asp-validation-for="UserModel.LockoutEnd" class="text-danger"></span>
-        </div>
-        <div class="form-floating">
-            <input asp-for="UserModel.AccessFailedCount" class="form-control" disabled />
-            <label asp-for="UserModel.AccessFailedCount" class="control-label"></label>
-            <span asp-validation-for="UserModel.AccessFailedCount" class="text-danger"></span>
-        </div>
-        <div class="form-check">
-            <label class="form-check-label">
-                <input class="form-check-input" asp-for="UserModel.EmailConfirmed" disabled />
-                @Html.DisplayNameFor(model => model.UserModel.EmailConfirmed)
-            </label>
-        </div>
-        <div class="form-check">
-            <label class="form-check-label">
-                <input class="form-check-input" asp-for="UserModel.PhoneNumberConfirmed" disabled />
-                @Html.DisplayNameFor(model => model.UserModel.PhoneNumberConfirmed)
-            </label>
-        </div>
-        <div class="form-check">
-            <label class="form-check-label">
-                <input class="form-check-input" asp-for="UserModel.LockoutEnabled" disabled />
-                @Html.DisplayNameFor(model => model.UserModel.LockoutEnabled)
-            </label>
-        </div>
-    </div>
-    <div class="col">
-        <h5 class="text-center text-muted mb-3">The user's role assignments:</h5>
-        <hr />
-        <div class="mx-auto">
-            <table class="table table-sm" data-order='[[1,"asc"]]'>
-                <thead>
-                    <tr>
-                        <th class="select-col" data-orderable="false">
-                            <label asp-for="UserModel.Roles.ElementAt(0).IsAssigned"></label>
-                        </th>
-                        <th><label asp-for="UserModel.Roles.ElementAt(0).Name"></label></th>
-                        <th><label asp-for="UserModel.Roles.ElementAt(0).Description"></label></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        foreach (var role in Model.UserModel.Roles)
-                        {
-                            var checkedVal = (role.IsAssigned) ? "checked" : "";
-                            <tr>
-                                <td class="align-middle">
-                                    <input class="form-check ms-3" type="checkbox" @checkedVal disabled />
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(x => role.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(x => role.Description)
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<div class="form-row align-items-center mx-sm-1">
-    <div class="col mx-sm-2">
-        <form id="formDelete" method="post">
+        <div class="col-auto col-properties me-sm-5 mb-3">
+            <h5 class="text-muted">Update the user's details:</h5>
+            <hr />
             <input type="hidden" asp-for="IsSystemUser" />
-            <input type="hidden" asp-for="UserModel.Id" />
-            <input type="hidden" asp-for="UserModel.Email" />
-            <input type="hidden" asp-for="UserModel.Password" />
-            <input type="hidden" asp-for="UserModel.ConfirmPassword" />
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <input id="btnDelete" type="submit" value="Delete" class="btn btn-primary" @btnDeleteAttr />
-                </div>
-                <div class="col-auto px-0">|</div>
-                <div class="col-auto">
-                    <a asp-page="./Index">Back to List</a>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_Id" type="text" value="@Model.UserModel.Id" disabled />
+                <label asp-for="UserModel.Id" class="control-label"></label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_Email" type="text" value="@Model.UserModel.Email" disabled />
+                <label asp-for="UserModel.Email" class="control-label"></label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_GivenName" type="text" value="@Model.UserModel.GivenName" disabled />
+                <label asp-for="UserModel.GivenName" class="control-label"></label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_Surname" type="text" value="@Model.UserModel.Surname" disabled />
+                <label asp-for="UserModel.Surname" class="control-label"></label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_PhoneNumber" type="text" value="@Model.UserModel.PhoneNumber" disabled />
+                <label asp-for="UserModel.PhoneNumber" class="control-label"></label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_LockoutEnd" type="text" value="@Model.UserModel.LockoutEnd" disabled />
+                <label asp-for="UserModel.LockoutEnd" class="control-label"></label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control" id="UserModel_AccessFailedCount" type="text" value="@Model.UserModel.AccessFailedCount" disabled />
+                <label asp-for="UserModel.AccessFailedCount" class="control-label"></label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" disabled
+                        id="UserModel_EmailConfirmed" name="UserModel.EmailConfirmed"
+                        @(Model.UserModel.EmailConfirmed ? "Checked" : "") />
+                    @Html.DisplayNameFor(model => model.UserModel.EmailConfirmed)
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" disabled
+                        id="UserModel_PhoneNumberConfirmed" name="UserModel.PhoneNumberConfirmed"
+                        @(Model.UserModel.PhoneNumberConfirmed ? "Checked" : "") />
+                    @Html.DisplayNameFor(model => model.UserModel.PhoneNumberConfirmed)
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" disabled
+                        id="UserModel_LockoutEnabled" name="UserModel.LockoutEnabled"
+                        @(Model.UserModel.LockoutEnabled ? "Checked" : "") />
+                    @Html.DisplayNameFor(model => model.UserModel.LockoutEnabled)
+                </label>
+            </div>
+            <div class="row">
+                <div class="col-auto d-none d-sm-block align-items-center mt-3">
+                    <input class="btn btn-primary" id="btnDelete" type="submit" value="Delete" @btnDeleteAttr />
+                    <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
                 </div>
             </div>
-        </form>
+        </div>
+        <div class="col col-roles mb-3">
+            <h5 class="text-muted text-center mb-3">Select the user's role assignments:</h5>
+            <hr />
+            <div class="mx-auto">
+                <table class="table table-sm" data-order='[[1,"asc"]]'>
+                    <thead>
+                        <tr>
+                            <th id="thSelect" class="col-auto" data-orderable="false">
+                                <label asp-for="UserModel.Roles.ElementAt(0).IsAssigned"></label>
+                            </th>
+                            <th><label asp-for="UserModel.Roles.ElementAt(0).Name"></label></th>
+                            <th><label asp-for="UserModel.Roles.ElementAt(0).Description"></label></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var role in Model.UserModel.Roles)
+                            {
+                                var checkedVal = (role.IsAssigned) ? "checked" : "";
+                                <tr>
+                                    <td class="align-middle">
+                                        <input class="form-check ms-3" type="checkbox" @checkedVal disabled />
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(x => role.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(x => role.Description)
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-auto d-block d-sm-none align-items-center mt-3">
+                    <input class="btn btn-primary" id="btnDelete" type="submit" value="Delete" @btnDeleteAttr />
+                    <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</form>
 
 @section Scripts {
 

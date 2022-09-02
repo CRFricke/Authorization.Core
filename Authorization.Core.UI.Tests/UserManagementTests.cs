@@ -85,6 +85,17 @@ namespace Authorization.Core.UI.Tests
                 new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
             };
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.DefinedClaims == GetDefinedClaims() &&
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
@@ -101,6 +112,7 @@ namespace Authorization.Core.UI.Tests
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -122,6 +134,17 @@ namespace Authorization.Core.UI.Tests
 
             var roles = new List<ApplicationRole>();
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.DefinedClaims == GetDefinedClaims() &&
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
@@ -138,6 +161,7 @@ namespace Authorization.Core.UI.Tests
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -153,6 +177,8 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
@@ -165,6 +191,17 @@ namespace Authorization.Core.UI.Tests
             ApplicationUser user = null;
 
             var roles = new List<ApplicationRole>();
+
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.DefinedClaims == GetDefinedClaims() &&
@@ -182,6 +219,7 @@ namespace Authorization.Core.UI.Tests
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -199,6 +237,17 @@ namespace Authorization.Core.UI.Tests
 
             var roles = new List<ApplicationRole>();
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.DefinedClaims == GetDefinedClaims() &&
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
@@ -215,6 +264,7 @@ namespace Authorization.Core.UI.Tests
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -223,7 +273,9 @@ namespace Authorization.Core.UI.Tests
             Assert.NotNull(user);
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
+            Assert.Contains($"created {nameof(ApplicationUser)}", logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
         }
@@ -330,6 +382,17 @@ namespace Authorization.Core.UI.Tests
             var users = new List<ApplicationUser> { new ApplicationUser("TestUser@company.com") };
             var roles = new List<ApplicationRole> { };
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
             repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
             repository.Setup(db => db.Users).Returns(users.AsQueryable().BuildMockDbSet().Object);
@@ -340,6 +403,7 @@ namespace Authorization.Core.UI.Tests
             var model = new EditModel<ApplicationUser, ApplicationRole>(null, repository.Object, logger)
             {
                 UserModel = new UserModel { Id = users[0].Id, Email = "TestUser@company.com" },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -355,6 +419,8 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(users[0].Id, logger.LogEntries[0].Message);
             Assert.Contains(users[0].Email, logger.LogEntries[0].Message);
@@ -474,6 +540,17 @@ namespace Authorization.Core.UI.Tests
             var user = new ApplicationUser("TestUser@company.com");
             var users = new List<ApplicationUser> { user };
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
                 db.Users == users.AsQueryable().BuildMockDbSet().Object &&
@@ -485,6 +562,7 @@ namespace Authorization.Core.UI.Tests
             var model = new EditModel<ApplicationUser, ApplicationRole>(null, repository, logger)
             {
                 UserModel = new UserModel { Id = user.Id, Email = user.Email },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -503,6 +581,17 @@ namespace Authorization.Core.UI.Tests
             var user = new ApplicationUser("TestUser@company.com");
             var users = new List<ApplicationUser> { user };
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
                 db.Users == users.AsQueryable().BuildMockDbSet().Object &&
@@ -514,6 +603,7 @@ namespace Authorization.Core.UI.Tests
             var model = new EditModel<ApplicationUser, ApplicationRole>(null, repository, logger)
             {
                 UserModel = new UserModel { Id = user.Id, Email = user.Email },
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -522,6 +612,8 @@ namespace Authorization.Core.UI.Tests
             Assert.NotNull(user);
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
@@ -710,6 +802,17 @@ namespace Authorization.Core.UI.Tests
 
             var user = new ApplicationUser("TestUser@company.com");
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
@@ -724,7 +827,7 @@ namespace Authorization.Core.UI.Tests
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 UserModel = CreateModelFromUser(user),
-                PageContext = new PageContext(),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -740,6 +843,8 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
@@ -750,6 +855,17 @@ namespace Authorization.Core.UI.Tests
         public async Task UserManagement_Test24Async()
         {
             var user = new ApplicationUser("TestUser@company.com");
+
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
@@ -766,7 +882,7 @@ namespace Authorization.Core.UI.Tests
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 UserModel = CreateModelFromUser(user),
-                PageContext = new PageContext(),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -785,6 +901,17 @@ namespace Authorization.Core.UI.Tests
 
             var user = new ApplicationUser("TestUser@company.com");
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
@@ -801,7 +928,7 @@ namespace Authorization.Core.UI.Tests
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 UserModel = CreateModelFromUser(user),
-                PageContext = new PageContext(),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -814,6 +941,8 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
@@ -826,6 +955,17 @@ namespace Authorization.Core.UI.Tests
 
             var user = new ApplicationUser("TestUser@company.com");
             var users = new List<ApplicationUser>(new[] { user });
+
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), user, It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
@@ -841,6 +981,7 @@ namespace Authorization.Core.UI.Tests
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 UserModel = CreateModelFromUser(user),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -854,17 +995,20 @@ namespace Authorization.Core.UI.Tests
             Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
             Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
+            Assert.Contains("delete system", logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
-            Assert.Contains(expectedMessage, logger.LogEntries[0].Message);
         }
 
         [Fact(DisplayName = "Edit User [Post] prevents update of System User")]
         public async Task UserManagement_Test27Async()
         {
             var expectedMessage = "You may not update the Roles assigned to a system User";
+            var expectedLogMessage = $"update the Roles of system {nameof(ApplicationUser)}";
 
             var roles = new List<ApplicationRole>
             {
@@ -881,6 +1025,17 @@ namespace Authorization.Core.UI.Tests
                 );
             var users = new List<ApplicationUser> { user };
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), user, It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
                 );
@@ -895,6 +1050,7 @@ namespace Authorization.Core.UI.Tests
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, dbContext, logger)
             {
                 UserModel = CreateModelFromUser(user),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -908,11 +1064,12 @@ namespace Authorization.Core.UI.Tests
             Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
             Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
+            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
+            Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
-            Assert.Contains(expectedMessage, logger.LogEntries[0].Message);
         }
 
         [Fact(DisplayName = "Edit User [Post] refreshes User cache on success")]
@@ -933,6 +1090,17 @@ namespace Authorization.Core.UI.Tests
                 );
             var users = new List<ApplicationUser> { user };
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), user, It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
@@ -948,6 +1116,7 @@ namespace Authorization.Core.UI.Tests
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 UserModel = CreateModelFromUser(user),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -964,6 +1133,17 @@ namespace Authorization.Core.UI.Tests
         {
             var user = new ApplicationUser("TestUser@company.com");
 
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
+            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
+                );
+
+            var httpContext = Mock.Of<HttpContext>(hc =>
+                hc.User == claimsPrincipal
+                );
+
             var authManager = Mock.Of<IAuthorizationManager>(am =>
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), user, It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
@@ -979,7 +1159,7 @@ namespace Authorization.Core.UI.Tests
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 UserModel = CreateModelFromUser(user),
-                PageContext = new PageContext(),
+                PageContext = new PageContext { HttpContext = httpContext },
                 TempData = new TestTempDataDictionary()
             };
 
@@ -1018,12 +1198,15 @@ namespace Authorization.Core.UI.Tests
         public async Task UserManagement_Test31Async()
         {
             var expectedMessage = "can not create a User with more privileges than you";
-            var expectedLogMessage = $"attempted to give {nameof(ApplicationUser)} elevated privileges";
+            var expectedLogMessage = $"create {nameof(ApplicationUser)} with elevated privileges";
 
-            var user = new ApplicationUser("TestUser@company.com");
+            var user = new ApplicationUser("NewUser@company.com");
+
+            var principalId = Guid.NewGuid().ToString();
+            var principalName = "TestUser@company.com";
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, user.Id) } &&
-                cp.Identity.Name == user.UserName
+                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+                cp.Identity.Name == principalName
                 );
 
             var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1057,9 +1240,9 @@ namespace Authorization.Core.UI.Tests
             Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
             Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(user.Id, logger.LogEntries[0].Message);
-            Assert.Contains(user.UserName, logger.LogEntries[0].Message);
+            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+            Assert.Contains(principalId, logger.LogEntries[0].Message);
+            Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Null(logger.LogEntries[0].Exception);
         }
@@ -1068,7 +1251,7 @@ namespace Authorization.Core.UI.Tests
         public async Task UserManagement_Test32Async()
         {
             var expectedMessage = "can not give a User more privileges than you";
-            var expectedLogMessage = $"attempted to give {nameof(ApplicationUser)} elevated privileges";
+            var expectedLogMessage = "elevated privileges";
 
             var roles = new List<ApplicationRole>
             {
@@ -1121,9 +1304,12 @@ namespace Authorization.Core.UI.Tests
             Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
             Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
             Assert.Contains(principalUser.Id, logger.LogEntries[0].Message);
             Assert.Contains(principalUser.UserName, logger.LogEntries[0].Message);
+            Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
+            Assert.Contains(user.Email, logger.LogEntries[0].Message);
+            Assert.Contains(user.Id, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Null(logger.LogEntries[0].Exception);
         }
@@ -1185,7 +1371,7 @@ namespace Authorization.Core.UI.Tests
             Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
             Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
             Assert.Contains(principal.Id, logger.LogEntries[0].Message);
             Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);

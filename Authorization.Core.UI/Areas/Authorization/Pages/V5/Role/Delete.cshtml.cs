@@ -85,7 +85,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 return RedirectToPage(IndexModel.PageName);
             }
 
-            await RoleModel.InitRoleUsersAsync(_repository);
+            // Don't care about ModelState on Delete.
+            ModelState.Clear();
 
             var result = await _authManager.AuthorizeAsync(User, role, new AppClaimRequirement(SysClaims.Role.Delete));
             if (!result.Succeeded)
@@ -98,6 +99,9 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                      User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
                     );
 
+                await RoleModel.InitRoleClaims(_authManager)
+                    .InitFromRole(role)
+                    .InitRoleUsersAsync(_repository);
 
                 return Page();
             }
@@ -105,7 +109,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
             var userClaims = await (
                 from uc in _repository.UserClaims
                 join au in _repository.Users on uc.UserId equals au.Id
-                where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == RoleModel.Name
+                where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == role.Name
                 select uc
                 ).ToArrayAsync();
 
@@ -125,6 +129,9 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                     User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
                     );
 
+                await RoleModel.InitRoleClaims(_authManager)
+                    .InitFromRole(role)
+                    .InitRoleUsersAsync(_repository);
 
                 return Page();
             }
