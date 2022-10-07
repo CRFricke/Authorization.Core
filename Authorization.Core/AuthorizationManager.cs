@@ -30,32 +30,26 @@ namespace CRFricke.Authorization.Core
         /// </summary>
         static AuthorizationManager()
         {
-            List<Type> classTypes = new();
+            Assembly thisAssembly = typeof(AuthorizationManager<TUser, TRole>).Assembly;
+            string assemblyName = thisAssembly.GetName().Name!;
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<Assembly> assemblies = new() { thisAssembly };
+            assemblies.AddRange(
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => a.GetReferencedAssemblies().Any(an => an.Name == assemblyName))
+                );
+
+            List<Type> classTypes = new();
             foreach (var assembly in assemblies)
             {
                 try
                 {
                     classTypes.AddRange(assembly.ExportedTypes.Where(t => !t.IsInterface));
                 }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    // Experienced error loading Types for 'Microsoft.EntityFrameworkCore.Relational, Version=3.1.21.0' during testing.
-                    // We can probably ignore any assemblies that cause this Exception, but to be safe we'll process the Types that were successfully loaded.
-
-                    if (ex.Types != null)
-                    {
-                        var x = ex.Types.Where(t => t != null && t.IsVisible && !t.IsInterface).Cast<Type>();
-                        classTypes.AddRange(x);
-                    }
-                }
                 catch (NotSupportedException)
                 { 
-                    // Can't load members of a dynamic assembly
+                    // Can't load members of the dynamic assemblies created during unit testing.
                 }
-                catch (TypeLoadException)
-                { }
             }
 
             LoadSystemClaims(classTypes);
