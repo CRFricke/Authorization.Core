@@ -199,7 +199,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.NotNull(logger.LogEntries[0].Exception);
@@ -245,7 +244,6 @@ namespace Authorization.Core.UI.Tests
             Assert.NotNull(role);
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -427,7 +425,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -638,7 +635,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -840,7 +836,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(expectedMessage2, logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -905,7 +900,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -1019,7 +1013,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -1075,7 +1068,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(expectedMessage2, logger.LogEntries[0].Message);
             Assert.Contains(role.Id, logger.LogEntries[0].Message);
@@ -1231,7 +1223,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Null(logger.LogEntries[0].Exception);
@@ -1286,7 +1277,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
             Assert.Contains(role.Name, logger.LogEntries[0].Message);
