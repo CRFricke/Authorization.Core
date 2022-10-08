@@ -1,7 +1,7 @@
 ## Installing the Authorization.Core package
 
-This section assumes that ASP.NET Core Identity is already installed, and that you can sucessfully 
-log in. To create a new ASP.NET Core Web Application with authentication, see 
+This section assumes that ASP.NET Core Identity is already installed and you can sucessfully log in. 
+To create a new ASP.NET Core Web Application with authentication, see 
 [Create a Web app with authentication](https://docs.microsoft.com/en-gb/aspnet/core/security/authentication/identity?view=aspnetcore-6.0&tabs=visual-studio#create-a-web-app-with-authentication).
 To add authentication to an existing ASP.NET Core Application, see 
 [Scaffold Identity in ASP.NET Core projects](https://docs.microsoft.com/en-gb/aspnet/core/security/authentication/scaffold-identity?view=aspnetcore-6.0&tabs=visual-studio#scaffold-identity-into-a-razor-project-without-existing-authorization).
