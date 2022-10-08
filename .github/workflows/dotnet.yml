@@ -10,7 +10,7 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      VERSION_DEFAULT: '6.0.2'
+      VERSION_DEFAULT: '6.0.3'
 
     runs-on: ubuntu-latest
 
