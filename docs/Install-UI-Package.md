@@ -1,6 +1,6 @@
 ﻿## Installing the Authorization.Core.UI package
 
-This section assumes that ASP.NET Core Identity is already installed, and that you can sucessfully 
+This section assumes that ASP.NET Core Identity is already installed and you can sucessfully 
 log in. To create a new ASP.NET Core Web Application with authentication, see 
 [Create a Web app with authentication](https://docs.microsoft.com/en-gb/aspnet/core/security/authentication/identity?view=aspnetcore-6.0&tabs=visual-studio#create-a-web-app-with-authentication).
 To add authentication to an existing ASP.NET Core Application, see 
@@ -88,6 +88,10 @@ _Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the e
 - If you extended the `AuthUiRole` class, chain an `AddRoles` clause with the name of the new class 
   to the `AddDefaultIdentity` statement.
 - Chain an `AddAccessRightBasedAuthorization` clause to the `AddEntityFrameworkStores` clause.
+  - AddAccessRightBasedAuthorization accepts an optional parameter, `DbInitializationOption`, to specify 
+    how the Microsoft Identity database (which the Authorization.Core package uses) is to be initialized. 
+    The default is `DbInitializationOption.Migrate`. which will apply any outstanding database migrations 
+    during startup..
 - Chain an `AddAuthorizationCoreUI` clause to the AddAccessRightBasedAuthorization clause.
     - You can specify an alternate area name for the pages exposed by the UI package by specifying the 
     desired name in the `AuthCoreUIOptions.FriendlyAreaName` property (shown below). If a value is 
