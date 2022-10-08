@@ -69,8 +69,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, "You can not create a User with more privileges than you have.");
 
                 _logger.LogWarning(
-                    "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to create {UserType} with elevated privileges.",
-                    User.Identity.Name, User.UserId(), typeof(TUser).Name
+                    "'{PrincipalEmail}' attempted to create {UserType} with elevated privileges.",
+                    User.Identity.Name, typeof(TUser).Name
                     );
 
                 return Page();
@@ -90,8 +90,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
                 _logger.LogError(
-                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not create {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    ex, "'{PrincipalEmail}' could not create {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                     );
 
                 return Page();
@@ -103,8 +103,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 );
 
             _logger.LogInformation(
-                "'{PrincipalEmail}' (ID '{PrincipalId}') created {UserType} '{UserEmail}' (ID '{UserId}').",
-                 User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                "'{PrincipalEmail}' created {UserType} '{UserEmail}' (ID '{UserId}').",
+                User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                 );
 
             return RedirectToPage(IndexModel.PageName);

@@ -95,8 +95,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 ModelState.AddModelError(string.Empty, "System Roles may not be deleted.");
 
                 _logger.LogWarning(
-                    "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                     User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    "'{PrincipalEmail}' attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                     );
 
                 await RoleModel.InitRoleClaims(_authManager)
@@ -125,8 +125,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
                 _logger.LogError(
-                    ex, "'{PrincipalEmail}' (ID: {PrincipalId}) could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
-                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    ex, "'{PrincipalEmail}' could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                     );
 
                 await RoleModel.InitRoleClaims(_authManager)
@@ -151,8 +151,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
                 );
 
             _logger.LogInformation(
-                "'{PrincipalEmail}' (ID: {PrincipalId}) deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
-                User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                "'{PrincipalEmail}' deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
+                User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             return RedirectToPage(IndexModel.PageName);

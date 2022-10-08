@@ -107,8 +107,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                         ModelState.AddModelError(string.Empty, "You may not update the Roles assigned to a system User.");
 
                         _logger.LogWarning(
-                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
-                            User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                            "'{PrincipalEmail}' attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
+                            User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                             );
                         return Page();
                     }
@@ -117,16 +117,16 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                     {
                         ModelState.AddModelError(string.Empty, "You can not give a User more privileges than you have.");
                         _logger.LogWarning(
-                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
-                            User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                            "'{PrincipalEmail}' attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
+                            User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                             );
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "You can not elevate your own privileges.");
                         _logger.LogWarning(
-                            "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to elevate their own privileges.",
-                             User.Identity.Name, User.UserId()
+                            "'{PrincipalEmail}' attempted to elevate their own privileges.",
+                            User.Identity.Name
                             );
                     }
 
@@ -144,8 +144,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
                 _logger.LogError(
-                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not update {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    ex, "'{PrincipalEmail}' could not update {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                     );
 
                 return Page();
@@ -164,8 +164,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
                     );
 
                 _logger.LogInformation(
-                    "'{PrincipalEmail}' (ID '{PrincipalId}') updated {UserType} '{UserEmail}' (ID '{UserId}').",
-                     User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    "'{PrincipalEmail}' updated {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                     );
             }
 

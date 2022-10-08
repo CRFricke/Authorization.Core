@@ -108,8 +108,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
                         ModelState.AddModelError(string.Empty, "You may not update the Claims assigned to a system Role.");
 
                         _logger.LogWarning(
-                            "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                            User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                            "'{PrincipalEmail}' attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
+                            User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                             );
                         return Page();
                     }
@@ -117,8 +117,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
                     ModelState.AddModelError(string.Empty, "You can not give a Role more privileges than you have.");
 
                     _logger.LogWarning(
-                        "'{PrincipalEmail}' (ID: {PrincipalId}) attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
-                        User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                        "'{PrincipalEmail}' attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
+                        User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                         );
                     return Page();
                 }
@@ -134,8 +134,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
                 _logger.LogError(
-                    ex, "'{PrincipalEmail}' (ID: {PrincipalId}) could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
-                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    ex, "'{PrincipalEmail}' could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                     );
 
                 return Page();
@@ -154,8 +154,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
                     );
 
                 _logger.LogInformation(
-                    "'{PrincipalEmail}' (ID: {PrincipalId}) updated {RoleType} '{RoleName}' (ID: {RoleId}).",
-                    User.Identity.Name, User.UserId(), typeof(TRole).Name, role.Name, role.Id
+                    "'{PrincipalEmail}' updated {RoleType} '{RoleName}' (ID: {RoleId}).",
+                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                     );
             }
 

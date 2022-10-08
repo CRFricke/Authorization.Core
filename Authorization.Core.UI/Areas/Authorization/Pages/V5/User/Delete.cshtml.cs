@@ -100,8 +100,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
                 ModelState.AddModelError(string.Empty, "System accounts may not be deleted.");
 
                 _logger.LogWarning(
-                    "'{PrincipalEmail}' (ID '{PrincipalId}') attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    "'{PrincipalEmail}' attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                     );
 
                 (await UserModel.InitRoleInfoAsync(_repository)).InitFromUser(user);
@@ -119,8 +119,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
                 ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
                 _logger.LogError(
-                    ex, "'{PrincipalEmail}' (ID '{PrincipalId}') could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                    ex, "'{PrincipalEmail}' could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
+                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                     );
             }
 
@@ -139,8 +139,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
                 );
 
             _logger.LogInformation(
-                "'{PrincipalEmail}' (ID '{PrincipalId}') deleted {UserType} '{UserEmail}' (ID '{UserId}').",
-                User.Identity.Name, User.UserId(), typeof(TUser).Name, user.Email, user.Id
+                "'{PrincipalEmail}' deleted {UserType} '{UserEmail}' (ID '{UserId}').",
+                User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
                 );
 
             return RedirectToPage(IndexModel.PageName);

@@ -177,7 +177,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
@@ -273,7 +272,6 @@ namespace Authorization.Core.UI.Tests
             Assert.NotNull(user);
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains($"created {nameof(ApplicationUser)}", logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
@@ -419,7 +417,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(users[0].Id, logger.LogEntries[0].Message);
@@ -612,7 +609,6 @@ namespace Authorization.Core.UI.Tests
             Assert.NotNull(user);
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
@@ -843,7 +839,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
@@ -941,7 +936,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
@@ -996,7 +990,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains("delete system", logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
@@ -1065,7 +1058,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Contains(user.Id, logger.LogEntries[0].Message);
@@ -1241,7 +1233,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalId, logger.LogEntries[0].Message);
             Assert.Contains(principalName, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Null(logger.LogEntries[0].Exception);
@@ -1305,7 +1296,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalUser.Id, logger.LogEntries[0].Message);
             Assert.Contains(principalUser.UserName, logger.LogEntries[0].Message);
             Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
             Assert.Contains(user.Email, logger.LogEntries[0].Message);
@@ -1372,7 +1362,6 @@ namespace Authorization.Core.UI.Tests
 
             Assert.Single(logger.LogEntries);
             Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principal.Id, logger.LogEntries[0].Message);
             Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
             Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
             Assert.Null(logger.LogEntries[0].Exception);
