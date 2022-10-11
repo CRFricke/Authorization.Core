@@ -36,7 +36,7 @@ namespace CRFricke.Authorization.Core
             List<Assembly> assemblies = new() { thisAssembly };
             assemblies.AddRange(
                 AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => !a.IsDynamic)   // Ignore Mocked assemblies during testing
+                    .Where(a => !a.IsDynamic)   // Ignore Mocked assemblies during testing (GetExportedTypes() throws exception)
                     .Where(a => a.GetReferencedAssemblies().Any(an => an.Name == assemblyName))
                 );
 
