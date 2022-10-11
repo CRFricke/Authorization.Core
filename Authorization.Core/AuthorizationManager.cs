@@ -36,82 +36,68 @@ namespace CRFricke.Authorization.Core
             List<Assembly> assemblies = new() { thisAssembly };
             assemblies.AddRange(
                 AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => !a.IsDynamic)   // Ignore Mocked assemblies during testing
                     .Where(a => a.GetReferencedAssemblies().Any(an => an.Name == assemblyName))
                 );
 
-            List<Type> classTypes = new();
-            foreach (var assembly in assemblies)
-            {
-                try
-                {
-                    classTypes.AddRange(assembly.ExportedTypes.Where(t => !t.IsInterface));
-                }
-                catch (NotSupportedException)
-                { 
-                    // Can't load members of the dynamic assemblies created during unit testing.
-                }
-            }
-
-            LoadSystemClaims(classTypes);
-            LoadSystemGuids(classTypes);
+            LoadSystemClaims(assemblies);
+            LoadSystemGuids(assemblies);
         }
 
         /// <summary>
         /// Loads the Claims that are installed by the application.
         /// </summary>
-        private static void LoadSystemClaims(List<Type> classTypes)
+        private static void LoadSystemClaims(List<Assembly> assemblies)
         {
-            // Find all classes that implement IDefinesClaims interface.
-            var types = classTypes.Where(t => typeof(IDefinesClaims).IsAssignableFrom(t));
+            List<IDefinesClaims> claimClasses = new();
+
+            // Load all classes that implement IDefinesClaims interface.
+            foreach (Assembly assembly in assemblies)
+            {
+                claimClasses.AddRange(
+                    assembly.GetExportedTypes()
+                        .Where(t => typeof(IDefinesClaims).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+                        .Select(Activator.CreateInstance).Cast<IDefinesClaims>()
+                    );
+            }
 
             // Now retrieve the Claims defined in each class
-            foreach (Type type in types)
+            foreach (var claimClass in claimClasses)
             {
-                var constructor = type.GetConstructor(Type.EmptyTypes)
-                    ?? throw new InvalidOperationException($"'{type.FullName}' does not have a default constructor.");
-
-                var definesClaims = (IDefinesClaims)constructor.Invoke(null);
-                var claims = definesClaims.DefinedClaims;
-                if (claims != null)
-                {
-                    DefinedClaims.AddRange(claims);
-                }
+                DefinedClaims.AddRange(claimClass.DefinedClaims);
 
                 // Save any claims that are marked with the RestrictedClaim attribute
-                var fiCollection = type.GetFields()
-                    .Where(fi => Attribute.IsDefined(fi, typeof(RestrictedClaimAttribute)));
-                if (fiCollection != null)
-                {
-                    RestrictedClaims.AddRange(
-                        from FieldInfo fi in fiCollection
-                        let claim = fi.GetRawConstantValue() as string
-                        where claim != null
-                        select claim
+                RestrictedClaims.AddRange(
+                    from FieldInfo fi in claimClass.GetType().GetFields()
+                    where Attribute.IsDefined(fi, typeof(RestrictedClaimAttribute))
+                    let claim = fi.GetRawConstantValue() as string
+                    where claim != null
+                    select claim
                     );
-                }
             }
         }
 
         /// <summary>
         /// Loads the GUIDs of the entities installed by the application.
         /// </summary>
-        private static void LoadSystemGuids(List<Type> classTypes)
+        private static void LoadSystemGuids(List<Assembly> assemblies)
         {
-            // Find all classes that implement IDefinesGuids interface.
-            var types = classTypes.Where(t => typeof(IDefinesGuids).IsAssignableFrom(t));
+            List<IDefinesGuids> guidClasses = new();
 
-            // Now retrieve the GUIDs defined in each class
-            foreach (Type type in types)
+            // Load all classes that implement IDefinesGuids interface.
+            foreach (Assembly assembly in assemblies)
             {
-                var constructor = type.GetConstructor(Type.EmptyTypes)
-                    ?? throw new InvalidOperationException($"'{type.FullName}' does not have a default constructor.");
+                guidClasses.AddRange(
+                    assembly.GetExportedTypes()
+                        .Where(t => typeof(IDefinesGuids).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+                        .Select(Activator.CreateInstance).Cast<IDefinesGuids>()
+                    );
+            }
 
-                var definesGuids = (IDefinesGuids)constructor.Invoke(null);
-                var guids = definesGuids.DefinedGuids;
-                if (guids != null)
-                {
-                    DefinedGuids.AddRange(guids);
-                }
+            // Now load the GUIDs defined in each class
+            foreach (var guidClass in guidClasses)
+            {
+                DefinedGuids.AddRange(guidClass.DefinedGuids);
             }
         }
 
