@@ -9,25 +9,25 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      VERSION_DEFAULT: '6.0.3'
 
     runs-on: ubuntu-latest
 
     steps:
     - name: Setup PowerShell
-      uses: CRFricke/Setup-PowerShell@v1.0.1
-
-    - name: Get Build Version
-      shell: pwsh
-      run: |
-        Get-VersionVariables $env:GITHUB_REF
-        if ($Tag_PreRelease -or $Tag_Build) { throw "Invalid GITHUB_REF for release." }
-        $Version = "$Tag_Major.$Tag_Minor.$Tag_Patch"
-        Set-ActionVariable "BUILD_VERSION" "$Version"
-        Write-Host "BUILD_VERSION: $Version"
+      uses: CRFricke/Setup-PowerShell@v1.0.4
 
     - name: Checkout
       uses: actions/checkout@v2
+
+    - name: Get Build Version
+      shell: pwsh
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        Get-VersionVariables
+        if ($Tag_PreRelease -or $Tag_Build) { throw "Invalid GITHUB_REF for release." }
+        Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
+        Write-Host "BUILD_VERSION: $Tag_Version"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
