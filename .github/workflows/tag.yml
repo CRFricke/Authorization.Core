@@ -21,12 +21,12 @@ jobs:
 
     - name: Get Build Version
       shell: pwsh
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
         Write-Host "BUILD_VERSION: $Tag_Version"
-      env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
