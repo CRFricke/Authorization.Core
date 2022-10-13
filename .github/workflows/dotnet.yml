@@ -22,6 +22,8 @@ jobs:
 
     - name: Get Build Version
       shell: pwsh
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
