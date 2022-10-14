@@ -23,6 +23,7 @@ jobs:
       shell: pwsh
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: 'v6.0'
       run: |
         Get-VersionVariables
         if ($Tag_PreRelease -or $Tag_Build) { throw "Invalid GITHUB_REF for release." }
