@@ -5,31 +5,14 @@
     ViewData["Title"] = "Edit User";
 }
 
-@section css {
-
-    <environment include="Development">
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" />
-    </environment>
-
-    <style>
-        .col-properties {
-            min-width: 25rem;
-            max-width: 30rem;
-        }
-    </style>
-
-    @if (Model.IsSystemUser)
-    {
-        <style>
-            td input[type=checkbox] {
-                pointer-events: none;
-                opacity: 0.5;
-            }
-        </style>
+@if (Model.IsSystemUser)
+{
+<style>
+    td input[type=checkbox] {
+        pointer-events: none;
+        opacity: 0.5;
     }
+</style>
 }
 
 <div class="row">
@@ -147,15 +130,6 @@
 </div>
 
 @section Scripts {
-
-    <environment include="Development">
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.js"></script>
-    </environment>
-    <environment exclude="Development">
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
-    </environment>
 
     <script defer>
         var dt = $('table').DataTable();
