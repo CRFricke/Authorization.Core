@@ -64,10 +64,23 @@ must be `AuthUiUser` (or the name of your derived class; in this case, Applicati
 @inject UserManager<ApplicationUser> UserManager
 ```
 
-### Add a RenderSectionAsync statement to _Layout.cshtml
+### Add DataTables package references to _Layout.cshtml
 
-The razor pages exposed by the UI package need to add stylesheet links in the `<head>` section of 
-_Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the end of the section:
+**_Note:_** _If your application uses the DataTables.net client side package and already has references for it,
+there is no need to add the statements described below; you can skip the section._
+
+The razor pages exposed by the UI package make use of a client side package called DataTables.net. 
+This package supports both Bootstrap 4 and 5. It requires references for the associated CSS and 
+javascript files be added to the `_Layout.cshtml` file that exposes the UI package's razor pages.
+
+The UI package provides the required CSS and javascript files in the 
+`~/_content/CRFricke.Authorization.Core.UI/lib/datatables` folder.
+The Bootstrap 4 files are located in the "bs4" folder, the Bootstrap 5 files in the "bs5" folder.
+
+Add a stylesheet link for `dataTables.min.css` from the appropriate folder ("bs5" in the example below)
+to the `<head>` section.
+Also add a script reference for `dataTables.min.js` from the appropriate folder to the end of the `<body>` 
+section. Both statements are shown below:
 
 ```html
 <!DOCTYPE html>
@@ -77,10 +90,22 @@ _Layout.cshtml. Add the `RenderSectionAsync` statement, as shown below, to the e
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Authorization.Core.UI.Test.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/_content/CRFricke.Authorization.Core.UI/lib/datatables/bs5/dataTables.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     @await RenderSectionAsync("css", required: false)
 </head>
+<body>
+
     ⁝
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/_content/CRFricke.Authorization.Core.UI/lib/datatables/bs5/dataTables.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
 ```
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
