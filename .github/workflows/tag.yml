@@ -59,7 +59,7 @@ jobs:
         dotnet add **/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $BUILD_VERSION --source https://nuget.pkg.github.com/CRFricke/index.json
 
     - name: Create Authorization.Core.UI NuGet package
-      run: dotnet pack **/Authorization.Core.UI.csproj --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
+      run: dotnet pack **/Authorization.Core.UI.csproj --configuration $BUILD_CONFIG /p:Version=$BUILD_VERSION
 
     - name: Upload Authorization.Core.UI NuGet package to GitHub
       run: dotnet nuget push "**/CRFricke.Authorization.Core.UI.*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
