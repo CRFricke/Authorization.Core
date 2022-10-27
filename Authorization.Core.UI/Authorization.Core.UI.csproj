@@ -69,6 +69,8 @@
   <!-- Based on Microsoft.AspNetCore.Identity.UI project file located at: --> 
   <!--   https://github.com/dotnet/aspnetcore/blob/main/src/Identity/UI/src/Microsoft.AspNetCore.Identity.UI.csproj --> 
   <PropertyGroup>
+    <ProvideApplicationPartFactoryAttributeTypeName>Microsoft.AspNetCore.Mvc.ApplicationParts.NullApplicationPartFactory, Microsoft.AspNetCore.Mvc.Core</ProvideApplicationPartFactoryAttributeTypeName>
+    <GenerateStaticWebAssetsPackTargetsDependsOn>_GenerateAuthUIPackItems;$(GenerateStaticWebAssetsPackTargetsDependsOn)</GenerateStaticWebAssetsPackTargetsDependsOn>
     <DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
     <StaticWebAssetsDisableProjectBuildPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildPropsFileGeneration>
     <StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>
@@ -77,6 +79,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Update="**\*.cshtml" Pack="false" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
     <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
@@ -95,6 +98,7 @@
         <ContentRoot>$([System.IO.Path]::GetFullPath($(_ReferenceAssetContentRoot)))</ContentRoot>
       </ReferenceAssetCandidates>
     </ItemGroup>
+    <Message Importance="high" Text="ReferenceAssetCandidate count: @(ReferenceAssetCandidates->Count())." />
     <DefineStaticWebAssets
       Condition="'@(ReferenceAssetCandidates->Count())' != '0'"
       CandidateAssets="@(ReferenceAssetCandidates)"
@@ -111,7 +115,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="_GenerateAuthUIPackItems" BeforeTargets="GenerateStaticWebAssetsPackFiles">
+  <Target Name="_GenerateAuthUIPackItems">
     <ItemGroup>
       <BS4AssetCandidates Include="assets\BS4\**" />
       <BS4AssetCandidates>
@@ -122,6 +126,8 @@
         <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
       </BS5AssetCandidates>
     </ItemGroup>
+    <Message Importance="high" Text="BS4AssetCandidate count: @(BS4AssetCandidates->Count())." />
+    <Message Importance="high" Text="BS5AssetCandidate count: @(BS5AssetCandidates->Count())." />
     <DefineStaticWebAssets 
       Condition="'@(BS4AssetCandidates->Count())' != '0'" 
       CandidateAssets="@(BS4AssetCandidates)" 
@@ -141,23 +147,29 @@
       <Output TaskParameter="Assets" ItemName="BS5Assets" />
     </DefineStaticWebAssets>
 
-    <GenerateStaticWebAsssetsPropsFile StaticWebAssets="@(BS4Assets)" PackagePathPrefix="staticwebassets/BS4" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.V4.targets" />
-    <GenerateStaticWebAsssetsPropsFile StaticWebAssets="@(BS5Assets)" PackagePathPrefix="staticwebassets/BS5" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.V5.targets" />
+    <GenerateStaticWebAsssetsPropsFile StaticWebAssets="@(BS4Assets)" PackagePathPrefix="staticwebassets/BS4" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" />
+    <GenerateStaticWebAsssetsPropsFile StaticWebAssets="@(BS5Assets)" PackagePathPrefix="staticwebassets/BS5" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" />
 
     <ComputeStaticWebAssetsTargetPaths Assets="@(BS4Assets)" PathPrefix="staticwebassets/BS4" AdjustPathsForPack="true">
-      <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
+      <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackBS4Assets" />
     </ComputeStaticWebAssetsTargetPaths>
     <ComputeStaticWebAssetsTargetPaths Assets="@(BS5Assets)" PathPrefix="staticwebassets/BS5" AdjustPathsForPack="true">
-      <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
+      <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackBS5Assets" />
     </ComputeStaticWebAssetsTargetPaths>
 
     <ItemGroup>
-      <StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.V4.targets">
+      <TfmSpecificPackageFile Include="$(IntermediateOutputPath)AuthUI.BS4.targets">
         <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS4.targets</PackagePath>
-      </StaticWebAssetPackageFile>
-      <StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.V5.targets">
+      </TfmSpecificPackageFile>
+      <TfmSpecificPackageFile Include="%(_PackBS4Assets.Identity)">
+        <PackagePath>%(_PackBS4Assets.TargetPath)</PackagePath>
+      </TfmSpecificPackageFile>
+      <TfmSpecificPackageFile Include="$(IntermediateOutputPath)AuthUI.BS5.targets">
         <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS5.targets</PackagePath>
-      </StaticWebAssetPackageFile>
+      </TfmSpecificPackageFile>
+      <TfmSpecificPackageFile Include="%(_PackBS5Assets.Identity)">
+        <PackagePath>%(_PackBS5Assets.TargetPath)</PackagePath>
+      </TfmSpecificPackageFile>
     </ItemGroup>
   </Target>
 
