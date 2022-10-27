@@ -46,9 +46,9 @@
 
   <ItemGroup>
     <PackageReference Include="CRFricke.EF.Core.Utilities" Version="6.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
