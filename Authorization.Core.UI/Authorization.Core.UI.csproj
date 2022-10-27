@@ -12,6 +12,7 @@
     <Company>Fricke Consulting</Company>
     <Copyright>Copyright © Chuck Fricke 2021</Copyright>
     <Description>Extends ASP.NET Core Identity to include a UI for management of Users and Roles.</Description>
+    <RazorAssemblyDescription>Compiled Razor views assembly for the CRFricke.Authorization.Core.UI package.</RazorAssemblyDescription>
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
@@ -68,6 +69,8 @@
   <!-- Based on Microsoft.AspNetCore.Identity.UI project file located at: --> 
   <!--   https://github.com/dotnet/aspnetcore/blob/main/src/Identity/UI/src/Microsoft.AspNetCore.Identity.UI.csproj --> 
   <PropertyGroup>
+    <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+    <ProvideApplicationPartFactoryAttributeTypeName>Microsoft.AspNetCore.Mvc.ApplicationParts.NullApplicationPartFactory, Microsoft.AspNetCore.Mvc.Core</ProvideApplicationPartFactoryAttributeTypeName>
     <DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
     <StaticWebAssetsDisableProjectBuildPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildPropsFileGeneration>
     <StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>
@@ -76,10 +79,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="@(Content)" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
     <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
+
+  <Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
+    <ItemGroup>
+      <_RazorGenerate Include="Areas\Authorization\Pages\**\*.cshtml" />
+
+      <RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Authorization\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
 
   <Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
     <PropertyGroup>
@@ -122,7 +134,7 @@
       </BS5AssetCandidates>
     </ItemGroup>
     <DefineStaticWebAssets 
-      Condition="'@(BS4AssetCandidates->Count())' != '0'" 
+      Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" 
       CandidateAssets="@(BS4AssetCandidates)" 
       SourceId="$(PackageId)" SourceType="Discovered" 
       AssetKind="All" 
@@ -131,7 +143,7 @@
       <Output TaskParameter="Assets" ItemName="BS4Assets" />
     </DefineStaticWebAssets>
     <DefineStaticWebAssets 
-      Condition="'@(BS5AssetCandidates->Count())' != '0'" 
+      Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" 
       CandidateAssets="@(BS5AssetCandidates)" 
       SourceId="$(PackageId)" SourceType="Discovered" 
       AssetKind="All" 
