@@ -48,18 +48,20 @@ jobs:
       run: dotnet test --configuration $env:BUILD_CONFIG --no-build --verbosity normal
 
     - name: Create Authorization.Core NuGet package
-      run: dotnet pack **\Authorization.Core.csproj --configuration $env:BUILD_CONFIG --no-build /p:Version=$env:BUILD_VERSION
+      run: dotnet pack Authorization.Core/Authorization.Core.csproj --configuration $env:BUILD_CONFIG --no-build /p:Version=$env:BUILD_VERSION
 
     - name: Upload Authorization.Core NuGet package to GitHub
-      run: dotnet nuget push "**\CRFricke.Authorization.Core.*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push "Authorization.Core\bin\$env:BUILD_CONFIG\CRFricke.Authorization.Core.*.nupkg" 
+        --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
 
     - name: Update Authorization.Core References
       run: |
-        dotnet remove **\Authorization.Core.UI.csproj reference **\Authorization.Core.csproj
-        dotnet add **\Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $env:BUILD_VERSION --source https://nuget.pkg.github.com/CRFricke/index.json
+        dotnet remove Authorization.Core.UI/Authorization.Core.UI.csproj reference Authorization.Core/Authorization.Core.csproj
+        dotnet add Authorization.Core.UI/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $env:BUILD_VERSION --source https://nuget.pkg.github.com/CRFricke/index.json
 
     - name: Create Authorization.Core.UI NuGet package
-      run: dotnet pack **\Authorization.Core.UI.csproj --configuration $env:BUILD_CONFIG --no-build /p:Version=$env:BUILD_VERSION
+      run: dotnet pack Authorization.Core.UI/Authorization.Core.UI.csproj --configuration $env:BUILD_CONFIG --no-build /p:Version=$env:BUILD_VERSION
 
     - name: Upload Authorization.Core.UI NuGet package to GitHub
-      run: dotnet nuget push "**\CRFricke.Authorization.Core.UI.*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push "Authorization.Core.UI\bin\$env:BUILD_CONFIG\CRFricke.Authorization.Core.UI.*.nupkg" 
+        --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
