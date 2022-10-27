@@ -11,7 +11,7 @@
   <PropertyGroup>
     <Authors>Chuck Fricke</Authors>
     <Company>Fricke Consulting</Company>
-    <Copyright>Copyright © Chuck Fricke 2021</Copyright>
+    <Copyright>Copyright © Chuck Fricke $([System.DateTime]::Now.ToString(yyyy))</Copyright>
     <Description>Extends ASP.NET Core Identity to provide authorization based on entity CRUD permission claims (e.g. "User.Create", "User.Read", "User.Update", "User.Delete", and "User.List").</Description>
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
