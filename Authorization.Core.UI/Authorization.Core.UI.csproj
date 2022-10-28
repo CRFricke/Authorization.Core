@@ -87,7 +87,7 @@
 
   <Target Name="_CopyCssBundle" BeforeTargets="_GenerateAuthUIPackItems">
     <ItemGroup>
-      <_SourceFiles Include="$(IntermediateOutputPath)$(Configuration)\$(TargetFramework)\scopedcss\projectbundle\$(AssemblyName).bundle.scp.css" />
+      <_SourceFiles Include="$(IntermediateOutputPath)scopedcss\projectbundle\$(AssemblyName).bundle.scp.css" />
     </ItemGroup>
     <Copy SourceFiles="@(_SourceFiles)" DestinationFolder="assets\BS5" />
   </Target>
