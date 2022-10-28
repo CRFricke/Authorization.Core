@@ -98,7 +98,6 @@
         <ContentRoot>$([System.IO.Path]::GetFullPath($(_ReferenceAssetContentRoot)))</ContentRoot>
       </ReferenceAssetCandidates>
     </ItemGroup>
-    <Message Importance="high" Text="ReferenceAssetCandidate count: @(ReferenceAssetCandidates->Count())." />
     <DefineStaticWebAssets
       Condition="'@(ReferenceAssetCandidates->Count())' != '0'"
       CandidateAssets="@(ReferenceAssetCandidates)"
@@ -126,8 +125,6 @@
         <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
       </BS5AssetCandidates>
     </ItemGroup>
-    <Message Importance="high" Text="BS4AssetCandidate count: @(BS4AssetCandidates->Count())." />
-    <Message Importance="high" Text="BS5AssetCandidate count: @(BS5AssetCandidates->Count())." />
     <DefineStaticWebAssets 
       Condition="'@(BS4AssetCandidates->Count())' != '0'" 
       CandidateAssets="@(BS4AssetCandidates)" 
