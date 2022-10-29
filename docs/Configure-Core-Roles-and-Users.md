@@ -84,7 +84,7 @@ The `RestrictedClaim` attribute is used to identify such claims (as can be seen 
 must ensure the current user has been assigned the `Role.Delete` claim when it receives an authorization 
 request requiring that Claim. It is up to you to ensure your claim associations make sense (e.g. "Customer.Delete" 
 is associated with your application's logic to delete a Customer object; "Customer.Update" is associated with your 
-application's logic to update a Customer object).
+application's logic to update a Customer object, etc.).
 
 Define the claims required to control access to the entities in your application. For discoverability, it is best 
 to group related claims together in a class, and have these classes defined within a containing class. Use the 

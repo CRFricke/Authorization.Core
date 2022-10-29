@@ -34,7 +34,7 @@ classes from the associated Authorization.Core.UI classes (`AuthUiRole` and `Aut
 ### Update the ApplicationDbContext class to derive from AuthUiContext
 
 **_Note:_** The following example shows the form to use when both the `AuthUiUser` and `AuthUiRole` classes 
-have been extended (by ApplicationUser and ApplicationRole). 
+have been extended (by "ApplicationUser" and "ApplicationRole"). 
 
 ```csharp
 using CRFricke.Authorization.Core.UI.Data;
@@ -55,7 +55,7 @@ namespace WebApplication.Data
 ### Update the class name specified in _LoginPartial.cshtml
 
 The class name specified in the `@inject` statements for `SignInManager` and `UserManager` 
-must be `AuthUiUser` (or the name of your derived class; in this case, ApplicationUser).
+must be `AuthUiUser` (or the name of your derived class; in this case, "ApplicationUser").
 
 ```csharp
 @using CRFricke.Authorization.Core.Data
@@ -108,9 +108,9 @@ Both statements are shown below:
 ### Update Startup.cs (Program.cs in .Net 6.0)
 
 - If the `AddDefaultIdentity` clause references the `IdentityUser` class, change it to `AuthUiUser` 
-  (or the name of your derived class; `ApplicationUser` below).
+  (or the name of your derived class; "ApplicationUser" below).
 - If you extended the `AuthUiRole` class, chain an `AddRoles` clause with the name of the new class 
-  to the `AddDefaultIdentity` statement.
+  to the `AddDefaultIdentity` statement ("ApplicationRole", in this case).
 - Chain an `AddAccessRightBasedAuthorization` clause to the `AddEntityFrameworkStores` clause.
   - AddAccessRightBasedAuthorization accepts an optional parameter, `DbInitializationOption`, to specify 
     how the Microsoft Identity database (which the Authorization.Core package uses) is to be initialized. 
