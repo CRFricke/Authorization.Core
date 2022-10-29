@@ -63,6 +63,8 @@ must be `AuthUser` (or the name of your derived class; in this case, `Applicatio
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
 
+- If the `AddDefaultIdentity` clause references the `IdentityUser` class, change it to `AuthUiUser` 
+  (or the name of your derived class; `ApplicationUser` below).
 - If you extended the `AuthRole` class, chain an `AddRoles` clause with the name of the new class 
   to the `AddDefaultIdentity` statement (`ApplicationRole`, in this case).
 - Chain an `AddAccessRightBasedAuthorization` clause to the `AddEntityFrameworkStores` clause.
@@ -70,8 +72,6 @@ must be `AuthUser` (or the name of your derived class; in this case, `Applicatio
     how the Microsoft Identity database (which the Authorization.Core package uses) is to be initialized. 
     The default is `DbInitializationOption.Migrate`. which will apply any outstanding database migrations 
     during startup..
-- Change any `IdentityUser` class references to `AuthUser` (or the name of your derived class; 
-  `ApplicationUser` below).
 
 ```csharp
    services.AddDbContext<ApplicationDbContext>(options =>

@@ -82,7 +82,9 @@ The `RestrictedClaim` attribute is used to identify such claims (as can be seen 
 
 **_Note:_** The AuthorizationManager has no understanding of what "Delete" means. All it knows is that it 
 must ensure the current user has been assigned the `Role.Delete` claim when it receives an authorization 
-request requiring that Claim. 
+request requiring that Claim. It is up to you to ensure your claim associations make sense (e.g. "Customer.Delete" 
+is associated with your application's logic to delete a Customer object; "Customer.Update" is associated with your 
+application's logic to update a Customer object).
 
 Define the claims required to control access to the entities in your application. For discoverability, it is best 
 to group related claims together in a class, and have these classes defined within a containing class. Use the 
@@ -138,11 +140,11 @@ The `AuthDbContext` contained in the Authorization.Core package contains a virtu
 method that is called during database initialization to ensure the `Administrator` Role and User account 
 are installed. If either are accidently deleted, they are reinstalled the next time the application is restarted.
 
-_**Note:**_ The initial value for the Administrator's password is **"Administrat0r!"**. 
-If the Administrator account is reinstalled during an application restart, 
-_**the Administrator's password will revert to its initial value.**_
-
+_**Note:**_ The initial value for the Administrator's password is `Administrat0r!`. 
 _**Always be sure to change the Administrator's initial password in a production environment.**_
+
+_**Warning:**_ If the Administrator account is reinstalled during an application restart, 
+_**the Administrator's password will revert to its initial value.**_
 
 The `SeedDatabaseAsync` method can be overriden in your application's DbContext (the one you derived from 
 `AuthDbContext`) to provide similar functionality for your application:
