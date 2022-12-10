@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <IdentityUIFrameworkVersion Condition="'$(IdentityUIFrameworkVersion)' == ''">Bootstrap5</IdentityUIFrameworkVersion>
+  </PropertyGroup>
+</Project>

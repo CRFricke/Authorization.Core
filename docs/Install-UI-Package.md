@@ -34,7 +34,7 @@ classes from the associated Authorization.Core.UI classes (`AuthUiRole` and `Aut
 ### Update the ApplicationDbContext class to derive from AuthUiContext
 
 **_Note:_** The following example shows the form to use when both the `AuthUiUser` and `AuthUiRole` classes 
-have been extended (by ApplicationUser and ApplicationRole). 
+have been extended (by "ApplicationUser" and "ApplicationRole"). 
 
 ```csharp
 using CRFricke.Authorization.Core.UI.Data;
@@ -55,7 +55,7 @@ namespace WebApplication.Data
 ### Update the class name specified in _LoginPartial.cshtml
 
 The class name specified in the `@inject` statements for `SignInManager` and `UserManager` 
-must be `AuthUiUser` (or the name of your derived class; in this case, ApplicationUser).
+must be `AuthUiUser` (or the name of your derived class; in this case, "ApplicationUser").
 
 ```csharp
 @using CRFricke.Authorization.Core.Data
@@ -66,21 +66,19 @@ must be `AuthUiUser` (or the name of your derived class; in this case, Applicati
 
 ### Add DataTables package references to _Layout.cshtml
 
-**_Note:_** _If your application uses the DataTables.net client side package and already has references for it,
-there is no need to add the statements described below; you can skip the section._
-
 The razor pages exposed by the UI package make use of a client side package called DataTables.net. 
 This package supports both Bootstrap 4 and 5. It requires references for the associated CSS and 
 javascript files be added to the `_Layout.cshtml` file that exposes the UI package's razor pages.
 
+**_Note:_** _If your application uses the DataTables.net client side package and already has references for it 
+in `_Layout.cshtml`, there is no need to add the statements described below; you can skip this section._
+
 The UI package provides the required CSS and javascript files in the 
 `~/_content/CRFricke.Authorization.Core.UI/lib/datatables` folder.
-The Bootstrap 4 files are located in the "bs4" folder, the Bootstrap 5 files in the "bs5" folder.
 
-Add a stylesheet link for `dataTables.min.css` from the appropriate folder ("bs5" in the example below)
-to the `<head>` section.
-Also add a script reference for `dataTables.min.js` from the appropriate folder to the end of the `<body>` 
-section. Both statements are shown below:
+Add a stylesheet link for `dataTables.min.css` to the `<head>` section.
+Also add a script reference for `dataTables.min.js` to the end of the `<body>` section. 
+Both statements are shown below:
 
 ```html
 <!DOCTYPE html>
@@ -89,10 +87,9 @@ section. Both statements are shown below:
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Authorization.Core.UI.Test.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/_content/CRFricke.Authorization.Core.UI/lib/datatables/bs5/dataTables.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-    @await RenderSectionAsync("css", required: false)
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/_content/CRFricke.Authorization.Core.UI/lib/datatables/dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
 </head>
 <body>
 
@@ -100,7 +97,7 @@ section. Both statements are shown below:
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/_content/CRFricke.Authorization.Core.UI/lib/datatables/bs5/dataTables.min.js"></script>
+    <script src="~/_content/CRFricke.Authorization.Core.UI/lib/datatables/dataTables.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
@@ -110,8 +107,10 @@ section. Both statements are shown below:
 
 ### Update Startup.cs (Program.cs in .Net 6.0)
 
+- If the `AddDefaultIdentity` clause references the `IdentityUser` class, change it to `AuthUiUser` 
+  (or the name of your derived class; "ApplicationUser" below).
 - If you extended the `AuthUiRole` class, chain an `AddRoles` clause with the name of the new class 
-  to the `AddDefaultIdentity` statement.
+  to the `AddDefaultIdentity` statement ("ApplicationRole", in this case).
 - Chain an `AddAccessRightBasedAuthorization` clause to the `AddEntityFrameworkStores` clause.
   - AddAccessRightBasedAuthorization accepts an optional parameter, `DbInitializationOption`, to specify 
     how the Microsoft Identity database (which the Authorization.Core package uses) is to be initialized. 
@@ -121,7 +120,6 @@ section. Both statements are shown below:
     - You can specify an alternate area name for the pages exposed by the UI package by specifying the 
     desired name in the `AuthCoreUIOptions.FriendlyAreaName` property (shown below). If a value is 
     not specified, the default is "Authorization".
-- Change any `IdentityUser` class references to `AuthUiUser` (or the name of your derived class).
 
 ```csharp
    services.AddDbContext<ApplicationDbContext>(options =>
@@ -141,7 +139,7 @@ The UI package adds the following properties:
 - AuthUiRole adds the `Description` property.
 - AuthUiUser adds the following properties: `GivenName` and `Surname`.
 
-Using the Package Manager Console run the following commands, where \<migration-name\> is the name you choose 
+Using the Package Manager Console run the following commands, where \<migration-name\> is the name you chose 
 for the migration (eg. "AuthorizationCoreUISchema"):
 
 ```
