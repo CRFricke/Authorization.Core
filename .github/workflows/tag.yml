@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: Setup PowerShell
-      uses: CRFricke/Setup-PowerShell@v1.0.4
+      uses: CRFricke/Setup-PowerShell@v1.0.6
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Get Build Version
       shell: pwsh
@@ -30,7 +30,7 @@ jobs:
         Write-Host "BUILD_VERSION: $Tag_Version"
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
