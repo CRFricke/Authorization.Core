@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
@@ -26,8 +27,9 @@ namespace CRFricke.Authorization.Core
         where TRole : AuthRole
     {
         /// <summary>
-        /// Initiaizes the static properties of the class.
+        /// Initializes the static properties of the class.
         /// </summary>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "GetReferencedAssemblies() called on assemblies contained in AppDomain.CurrentDomain.")]
         static AuthorizationManager()
         {
             Assembly thisAssembly = typeof(AuthorizationManager<TUser, TRole>).Assembly;
@@ -47,6 +49,9 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Loads the Claims that are installed by the application.
         /// </summary>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "assembly.GetExportedTypes(): assembly instances loaded from AppDomain.CurrentDomain.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2111:DynamicallyAccessedMembers", Justification = "Activator.CreateInstance(): 'IDefinesClaims' implementation classes always have a public parameter-less constructor.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:DynamicallyAccessedMembers", Justification = "claimClass.GetType().GetFields(): claimClass instances are loaded prior to call.")]
         private static void LoadSystemClaims(List<Assembly> assemblies)
         {
             List<IDefinesClaims> claimClasses = new();
@@ -80,6 +85,8 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Loads the GUIDs of the entities installed by the application.
         /// </summary>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "assembly.GetExportedTypes(): assembly instances loaded from AppDomain.CurrentDomain.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2111:DynamicallyAccessedMembers", Justification = "Activator.CreateInstance(): 'IDefinesClaims' implementation classes always have a public parameter-less constructor.")]
         private static void LoadSystemGuids(List<Assembly> assemblies)
         {
             List<IDefinesGuids> guidClasses = new();
@@ -350,7 +357,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Returns the claims associated with the specified Role.
         /// </summary>
-        /// <param name="role">The Role whose claims are to be retrived.</param>
+        /// <param name="role">The Role whose claims are to be retrieved.</param>
         /// <returns>A HashSet containing the IDs of the associated claims.</returns>
         private static HashSet<string> GetRoleClaims(TRole role)
         {
@@ -364,7 +371,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Returns the claims associated with the specified Roles.
         /// </summary>
-        /// <param name="roleIds">A HashSet containing the IDs of the Roles whose claims are to be retrived.</param>
+        /// <param name="roleIds">A HashSet containing the IDs of the Roles whose claims are to be retrieved.</param>
         /// <returns>A HashSet containing the IDs of the associated claims.</returns>
         private async Task<HashSet<string>> GetRoleClaimsAsync(HashSet<string> roleIds)
         {
@@ -381,7 +388,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Returns the claims associated with the specified Role.
         /// </summary>
-        /// <param name="roleId">The ID of the Role whose claims are to be retrived.</param>
+        /// <param name="roleId">The ID of the Role whose claims are to be retrieved.</param>
         /// <returns>A HashSet containing the IDs of the associated claims.</returns>
         private async Task<HashSet<string>> GetRoleClaimsAsync(string roleId)
         {
@@ -437,6 +444,7 @@ namespace CRFricke.Authorization.Core
         /// </summary>
         /// <param name="userId">The Id of the user whose Role IDs are to be returned.</param>
         /// <returns>A HashSet containing the IDs of the assigned roles.</returns>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "Initialized dbContext instance loaded from IServiceProvider before LINQ query.")]
         private async Task<HashSet<string>> GetUserRolesAsync(string userId)
         {
             var userRoleCache = _serviceProvider.GetRequiredService<UserRoleCache>();
