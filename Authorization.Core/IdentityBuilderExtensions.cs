@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CRFricke.Authorization.Core
 {
@@ -20,6 +21,7 @@ namespace CRFricke.Authorization.Core
         /// The <see cref="DbInitializationOption"/> to be used to initialize the database.
         /// </param>
         /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2062:DynamicallyAccessedMembers", Justification = "AddScoped() 'implementationType' parameter is DBContext and always has available public constructor.")]
         public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder, DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
         {
             Type contextType;
