@@ -84,7 +84,7 @@
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
-  <Target Name="_CopyCssBundle" BeforeTargets="_GenerateAuthUIPackItems">
+  <Target Name="_CopyCssBundle" BeforeTargets="GetAuthUIAssets">
     <ItemGroup>
       <_SourceFiles Include="$(IntermediateOutputPath)scopedcss\projectbundle\$(AssemblyName).bundle.scp.css" />
     </ItemGroup>
