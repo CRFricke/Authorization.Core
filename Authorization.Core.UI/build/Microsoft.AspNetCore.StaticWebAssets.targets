@@ -1,4 +1,22 @@
 <Project>
   <Import Condition="'$(IdentityUIFrameworkVersion)' == 'Bootstrap4'" Project="$(MSBuildThisFileDirectory)Microsoft.AspNetCore.StaticWebAssets.BS4.targets"/>
   <Import Condition="'$(IdentityUIFrameworkVersion)' == 'Bootstrap5'" Project="$(MSBuildThisFileDirectory)Microsoft.AspNetCore.StaticWebAssets.BS5.targets"/>
+  <ItemGroup>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\staticwebassets\CRFricke.Authorization.Core.UI.bundle.scp.css))">
+      <SourceType>Package</SourceType>
+      <SourceId>CRFricke.Authorization.Core.UI</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/CRFricke.Authorization.Core.UI</BasePath>
+      <RelativePath>CRFricke.Authorization.Core.UI.bundle.scp.css</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>Reference</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName>ScopedCss</AssetTraitName>
+      <AssetTraitValue>ProjectBundle</AssetTraitValue>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\staticwebassets\CRFricke.Authorization.Core.UI.bundle.scp.css))</OriginalItemSpec>
+    </StaticWebAsset>
+  </ItemGroup>
 </Project>
