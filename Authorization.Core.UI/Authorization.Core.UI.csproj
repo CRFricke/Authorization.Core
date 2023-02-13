@@ -84,18 +84,12 @@
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
-  <Target Name="_CopyCssBundle" BeforeTargets="GetAuthUIAssets">
-    <ItemGroup>
-      <_SourceFiles Include="$(IntermediateOutputPath)scopedcss\projectbundle\$(AssemblyName).bundle.scp.css" />
-    </ItemGroup>
-    <Copy SourceFiles="@(_SourceFiles)" DestinationFolder="assets\BS5" />
-  </Target>
-
   <Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
     <PropertyGroup>
       <_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'">assets/BS5</_ReferenceAssetContentRoot>
       <_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'">assets/BS4</_ReferenceAssetContentRoot>
     </PropertyGroup>
+    
     <ItemGroup>
       <ReferenceAssetCandidates Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'" Include="assets\BS5\**" />
       <ReferenceAssetCandidates Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'" Include="assets\BS4\**" />
@@ -104,7 +98,20 @@
         <ContentRoot>$([System.IO.Path]::GetFullPath($(_ReferenceAssetContentRoot)))</ContentRoot>
       </ReferenceAssetCandidates>
     </ItemGroup>
-    <DefineStaticWebAssets Condition="'@(ReferenceAssetCandidates->Count())' != '0'" CandidateAssets="@(ReferenceAssetCandidates)" SourceId="$(PackageId)" SourceType="Project" AssetKind="All" BasePath="$(StaticWebAssetBasePath)">
+    <ItemGroup>
+      <ReferenceAssetCandidates>
+        <RelativePath>$(PackageId).bundle.scp.css</RelativePath>
+        <ContentRoot>$(_ScopedCssProjectBundleContentRoot)</ContentRoot>
+      </ReferenceAssetCandidates>
+    </ItemGroup>
+    
+    <DefineStaticWebAssets Condition="'@(ReferenceAssetCandidates->Count())' != '0'" 
+      CandidateAssets="@(ReferenceAssetCandidates)" 
+      SourceId="$(PackageId)" 
+      SourceType="Project" 
+      AssetKind="All" 
+      BasePath="$(StaticWebAssetBasePath)"
+    >
       <Output TaskParameter="Assets" ItemName="ReferenceAsset" />
     </DefineStaticWebAssets>
     <ItemGroup>
@@ -120,15 +127,34 @@
       <BS4AssetCandidates>
         <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
       </BS4AssetCandidates>
+      
       <BS5AssetCandidates Include="assets\BS5\**" />
       <BS5AssetCandidates>
         <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
       </BS5AssetCandidates>
     </ItemGroup>
-    <DefineStaticWebAssets Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS4AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS4" BasePath="$(StaticWebAssetBasePath)">
+    
+    <DefineStaticWebAssets 
+      Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" 
+      CandidateAssets="@(BS4AssetCandidates)" 
+      SourceId="$(PackageId)" 
+      SourceType="Discovered" 
+      AssetKind="All" 
+      ContentRoot="assets/BS4" 
+      BasePath="$(StaticWebAssetBasePath)"
+    >
       <Output TaskParameter="Assets" ItemName="BS4Assets" />
     </DefineStaticWebAssets>
-    <DefineStaticWebAssets Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS5AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS5" BasePath="$(StaticWebAssetBasePath)">
+    
+    <DefineStaticWebAssets 
+      Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" 
+      CandidateAssets="@(BS5AssetCandidates)" 
+      SourceId="$(PackageId)" 
+      SourceType="Discovered" 
+      AssetKind="All" 
+      ContentRoot="assets/BS5" 
+      BasePath="$(StaticWebAssetBasePath)"
+    >
       <Output TaskParameter="Assets" ItemName="BS5Assets" />
     </DefineStaticWebAssets>
 
