@@ -47,8 +47,3 @@ jobs:
 
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
-
-    - name: Display Core.UI obj folder contents
-      if: ${{ failure() }}
-      shell: pwsh
-      run: Get-ChildItem -Path Authorization.Core.UI\obj -Name -Recurse
