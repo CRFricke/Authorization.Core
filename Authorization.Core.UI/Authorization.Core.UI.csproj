@@ -105,13 +105,7 @@
       </ReferenceAssetCandidates>
     </ItemGroup>
     
-    <DefineStaticWebAssets Condition="'@(ReferenceAssetCandidates->Count())' != '0'" 
-      CandidateAssets="@(ReferenceAssetCandidates)" 
-      SourceId="$(PackageId)" 
-      SourceType="Project" 
-      AssetKind="All" 
-      BasePath="$(StaticWebAssetBasePath)"
-    >
+    <DefineStaticWebAssets Condition="'@(ReferenceAssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(ReferenceAssetCandidates)" SourceId="$(PackageId)" SourceType="Project" AssetKind="All" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="ReferenceAsset" />
     </DefineStaticWebAssets>
     <ItemGroup>
@@ -134,27 +128,11 @@
       </BS5AssetCandidates>
     </ItemGroup>
     
-    <DefineStaticWebAssets 
-      Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" 
-      CandidateAssets="@(BS4AssetCandidates)" 
-      SourceId="$(PackageId)" 
-      SourceType="Discovered" 
-      AssetKind="All" 
-      ContentRoot="assets/BS4" 
-      BasePath="$(StaticWebAssetBasePath)"
-    >
+    <DefineStaticWebAssets Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS4AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS4" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="BS4Assets" />
     </DefineStaticWebAssets>
     
-    <DefineStaticWebAssets 
-      Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" 
-      CandidateAssets="@(BS5AssetCandidates)" 
-      SourceId="$(PackageId)" 
-      SourceType="Discovered" 
-      AssetKind="All" 
-      ContentRoot="assets/BS5" 
-      BasePath="$(StaticWebAssetBasePath)"
-    >
+    <DefineStaticWebAssets Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS5AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS5" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="BS5Assets" />
     </DefineStaticWebAssets>
 
@@ -176,6 +154,10 @@
         <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS5.targets</PackagePath>
       </StaticWebAssetPackageFile>
     </ItemGroup>
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="dir /S" />
   </Target>
 
 </Project>
