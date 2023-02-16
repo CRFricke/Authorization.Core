@@ -51,4 +51,4 @@ jobs:
     - name: Display Core.UI obj folder contents
       if: ${{ failure() }}
       shell: pwsh
-      run: Get-ChildItem -Path Authorization.Core.UI\obj -Recurse
+      run: Get-ChildItem -Path Authorization.Core.UI\obj -Name -Recurse
