@@ -39,7 +39,7 @@
     <_CoreUiProjectBundleName>$(_CoreUiPackageName).bundle.scp.css</_CoreUiProjectBundleName>
   </PropertyGroup>
 
-  <Target Name="CopyCoreUiAssets" BeforeTargets="PreBuildEvent">
+  <Target Name="CopyCoreUiAssets">
 
     <PropertyGroup>
       <_CoreUiContentPath>$(MSBuildThisFileDirectory)wwwroot\_content\$(_CoreUiPackageName)</_CoreUiContentPath>
@@ -60,7 +60,7 @@
     Now we need to add/fixup the @import statement at the beginning of this project's scoped CSS bundle.
   -->
 
-  <Target Name="FixupScopedCssBundle" AfterTargets="PostBuildEvent">
+  <Target Name="FixupScopedCssBundle" DependsOnTargets="CopyCoreUiAssets" AfterTargets="PostBuildEvent">
 
     <PropertyGroup>
       <_SearchText>_content/$(MSBuildProjectName)/_content</_SearchText>
