@@ -361,4 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Authorization.Core project items
 /Authorization.Core.UI.Test.Web/Test.Web.db*
+/Authorization.Core.UI.Test.Web/wwwroot/_content
