@@ -33,9 +33,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: |
-            6.0.x
-            7.0.x
+        dotnet-version: 6.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -49,3 +47,8 @@ jobs:
 
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
+
+    - name: Display Core.UI obj folder contents
+      if: ${{ failure() }}
+      shell: pwsh
+      run: Get-ChildItem -Path Authorization.Core.UI\obj -Recurse
