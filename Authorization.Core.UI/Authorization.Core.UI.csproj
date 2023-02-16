@@ -156,8 +156,4 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dir /S" />
-  </Target>
-
 </Project>
