@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Authorization.Core.UI.Test.Web
 {
     /// <summary>
-    /// Contains the configuration routines for the web appliction.
+    /// Contains the configuration routines for the web application.
     /// </summary>
     /// <remarks>
     /// IMPORTANT: When using the .Net 6.0 minimal API, configuration is performed in Program.cs. 
