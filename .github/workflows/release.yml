@@ -42,11 +42,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Update Authorization.Core References
-      run: |
-        dotnet remove **/Authorization.Core.UI.csproj reference **/Authorization.Core.csproj
-        dotnet add **/Authorization.Core.UI.csproj package CRFricke.Authorization.Core --version $BUILD_VERSION
-
     - name: Build
       run: dotnet build --configuration $BUILD_CONFIG --no-restore /p:Version=$BUILD_VERSION
 
@@ -54,9 +49,7 @@ jobs:
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
 
     - name: Create NuGet packages
-      if: ${{github.ref_type == 'tag'}}
       run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
     - name: Upload packages to NuGet.org
-      if: ${{github.event_name == 'release'}}
       run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
