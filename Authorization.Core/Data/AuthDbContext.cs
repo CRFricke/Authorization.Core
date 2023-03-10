@@ -128,7 +128,7 @@ namespace CRFricke.Authorization.Core.Data
                     PasswordHash = "AQAAAAEAACcQAAAAEPPGh+zIZ8PSo5IQ1IjPnVqUph0c0utc5Kd37NmA8U1Fhe+MEu3gbxP81sPcxkJaMQ==", // "Administrat0r!"
                     UserName = email
                 };
-                ((AuthUser)user).SetClaims(role.Name);
+                ((AuthUser)user).SetClaims(role.Name!);
 
                 await Users.AddAsync(user);
                 logger.LogInformation(

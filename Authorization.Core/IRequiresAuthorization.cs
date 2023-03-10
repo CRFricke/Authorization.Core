@@ -13,6 +13,6 @@
         /// <summary>
         /// Tha name of the object requiring authorization.
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
     }
 }

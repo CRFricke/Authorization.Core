@@ -19,6 +19,6 @@ namespace CRFricke.Authorization.Core
         public virtual void Remove(object key) => _cache.Remove(key);
 
         ///<inheritdoc/>
-        public virtual bool TryGetValue(object key, out object value) => _cache.TryGetValue(key, out value);
+        public virtual bool TryGetValue(object key, out object? value) => _cache.TryGetValue(key, out value);
     }
 }

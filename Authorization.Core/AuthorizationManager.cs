@@ -394,7 +394,7 @@ namespace CRFricke.Authorization.Core
         {
             var roleClaimCache = _serviceProvider.GetRequiredService<RoleClaimCache>();
 
-            if (!roleClaimCache.TryGetValue(roleId, out HashSet<string> hashSet))
+            if (!roleClaimCache.TryGetValue(roleId, out HashSet<string>? hashSet))
             {
                 var dbContext = (IRepository<TUser, TRole>)
                     _serviceProvider.GetRequiredService<IHttpContextAccessor>()
@@ -403,7 +403,7 @@ namespace CRFricke.Authorization.Core
                 hashSet = (await
                     dbContext.Set<IdentityRoleClaim<string>>()
                     .Where(rc => rc.RoleId == roleId && rc.ClaimType == SysClaims.ClaimType)
-                    .Select(rc => rc.ClaimValue)
+                    .Select(rc => rc.ClaimValue!)
                     .ToArrayAsync()
                     ).ToHashSet();
 
@@ -413,7 +413,7 @@ namespace CRFricke.Authorization.Core
                     );
             }
 
-            return hashSet;
+            return hashSet!;
         }
 
         /// <summary>
@@ -449,7 +449,7 @@ namespace CRFricke.Authorization.Core
         {
             var userRoleCache = _serviceProvider.GetRequiredService<UserRoleCache>();
 
-            if (!userRoleCache.TryGetValue(userId, out HashSet<string> hashSet))
+            if (!userRoleCache.TryGetValue(userId, out HashSet<string>? hashSet))
             {
                 var dbContext = (IRepository<TUser, TRole>)
                     _serviceProvider.GetRequiredService<IHttpContextAccessor>()
@@ -468,7 +468,7 @@ namespace CRFricke.Authorization.Core
                     );
             }
 
-            return hashSet;
+            return hashSet!;
         }
 
         /// <summary>
