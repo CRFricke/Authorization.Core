@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CRFricke.Authorization.Core.UI
 {
@@ -21,7 +22,7 @@ namespace CRFricke.Authorization.Core.UI
                 throw new ArgumentNullException(nameof(tempDataDictionary));
             }
 
-            tempDataDictionary[key] = JsonSerializer.Serialize(notifications);  // JsonConvert.SerializeObject(value);
+            tempDataDictionary[key] = JsonSerializer.Serialize(notifications, NotificationSerializerContext.Default.ListNotification);
         }
 
         /// <summary>
@@ -43,7 +44,11 @@ namespace CRFricke.Authorization.Core.UI
                 return default;
             }
 
-            return JsonSerializer.Deserialize<List<Notification>>(jsonString);
+            return JsonSerializer.Deserialize(jsonString, NotificationSerializerContext.Default.ListNotification);
         }
     }
+
+    [JsonSerializable(typeof(List<Notification>))]
+    internal partial class NotificationSerializerContext : JsonSerializerContext 
+    { }
 }

@@ -22,14 +22,16 @@ namespace CRFricke.Authorization.Core
     /// </summary>
     /// <typeparam name="TUser">The <see cref="Type"/> of user objects. The Type must be or extend from <see cref="AuthUser"/>.</typeparam>
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects. The Type must be or extend from <see cref="AuthRole"/>.</typeparam>
-    public sealed class AuthorizationManager<TUser, TRole> : IAuthorizationManager
+    public sealed class AuthorizationManager<
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole> : IAuthorizationManager
         where TUser : AuthUser
         where TRole : AuthRole
     {
         /// <summary>
         /// Initializes the static properties of the class.
         /// </summary>
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "GetReferencedAssemblies() called on assemblies contained in AppDomain.CurrentDomain.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode, GetReferencedAssemblies()", Justification = "Only looking for assemblies that use AuthorizationManager.")]
         static AuthorizationManager()
         {
             Assembly thisAssembly = typeof(AuthorizationManager<TUser, TRole>).Assembly;
@@ -49,9 +51,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Loads the Claims that are installed by the application.
         /// </summary>
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "assembly.GetExportedTypes(): assembly instances loaded from AppDomain.CurrentDomain.")]
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2111:DynamicallyAccessedMembers", Justification = "Activator.CreateInstance(): 'IDefinesClaims' implementation classes always have a public parameter-less constructor.")]
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:DynamicallyAccessedMembers", Justification = "claimClass.GetType().GetFields(): claimClass instances are loaded prior to call.")]
+        [RequiresUnreferencedCode("Types that implement IDefinesClaims might be removed if application is trimmed.")]
         private static void LoadSystemClaims(List<Assembly> assemblies)
         {
             List<IDefinesClaims> claimClasses = new();
@@ -85,8 +85,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Loads the GUIDs of the entities installed by the application.
         /// </summary>
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "assembly.GetExportedTypes(): assembly instances loaded from AppDomain.CurrentDomain.")]
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2111:DynamicallyAccessedMembers", Justification = "Activator.CreateInstance(): 'IDefinesClaims' implementation classes always have a public parameter-less constructor.")]
+        [RequiresUnreferencedCode("Types that implement IDefinesGuids might be removed if application is trimmed.")]
         private static void LoadSystemGuids(List<Assembly> assemblies)
         {
             List<IDefinesGuids> guidClasses = new();

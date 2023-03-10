@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.Data
@@ -40,7 +41,10 @@ namespace CRFricke.Authorization.Core.Data
     /// </summary>
     /// <typeparam name="TUser">The <see cref="Type"/> of user objects.</typeparam>
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects.</typeparam>
-    public abstract class AuthDbContext<TUser, TRole> : IdentityDbContext<TUser, TRole, string>, IRepository<TUser, TRole>, ISeedingContext
+    public abstract class AuthDbContext<
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole > 
+        : IdentityDbContext<TUser, TRole, string>, IRepository<TUser, TRole>, ISeedingContext
         where TUser : AuthUser, new()
         where TRole : AuthRole, new()
     {

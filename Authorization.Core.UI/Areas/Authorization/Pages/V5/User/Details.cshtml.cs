@@ -4,6 +4,7 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.User
@@ -16,11 +17,14 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
 
         public UserModel UserModel { get; set; }
 
-        public virtual Task<IActionResult> OnGetAsync(string id)
-            => throw new NotImplementedException();
+        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
+        public virtual Task<IActionResult> OnGetAsync(string id) => throw new NotImplementedException();
     }
 
-    internal class DetailsModel<TUser, TRole> : DetailsModel
+    internal class DetailsModel<
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser, 
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole
+        > : DetailsModel
         where TUser : AuthUiUser
         where TRole : AuthUiRole
     {
@@ -38,6 +42,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
             _repository = repository;
         }
 
+        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
         public override async Task<IActionResult> OnGetAsync(string id)
         {
             if (id == null)

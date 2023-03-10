@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +12,9 @@ namespace CRFricke.Authorization.Core.UI.Models
 {
     public class UserModel
     {
+        [DynamicDependency("Password")]
+        public UserModel() { }
+
         #region RoleInfo Class
 
         public class RoleInfo
@@ -64,6 +68,7 @@ namespace CRFricke.Authorization.Core.UI.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "Password property preserved via DynamicDependencyAttribute")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
@@ -118,7 +123,11 @@ namespace CRFricke.Authorization.Core.UI.Models
             return this;
         }
 
-        public virtual async Task<UserModel> InitRoleInfoAsync<TUser, TRole>(IRepository<TUser, TRole> repository)
+        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
+        public virtual async Task<UserModel> InitRoleInfoAsync<
+            [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+            [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole >
+            (IRepository<TUser, TRole> repository)
             where TRole : AuthUiRole
             where TUser : AuthUiUser
         {

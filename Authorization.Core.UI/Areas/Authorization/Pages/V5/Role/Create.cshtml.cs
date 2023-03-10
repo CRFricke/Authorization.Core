@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
@@ -21,7 +22,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
         public virtual Task<IActionResult> OnPostAsync(string hfClaimList) => throw new NotImplementedException();
     }
 
-    internal class CreateModel<TUser, TRole> : CreateModel
+    internal class CreateModel<
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole
+        > : CreateModel
         where TRole : AuthUiRole, new()
         where TUser : AuthUiUser
     {

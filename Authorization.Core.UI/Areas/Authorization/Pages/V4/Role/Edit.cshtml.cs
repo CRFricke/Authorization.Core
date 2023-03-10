@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
@@ -23,7 +24,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
         public virtual Task<IActionResult> OnPostAsync(string hfClaimList) => throw new NotImplementedException();
     }
 
-    internal class EditModel<TUser, TRole> : EditModel
+    internal class EditModel<
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser, 
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole
+        > : EditModel
         where TRole : AuthUiRole
         where TUser : AuthUiUser
     {
