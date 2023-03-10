@@ -2,10 +2,6 @@
 using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace Authorization.Core.UI.Test.Web.Data
 {
@@ -75,7 +71,7 @@ namespace Authorization.Core.UI.Test.Web.Data
                     PasswordHash = "AQAAAAEAACcQAAAAEFXwSRmwaiwTjRDW4zcaupENlSdbverXypglebb + Ti6f / Rn4sBikU3q / uE0jJQJAMw ==", // "Calend@rGuy!"
                     Surname = "Guy",
                     UserName = email
-                }.SetClaims(new[] { role.Name });
+                }.SetClaims(new[] { role.Name! });
 
                 await Users.AddAsync(user);
                 logger.LogInformation(
@@ -119,7 +115,7 @@ namespace Authorization.Core.UI.Test.Web.Data
                     PasswordHash = "AQAAAAEAACcQAAAAEJaNzNSqF3SrSxUHuT010YO6kAmf95+Xv20mzd3MzLBTNU8ySBGMBqkx82q3Be+BCg==", // "D0cumentGuy!"
                     Surname = "Guy",
                     UserName = email
-                }.SetClaims(new[] { role.Name });
+                }.SetClaims(new[] { role.Name! });
 
                 await Users.AddAsync(user);
                 logger.LogInformation(

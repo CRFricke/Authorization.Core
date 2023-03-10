@@ -15,12 +15,7 @@ namespace CRFricke.Authorization.Core.UI.Pages
         /// <param name="message">The message to be sent.</param>
         internal void SendNotification(Type toType, Severity severity, string message)
         {
-            var notifications = TempData.GetNotifications(toType.FullName);
-            if (notifications == null)
-            {
-                notifications = new List<Notification>();
-            }
-
+            var notifications = TempData.GetNotifications(toType.FullName) ?? new List<Notification>();
             notifications.Add(new Notification { Severity = severity, Message = message });
 
             TempData.SetNotifications(toType.FullName, notifications);

@@ -22,7 +22,7 @@
     public class Notification
     {
         /// <summary>
-        /// The <see cref="Severity"/> of the messsage.
+        /// The <see cref="Severity"/> of the message.
         /// </summary>
         public Severity Severity { get; set; }
 

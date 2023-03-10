@@ -32,7 +32,7 @@ namespace CRFricke.Authorization.Core.Data
         }
 
         ///<inheritdoc/>
-        string IRequiresAuthorization.Name => Email;
+        string? IRequiresAuthorization.Name => Email;
 
         /// <summary>
         /// The claims that this application user possesses.
