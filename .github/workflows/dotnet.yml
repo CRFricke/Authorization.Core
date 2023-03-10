@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Setup PowerShell
-      uses: CRFricke/Setup-PowerShell@v1.0.6
+      uses: CRFricke/Setup-PowerShell@v1.0.7
 
     - name: Checkout
       uses: actions/checkout@v3
