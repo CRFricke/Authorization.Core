@@ -9,18 +9,8 @@ using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
 {
-    internal static class UIPage
-    {
-        public const DynamicallyAccessedMemberTypes DynamicallyAccessedMemberTypes =
-            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods |
-            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties |
-            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors |
-            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicNestedTypes;
-    }
-
     [RequiresClaims(SysClaims.Role.List)]
     [PageImplementationType(typeof(IndexModel<,>))]
-    [DynamicallyAccessedMembers(UIPage.DynamicallyAccessedMemberTypes)]
     public abstract class IndexModel : ModelBase
     {
         internal const string PageName = "Index";
@@ -48,7 +38,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
         public virtual Task OnGetAsync() => throw new NotImplementedException();
     }
 
-    [DynamicallyAccessedMembers(UIPage.DynamicallyAccessedMemberTypes)]
     internal class IndexModel<
         [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
         [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole
