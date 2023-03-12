@@ -13,6 +13,10 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
     [PageImplementationType(typeof(IndexModel<,>))]
     public abstract class IndexModel : ModelBase
     {
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Areas_Authorization_Pages_V5_Role_Index))]
+        public IndexModel()
+        { }
+
         internal const string PageName = "Index";
 
         #region RoleModel Class
