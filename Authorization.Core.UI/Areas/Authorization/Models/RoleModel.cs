@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -85,11 +84,7 @@ namespace CRFricke.Authorization.Core.UI.Models
             return SetAssignedClaims(role.Claims);
         }
 
-        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
-        public virtual async Task<RoleModel> InitRoleUsersAsync<
-            [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
-            [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole >
-            (IRepository<TUser, TRole> repository)
+        public virtual async Task<RoleModel> InitRoleUsersAsync<TUser, TRole>(IRepository<TUser, TRole> repository)
             where TRole : AuthUiRole
             where TUser : AuthUiUser
         {
