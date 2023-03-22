@@ -4,7 +4,6 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
@@ -19,10 +18,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
             => throw new NotImplementedException();
     }
 
-    internal class DetailsModel<
-        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser, 
-        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole
-        > : DetailsModel
+    internal class DetailsModel<TUser, TRole> : DetailsModel
         where TUser : AuthUiUser
         where TRole : AuthUiRole
     {

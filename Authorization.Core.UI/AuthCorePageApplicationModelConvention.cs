@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CRFricke.Authorization.Core.UI
@@ -14,7 +13,6 @@ namespace CRFricke.Authorization.Core.UI
         where TUser : class
         where TRole : class
     {
-        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2055:RequiresUnreferencedCode", Justification = "MakeGenericType parameters are same as the type parameters of this class")]
         public void Apply(PageApplicationModel pam)
         {
             var attribute = pam.ModelType.GetCustomAttribute<PageImplementationTypeAttribute>();

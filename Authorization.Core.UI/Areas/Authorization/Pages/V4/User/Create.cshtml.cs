@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V4.User
@@ -17,17 +16,12 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
         [BindProperty]
         public UserModel UserModel { get; set; }
 
-        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
         public virtual Task<IActionResult> OnGetAsync() => throw new NotImplementedException();
 
-        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
         public virtual Task<IActionResult> OnPostAsync(string hfRoleList) => throw new NotImplementedException();
     }
 
-    internal class CreateModel<
-        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser, 
-        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole
-        > : CreateModel
+    internal class CreateModel<TUser, TRole> : CreateModel
         where TUser : AuthUiUser, new()
         where TRole : AuthUiRole
     {
@@ -47,7 +41,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
             _repository = repository;
         }
 
-        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
         public override async Task<IActionResult> OnGetAsync()
         {
             UserModel = await new UserModel()
@@ -56,7 +49,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
             return Page();
         }
 
-        [RequiresUnreferencedCode("The Property metadata or other accessor may be trimmed.")]
         public override async Task<IActionResult> OnPostAsync(string hfRoleList)
         {
             (await UserModel.InitRoleInfoAsync(_repository))
