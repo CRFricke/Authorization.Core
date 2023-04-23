@@ -96,6 +96,7 @@ namespace CRFricke.Authorization.Core.Data
         /// <inheritdoc/>
         public virtual async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
         {
+            var hasher = serviceProvider.GetRequiredService<IPasswordHasher<TUser>>();
             var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
             var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthDbContext>();
 
@@ -129,7 +130,7 @@ namespace CRFricke.Authorization.Core.Data
                     LockoutEnabled = true,
                     NormalizedEmail = normalizer.NormalizeEmail(email),
                     NormalizedUserName = normalizer.NormalizeName(email),
-                    PasswordHash = "AQAAAAEAACcQAAAAEPPGh+zIZ8PSo5IQ1IjPnVqUph0c0utc5Kd37NmA8U1Fhe+MEu3gbxP81sPcxkJaMQ==", // "Administrat0r!"
+                    PasswordHash = hasher.HashPassword(user!, "Administrat0r!"),
                     UserName = email
                 };
                 ((AuthUser)user).SetClaims(role.Name!);
