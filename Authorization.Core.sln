@@ -44,7 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{317DF210-7
 		docs\UI-User-Management-Page.md = docs\UI-User-Management-Page.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Core.UI.Tests.Integration", "Authorization.Core.UI.Tests.Integration\Authorization.Core.UI.Tests.Integration.csproj", "{7E849D0F-3F73-43CD-9F5E-40BD1C398887}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests.Integration", "Authorization.Core.UI.Tests.Integration\Authorization.Core.UI.Tests.Integration.csproj", "{7E849D0F-3F73-43CD-9F5E-40BD1C398887}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
