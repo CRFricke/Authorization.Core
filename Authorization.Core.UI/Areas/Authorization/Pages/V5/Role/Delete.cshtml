@@ -28,6 +28,7 @@
             <h5 class="text-muted">The role's properties:</h5>
             <hr />
             <input type="hidden" asp-for="IsSystemRole" />
+            <input type="hidden" asp-for="RoleModel.Name" />
             <div class="form-floating">
                 <input class="form-control" type="text" value="@Model.RoleModel.Id" disabled />
                 <label asp-for="RoleModel.Id" class="control-label"></label>

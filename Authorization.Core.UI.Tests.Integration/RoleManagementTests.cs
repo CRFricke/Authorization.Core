@@ -1,306 +1,367 @@
-﻿using AngleSharp.Dom;
-using Authorization.Core.UI.Test.Web;
+﻿using Authorization.Core.UI.Test.Web;
 using Authorization.Core.UI.Test.Web.Data;
 using Authorization.Core.UI.Tests.Integration.Infrastructure;
-using Authorization.Core.UI.Tests.Integration.Models;
+using Authorization.Core.UI.Tests.Integration.Infrastructure.Playwright;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
-using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Xunit;
+using Microsoft.Playwright;
+using System.Web;
+using Xunit.Abstractions;
 
-namespace Authorization.Core.UI.Tests.Integration
+using static Authorization.Core.UI.Tests.Integration.Infrastructure.PlaywrightTestFixture;
+
+namespace Authorization.Core.UI.Tests.Integration;
+
+public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTestFixture>, IAsyncLifetime
 {
-    public class RoleManagementTests : IClassFixture<WebAppFactory>
+    internal RoleManagementTests(PlaywrightTestFixture fixture) : base(fixture.Browser)
     {
-        public RoleManagementTests(WebAppFactory webAppFactory)
+        Fixture = fixture;
+        WebAppFactory = Fixture.WebAppFactory;
+        Client = WebAppFactory.CreateClient(new() { BaseAddress = new(HostUri) });
+    }
+
+    public RoleManagementTests(PlaywrightTestFixture fixture, ITestOutputHelper outputHelper) : this(fixture)
+    {
+        OutputHelper = outputHelper;
+    }
+
+    private ITestOutputHelper OutputHelper { get; } = null!;
+
+    private PlaywrightTestFixture Fixture { get; }
+
+    private HttpClient Client { get; }
+
+    private WebAppFactory WebAppFactory { get; }
+
+    private string HostUri { get; } = "https://localhost/";
+
+
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        await Context.RouteAsync($"{HostUri}**", async route =>
         {
-            WebAppFactory = webAppFactory;
-        }
+            var request = route.Request;
+            var content = request.PostDataBuffer is { } postDataBuffer
+                ? new ByteArrayContent(postDataBuffer) : null;
 
-        public WebAppFactory WebAppFactory { get; }
-
-        private readonly RoleModel ListerRoleModel = new()
-        {
-            Name = "Lister",
-            Description = "Can list things"
-        };
-
-        private readonly string[] ListerRoleClaims = new string[]
-        {
-                SysClaims.Role.List, SysClaims.User.List, AppClaims.Bulletin.List, AppClaims.Calendar.List, AppClaims.Document.List, AppClaims.News.List
-        };
-
-
-        [Fact(DisplayName = "Can create new role with claims")]
-        public async void RoleManagementTest01Async()
-        {
-            var client = WebAppFactory.CreateClient();
-            var requiredClaims = new[]
+            var requestMessage = new HttpRequestMessage(new(request.Method), request.Url)
             {
-                SysClaims.Role.List, SysClaims.Role.Create,
-                SysClaims.User.List, AppClaims.Bulletin.List, AppClaims.Calendar.List, AppClaims.Document.List, AppClaims.News.List
+                Content = content
             };
-            await SetupTestEnvironmentAsync(client, requiredClaims);
 
-            var index = await Pages.Role.Index.CreateAsync(client);
-            var create = await index.ClickCreateNewLinkAsync();
-            await create.ClickCreateButtonAsync(ListerRoleModel, ListerRoleClaims);
-
-            var dbContext = WebAppFactory.Services.GetRequiredService<ApplicationDbContext>();
-            var role = await dbContext.Roles
-                .Include(ar => ar.Claims)
-                .Where(ar => ar.Name == ListerRoleModel.Name)
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
-
-            Assert.NotNull(role);
-            Assert.Equal(ListerRoleModel.Description, role.Description);
-            Assert.Equal(ListerRoleClaims.Length, role.Claims.Count);
-        }
-
-        [Fact(DisplayName = "Can display existing role")]
-        public async void RoleManagementTest02()
-        {
-            var client = WebAppFactory.CreateClient();
-            await SetupTestEnvironmentAsync(client, SysClaims.Role.List, SysClaims.Role.Read);
-            var role = EnsureListerRoleExists();
-
-            var index = await Pages.Role.Index.CreateAsync(client);
-            var details = await index.ClickDetailsLinkAsync(role.Id);
-
-            Assert.Equal(role.Description, details.Description);
-            Assert.Equal(role.Id, details.Id);
-            Assert.Equal(role.Name, details.Name);
-
-            Assert.Equal(role.Claims.Count, details.Claims.Count);
-            foreach (var claim in role.Claims)
+            foreach (var header in request.Headers)
             {
-                Assert.Contains(claim.ClaimValue, details.Claims);
-            }
-        }
-
-        [Fact(DisplayName = "Can update existing role and claims")]
-        public async void RoleManagementTest03()
-        {
-            var client = WebAppFactory.CreateClient();
-            await SetupTestEnvironmentAsync(client,
-                SysClaims.Role.List, SysClaims.Role.Read, SysClaims.Role.Update, SysClaims.Role.UpdateClaims
-                );
-            var role = EnsureListerRoleExists();
-
-            var tracker = new RoleTracker(role)
-                .SetValue(nameof(role.Description), role.Description += ": Updated!")
-                .SetClaims(SysClaims.Role.List, SysClaims.Role.Read);
-
-            var index = await Pages.Role.Index.CreateAsync(client);
-            var edit = await index.ClickEditLinkAsync(role.Id);
-            edit.UpdateProperties(tracker.GetUpdates()).SetClaims(tracker.GetCurrentClaims());
-            await edit.ClickSaveButtonAsync();
-
-            role = EnsureListerRoleExists();
-
-            Assert.Equal(tracker.Id, role.Id);
-            Assert.Equal(tracker.Name, role.Name);
-            Assert.Equal(tracker.Description, role.Description);
-
-            Assert.Equal(tracker.GetCurrentClaims().Length, role.Claims.Count);
-            foreach (var claim in role.Claims)
-            {
-                Assert.Contains(claim.ClaimValue, tracker.GetCurrentClaims());
-            }
-        }
-
-        [Fact(DisplayName = "Can delete existing role")]
-        public async void RoleManagementTest04()
-        {
-            var client = WebAppFactory.CreateClient();
-            await SetupTestEnvironmentAsync(client, SysClaims.Role.List, SysClaims.Role.Delete);
-            var role = EnsureListerRoleExists();
-
-            var index = await Pages.Role.Index.CreateAsync(client);
-            var delete = await index.ClickDeleteLinkAsync(role.Id);
-            await delete.ClickDeleteButtonAsync();
-
-            var dbContext = WebAppFactory.Services.GetRequiredService<ApplicationDbContext>();
-            Assert.False(
-                 dbContext.Roles.Any(ar => ar.Id == role.Id)
-                );
-        }
-
-        [Fact(DisplayName = "Receive NotFound passing null ID to Delete page")]
-        public async void RoleManagementTest05()
-        {
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var responseMessage = await client.GetAsync("Admin/Role/Delete");
-
-            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
-        }
-
-        [Fact(DisplayName = "Receive NotFound passing non-existing ID to Delete page")]
-        public async void RoleManagementTest06()
-        {
-            var id = Guid.Empty.ToString();
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var responseMessage = await client.GetAsync($"Admin/Role/Delete?id={id}");
-
-            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
-        }
-
-        [Fact(DisplayName = "Receive NotFound passing null ID to Details page")]
-        public async void RoleManagementTest07()
-        {
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var responseMessage = await client.GetAsync("Admin/Role/Details");
-
-            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
-        }
-
-        [Fact(DisplayName = "Receive NotFound passing non-existing ID to Details page")]
-        public async void RoleManagementTest08()
-        {
-            var id = Guid.Empty.ToString();
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var responseMessage = await client.GetAsync($"Admin/Role/Details?id={id}");
-
-            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
-        }
-
-        [Fact(DisplayName = "Receive NotFound passing null ID to Edit page")]
-        public async void RoleManagementTest09()
-        {
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var responseMessage = await client.GetAsync("Admin/Role/Edit");
-
-            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
-        }
-
-        [Fact(DisplayName = "Receive NotFound passing non-existing ID to Edit page")]
-        public async void RoleManagementTest10()
-        {
-            var id = Guid.Empty.ToString();
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var responseMessage = await client.GetAsync($"Admin/Role/Edit?id={id}");
-
-            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
-        }
-
-        [Fact(DisplayName = "Delete page disables Delete button for system Role")]
-        public async void RoleManagementTest11()
-        {
-            var roleId = SysUiGuids.Role.UserManager;
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var delete = await Pages.Role.Delete.CreateAsync(client, roleId);
-            Assert.True(delete.DeleteButton.IsDisabled());
-        }
-
-        [Fact(DisplayName = "Delete page displays authorization failure message")]
-        public async void RoleManagementTest12()
-        {
-            var roleId = SysUiGuids.Role.UserManager;
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var delete = await Pages.Role.Delete.CreateAsync(client, roleId);
-            delete = await delete.ClickDeleteButtonExpectingErrorAsync();
-            Assert.Contains("Can not delete Role", delete.GetValidationSummaryText());
-        }
-
-        [Fact(DisplayName = "Edit page displays authorization failure message")]
-        public async void RoleManagementTest13()
-        {
-            var roleId = SysUiGuids.Role.UserManager;
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var edit = (await Pages.Role.Edit.CreateAsync(client, roleId)).SetClaims(Array.Empty<string>());
-            edit = await edit.ClickSaveButtonExpectingErrorAsync();
-            Assert.Contains("Can not update Role", edit.GetValidationSummaryText());
-        }
-
-        [Fact(DisplayName = "Index page displays High Severity notification")]
-        public async void RoleManagementTest14()
-        {
-            var userId = SysGuids.Role.Administrator;
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var edit = (await Pages.Role.Edit.CreateAsync(client, userId))
-                .UpdateProperties(new Dictionary<string, string> { { nameof(AuthUiRole.Id), Guid.Empty.ToString() } });
-            var index = await edit.ClickSaveButtonAsync();
-
-            Assert.Contains("not found in the database", index.GetNotificationErrorText());
-        }
-
-        [Fact(DisplayName = "Index page displays Normal Severity notification")]
-        public async void RoleManagementTest15()
-        {
-            var name = "TestRole2";
-            var roleModel = new RoleModel { Name = name };
-            var client = WebAppFactory.CreateClient();
-
-            await WebAppFactory.LoginExistingUserAsync(client, "Admin@company.com", "Administrat0r!");
-            var edit = await Pages.Role.Create.CreateAsync(client);
-            var index = await edit.ClickCreateButtonAsync(roleModel);
-
-            Assert.Contains($"'{name}' successfully created", index.GetNotificationSuccessText());
-        }
-
-
-        private async Task SetupTestEnvironmentAsync(HttpClient client, params string[] requiredClaims)
-        {
-            var authManager = WebAppFactory.Services.GetRequiredService<IAuthorizationManager>();
-            var dbContext = WebAppFactory.Services.GetRequiredService<ApplicationDbContext>();
-
-            var role = dbContext.Roles.Find(WebAppFactory.AppRoleId);
-            Assert.NotNull(role);
-            role.SetClaims(requiredClaims);
-            dbContext.SaveChanges();
-
-            authManager.RefreshRole(role.Id);
-
-            await WebAppFactory.LoginExistingUserAsync(client, WebAppFactory.AppUserEmail, WebAppFactory.AppUserPassword);
-        }
-
-        private AuthUiRole EnsureListerRoleExists()
-        {
-            var dbContext = WebAppFactory.Services.GetRequiredService<ApplicationDbContext>();
-            var role = dbContext.Roles
-                .Include(ar => ar.Claims)
-                .Where(ar => ar.Name == ListerRoleModel.Name)
-                .AsNoTracking()
-                .SingleOrDefault();
-
-            if (role == null)
-            {
-                role = ListerRoleModel.ToRole().SetClaims(ListerRoleClaims);
-
-                dbContext.Roles.Add(role);
-                dbContext.SaveChanges();
+                try
+                {
+                    if (header.Key.StartsWith("content-"))
+                    {
+                        requestMessage.Content!.Headers.Add(header.Key, header.Value);
+                    }
+                    else
+                    {
+                        requestMessage.Headers.Add(header.Key, header.Value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    OutputHelper.WriteLine("Error copying HTTP request headers in Playwright.BrowserContext Route handler.");
+                    OutputHelper.WriteLine(ex.ToString());
+                }
             }
 
-            return role;
+            var response = await Client.SendAsync(requestMessage);
+            var responseBody = await response.Content.ReadAsByteArrayAsync();
+            var responseHeaders = response.Content.Headers
+                .Select(h => KeyValuePair.Create(h.Key, h.Value.First()));
+
+            await route.FulfillAsync(new()
+            {
+                BodyBytes = responseBody,
+                Headers = responseHeaders,
+                Status = (int)response.StatusCode
+            });
+        });
+    }
+
+    public override async Task DisposeAsync()
+    {
+        Client?.Dispose();
+
+        await base.DisposeAsync();
+    }
+
+
+    #region Helper Methods
+
+    private async Task<ApplicationRole?> GetRoleByIdAsync(string roleId)
+    {
+        using var scope = WebAppFactory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        return await dbContext.Roles
+            .Where(r => r.Id == roleId)
+            .Include(r => r.Claims)
+            .AsNoTracking()
+            .SingleOrDefaultAsync();
+    }
+
+    private async Task LogUserInAsync(Login login, string? returnUrl = null)
+    {
+        var url = $"{HostUri}Identity/Account/Login";
+        if (returnUrl != null)
+        {
+            url += "?ReturnUrl=" + HttpUtility.UrlEncode(returnUrl);
         }
+
+        await Page.GotoAsync(url);
+        await Page.GetByPlaceholder("name@example.com").FillAsync(login.Email);
+        await Page.GetByPlaceholder("password").FillAsync(login.Password);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
+    }
+
+    private async Task VerifyRoleExistsAsync(string roleName)
+    {
+        using var scope = WebAppFactory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.True( await dbContext.Roles.AnyAsync(r => r.Name == roleName) );
+    }
+
+    #endregion
+
+
+    [Fact(DisplayName = "Can create new role with claims")]
+    public async Task RoleManagementTest01Async()
+    {
+        await LogUserInAsync(Logins.Administrator, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        await Page.GetByRole(AriaRole.Link, new() { Name = "Create New" }).ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Create Role", title);
+
+        var roleName = "Test01Role";
+
+        await Page.GetByLabel("Name").FillAsync(roleName);
+        await Page.GetByLabel("Description").FillAsync("Test Role");
+        await Page.GetByLabel("Search:").FillAsync("List");
+        await Page.GetByRole(AriaRole.Row, new() { Name = "Bulletin.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
+        await Page.GetByRole(AriaRole.Row, new() { Name = "Calendar.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
+        await Page.GetByRole(AriaRole.Row, new() { Name = "Document.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
+        await Page.GetByRole(AriaRole.Row, new() { Name = "News.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
+        await Page.GetByRole(AriaRole.Row, new() { Name = "Role.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
+        await Page.GetByRole(AriaRole.Row, new() { Name = "User.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
+
+        title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{roleName}' successfully created." });
+        Assert.NotNull(locator);
+
+        await VerifyRoleExistsAsync(roleName);
+    }
+
+    [Fact(DisplayName = "Can display existing role")]
+    public async void RoleManagementTest02Async()
+    {
+        var role = await GetRoleByIdAsync(SysUiGuids.Role.UserManager);
+        await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        await Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByRole(AriaRole.Link, new() { Name = "Details" })
+            .ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Role Details", title);
+
+        var value = await Page.GetByLabel("Id").InputValueAsync();
+        Assert.Equal(role.Id, value);
+        value = await Page.GetByLabel("Name").InputValueAsync();
+        Assert.Equal(role.Name, value);
+        value = await Page.GetByLabel("Description").InputValueAsync();
+        Assert.Equal(role.Description, value);
+
+        var roleClaims = role.Claims
+            .Select(r => r.ClaimValue!)
+            .ToList();
+
+        var rows = Page.GetByRole(AriaRole.Row);
+        var count = await rows.CountAsync();
+        Assert.True(count > 0);
+
+        for (var ix = 1; ix < count; ix++)
+        {
+            value = await rows.Nth(ix).GetByRole(AriaRole.Cell).Last.InnerTextAsync();
+            Assert.Contains(value, roleClaims);
+        }
+    }
+
+    [Fact(DisplayName = "Can update existing role and claims")]
+    public async void RoleManagementTest03Async()
+    {
+        var role = new ApplicationRole 
+        {
+            Name = "Test03Role", Description = "Can list and view news items." 
+        }.SetClaims(AppClaims.News.List, AppClaims.News.Read);
+        await Fixture.EnsureRoleAsync(role);
+
+        await LogUserInAsync(Logins.Administrator, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        await Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByRole(AriaRole.Link, new() { Name = "Edit" })
+            .ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Edit Role", title);
+
+        var locator = Page.GetByLabel(nameof(role.Name));
+        var value = await locator.InputValueAsync();
+        Assert.Equal(role.Name, value);
+        role.Name = "Test03RoleX";
+        await locator.FillAsync(role.Name);
+
+        locator = Page.GetByLabel(nameof(role.Description));
+        value = await locator.InputValueAsync();
+        Assert.Equal(role.Description, value);
+        role.Description = "Can create, delete, list, read, and update news items.";
+        await locator.FillAsync(role.Description);
+
+        await Page.GetByLabel("Search:").FillAsync("News");
+
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.List }).GetByRole(AriaRole.Checkbox);
+        Assert.True(await locator.IsCheckedAsync());
+
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Read }).GetByRole(AriaRole.Checkbox);
+        Assert.True(await locator.IsCheckedAsync());
+
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Create }).GetByRole(AriaRole.Checkbox);
+        Assert.False(await locator.IsCheckedAsync());
+        await locator.CheckAsync();
+
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Delete }).GetByRole(AriaRole.Checkbox);
+        Assert.False(await locator.IsCheckedAsync());
+        await locator.CheckAsync();
+
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Update }).GetByRole(AriaRole.Checkbox);
+        Assert.False(await locator.IsCheckedAsync());
+        await locator.CheckAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+        locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' was successfully updated." });
+        Assert.NotNull(locator);
+
+        role.SetClaims(AppClaims.News.DefinedClaims);
+
+        var dbRole = await GetRoleByIdAsync(role.Id);
+        Assert.NotNull(dbRole);
+        Assert.Equal(role.Name, dbRole.Name);
+        Assert.Equal(role.Description, dbRole.Description);
+        Assert.Equal(
+            role.Claims.Select(c => c.ClaimValue!).Order(), 
+            dbRole.Claims.Select(c => c.ClaimValue!).Order()
+            );
+    }
+
+    [Fact(DisplayName = "Can delete existing role")]
+    public async void RoleManagementTest04Async()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test04Role",
+            Description = "Can create, delete, list, read, and update calendar items."
+        }.SetClaims(AppClaims.Calendar.DefinedClaims);
+        await Fixture.EnsureRoleAsync(role);
+
+        var login = new Login("Test04User@company.com", "Test04pa$$");
+        await Fixture.EnsureUserAsync(login, role.Name);
+
+        await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        await Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByRole(AriaRole.Link, new() { Name = "Delete" })
+            .ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Delete Role", title);
+
+        var locator = Page.GetByRole(AriaRole.Textbox).Nth(0);
+        Assert.Equal(role.Id, await locator.InputValueAsync());
+
+        locator = Page.GetByRole(AriaRole.Textbox).Nth(1);
+        Assert.Equal(role.Name, await locator.InputValueAsync());
+
+        locator = Page.GetByRole(AriaRole.Textbox).Nth(2);
+        Assert.Equal(role.Description, await locator.InputValueAsync());
+
+        // Verify assigned User is displayed
+        locator = Page.GetByRole(AriaRole.Cell, new() { Name = login.Email });
+        Assert.Equal(1, await locator.CountAsync());
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully deleted." });
+        Assert.Equal(1, await locator.CountAsync());
+    }
+
+    [Fact(DisplayName = "Delete button is disabled for system Role")]
+    public async void RoleManagementTest05Async()
+    {
+        await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        await Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = nameof(AppGuids.Role.DocumentManager) })
+            .GetByRole(AriaRole.Link, new() { Name = "Delete" })
+            .ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Delete Role", title);
+
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = "System Roles may not be deleted!" });
+        Assert.Equal(1, await locator.CountAsync());
+
+        locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" });
+        Assert.Equal(1, await locator.CountAsync());
+        Assert.True(await locator.IsDisabledAsync());
+    }
+
+    [Fact(DisplayName = "Index page displays High Severity notification")]
+    public async void RoleManagementTest06Async()
+    {
+        var role = new ApplicationRole { Name = "Test06Role" };
+        await Fixture.EnsureRoleAsync(role);
+
+        await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        await Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByRole(AriaRole.Link, new() { Name = "Delete" })
+            .ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Delete Role", title);
+
+        await Fixture.DeleteRoleAsync(role.Id);
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Role Management", title);
+
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Error: Role '{role.Name}' was not found in the database." });
+        Assert.Equal(1, await locator.CountAsync());
     }
 }

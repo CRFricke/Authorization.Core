@@ -1,8 +1,8 @@
 ﻿using Authorization.Core.UI.Tests.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
-using CRFricke.Authorization.Core.UI.Pages.V4.Role;
 using CRFricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.UI.Pages.V4.Role;
 using CRFricke.Test.Support.Fakes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +20,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
-using System.Net.Http;
 
 namespace Authorization.Core.UI.Tests
 {
