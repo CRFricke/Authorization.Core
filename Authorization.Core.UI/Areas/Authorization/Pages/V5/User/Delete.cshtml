@@ -29,6 +29,7 @@
             <h5 class="text-muted">Update the user's details:</h5>
             <hr />
             <input type="hidden" asp-for="IsSystemUser" />
+            <input type="hidden" asp-for="UserModel.Email" />
             <div class="form-floating">
                 <input class="form-control" id="UserModel_Id" type="text" value="@Model.UserModel.Id" disabled />
                 <label asp-for="UserModel.Id" class="control-label"></label>
