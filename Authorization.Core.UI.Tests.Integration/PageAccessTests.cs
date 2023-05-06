@@ -54,8 +54,10 @@ namespace Authorization.Core.UI.Tests.Integration
 
         public WebAppFactory Factory { get; }
 
+        private string HostUri { get; } = "https://localhost/";
 
-        private HttpClient CreateClientWithAuthenticationScheme(string claimsIssuer = "Administrator")
+
+        private HttpClient CreateClientWithAuthenticationScheme(string claimsIssuer = "Administrator", bool allowRedirect = true)
         {
             var client = Factory.WithWebHostBuilder(builder => {
                 builder.ConfigureTestServices(services =>
@@ -64,9 +66,9 @@ namespace Authorization.Core.UI.Tests.Integration
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                             "TestScheme", options => { options.ClaimsIssuer = claimsIssuer; });
                 });
-            }).CreateClient(new WebApplicationFactoryClientOptions
+            }).CreateClient(new()
             {
-                AllowAutoRedirect = false,
+                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)
             });
 
             client.DefaultRequestHeaders.Authorization =
@@ -132,7 +134,7 @@ namespace Authorization.Core.UI.Tests.Integration
         {
             var client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false,
+                AllowAutoRedirect = false, BaseAddress = new(HostUri)
             });
 
             var response = await client.GetAsync(endpoint);
