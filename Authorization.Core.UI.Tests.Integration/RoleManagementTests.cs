@@ -97,6 +97,18 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
 
     #region Helper Methods
 
+    private async Task DeleteRoleAsync(string roleId)
+    {
+        using var scope = WebAppFactory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var dbRole = await dbContext.Roles.FindAsync(roleId);
+        if (dbRole is not null)
+        {
+            dbContext.Roles.Remove(dbRole);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
     private async Task<ApplicationRole?> GetRoleByIdAsync(string roleId)
     {
         using var scope = WebAppFactory.Services.CreateScope();
@@ -159,7 +171,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
         var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{roleName}' successfully created." });
-        Assert.NotNull(locator);
+        Assert.Equal(1, await locator.CountAsync());
 
         await VerifyRoleExistsAsync(roleName);
     }
@@ -316,7 +328,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         Assert.Equal(1, await locator.CountAsync());
     }
 
-    [Fact(DisplayName = "Delete button is disabled for system Role")]
+    [Fact(DisplayName = "Delete button is disabled for system role")]
     public async void RoleManagementTest05Async()
     {
         await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
@@ -355,7 +367,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         title = await Page.TitleAsync();
         Assert.Contains("Delete Role", title);
 
-        await Fixture.DeleteRoleAsync(role.Id);
+        await DeleteRoleAsync(role.Id);
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
         title = await Page.TitleAsync();
