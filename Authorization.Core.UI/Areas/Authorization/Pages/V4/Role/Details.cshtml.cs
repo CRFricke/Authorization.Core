@@ -1,8 +1,8 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -22,42 +22,21 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
         where TUser : AuthUiUser
         where TRole : AuthUiRole
     {
-        private readonly IAuthorizationManager _authManager;
-        private readonly IRepository<TUser, TRole> _repository;
+        private readonly DetailsHandler<TUser, TRole> _detailsHandler;
 
         /// <summary>
-        /// Creates a new DetailsModel<TRole> class instance using the specified authorization manager and repository.
+        /// Creates a new DetailsModel&lt;TUser, TRole&gt; class instance using the specified <see cref="IServiceProvider"/> instance.
         /// </summary>
-        /// <param name="authManager">The AuthorizationManager instance to be used to initialize the DetailsModel.</param>
-        /// <param name="repository">The repository instance to be used to initialize the DetailsModel.</param>
-        public DetailsModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository)
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsModel.</param>
+        public DetailsModel(IServiceProvider serviceProvider)
         {
-            _authManager = authManager;
-            _repository = repository;
+            _detailsHandler = new DetailsHandler<TUser, TRole>(serviceProvider);
         }
 
         public override async Task<IActionResult> OnGetAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var role = await _repository.Roles
-                .Include(ar => ar.Claims)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            RoleModel = new RoleModel()
-                .InitRoleClaims(_authManager)
-                .InitFromRole(role);
-
-            return Page();
+            RoleModel = new RoleModel();
+            return await _detailsHandler.OnGetAsync(RoleModel, this, id);
         }
     }
 }

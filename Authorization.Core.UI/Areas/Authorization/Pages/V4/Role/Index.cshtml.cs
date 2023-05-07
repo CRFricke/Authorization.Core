@@ -1,9 +1,8 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
-using Microsoft.EntityFrameworkCore;
+using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
@@ -12,27 +11,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
     [PageImplementationType(typeof(IndexModel<,>))]
     public abstract class IndexModel : ModelBase
     {
-        internal const string PageName = "Index";
-
-        #region RoleModel Class
-
-        public class RoleModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public string Description { get; set; }
-
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
-
-        #endregion
-
-        public IList<RoleModel> Roles { get; set; }
+        public IList<RoleInfo> RoleInfo { get; set; }
 
         public virtual Task OnGetAsync() => throw new NotImplementedException();
     }
@@ -41,38 +20,20 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
         where TRole : AuthUiRole
         where TUser : AuthUiUser
     {
-        private readonly IRepository<TUser, TRole> _repository;
+        private readonly IndexHandler<TUser, TRole> _indexHandler;
 
         /// <summary>
-        /// Creates a new IndexModel<TTUser,Role> class instance using the specified <paramref name="repository"/>.
+        /// Creates a new IndexModel&lt;TUser, TRole&gt; class instance using the specified <see cref="IServiceProvider"/>.
         /// </summary>
-        /// <param name="repository">The repository instance to be used to initialize the IndexModel.</param>
-        public IndexModel(IRepository<TUser,TRole> repository)
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsModel.</param>
+        public IndexModel(IServiceProvider serviceProvider)
         {
-            _repository = repository;
+            _indexHandler = new IndexHandler<TUser, TRole>(serviceProvider);
         }
 
         public override async Task OnGetAsync()
         {
-            Roles = await _repository.Roles
-                .AsNoTracking()
-                .Select(ar => CreateRoleModel(ar))
-                .ToListAsync();
-        }
-
-        /// <summary>
-        /// Creates a new RoleModel class instance using the specified TRole type instance.
-        /// </summary>
-        /// <param name="role">The role object to be used to initialize the RoleModel instance.</param>
-        /// <returns>The new RoleModel instance.</returns>
-        private static RoleModel CreateRoleModel(TRole role)
-        {
-            return new RoleModel
-            {
-                Id = role.Id,
-                Description = role.Description,
-                Name = role.Name
-            };
+            RoleInfo = await _indexHandler.OnGetAsync();
         }
     }
 }

@@ -64,6 +64,8 @@ namespace CRFricke.Authorization.Core.UI.Models
 
         public bool ClaimsUpdated { get; private set; }
 
+        public bool IsSystemRole { get; set; }
+
 
         internal RoleModel InitRoleClaims(IAuthorizationManager authManager)
         {

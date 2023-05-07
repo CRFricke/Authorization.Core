@@ -1,9 +1,8 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
-using Microsoft.AspNetCore.Identity;
+using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -25,102 +24,26 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
         where TRole : AuthUiRole, new()
         where TUser : AuthUiUser
     {
-        private readonly IAuthorizationManager _authManager;
-        private readonly ILogger<CreateModel> _logger;
-        private readonly IRepository<TUser, TRole> _repository;
+        private readonly CreateHandler<TUser, TRole> _createHandler;
 
         /// <summary>
-        /// Creates a new CreateModel<TUser, TRole> class instance using the specified authorization manager and repository.
+        /// Creates a new CreateModel&lt;TUser, TRole&gt; class instance using the specified <see cref="IServiceProvider"/> instance.
         /// </summary>
-        /// <param name="authManager">The AuthorizationManager instance to be used to initialize the CreateModel.</param>
-        /// <param name="repository">The repository instance to be used to initialize the CreateModel.</param>
-        public CreateModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository, ILogger<CreateModel> logger)
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsModel.</param>
+        public CreateModel(IServiceProvider serviceProvider)
         {
-            _authManager = authManager;
-            _logger = logger;
-            _repository = repository;
+            _createHandler = new CreateHandler<TUser, TRole>(serviceProvider, typeof(IndexModel));
         }
 
         public override IActionResult OnGet()
         {
-            RoleModel = new RoleModel()
-                .InitRoleClaims(_authManager);
-
-            return Page();
+            RoleModel = new RoleModel();
+            return _createHandler.OnGet(RoleModel, this);
         }
 
         public override async Task<IActionResult> OnPostAsync(string hfClaimList)
         {
-            RoleModel.InitRoleClaims(_authManager)
-                .SetAssignedClaims(
-                    hfClaimList?.Split(',') ?? Array.Empty<string>()
-                    );
-
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            var role = CreateRole(RoleModel);
-
-            var result = await _authManager.AuthorizeAsync(User, role, new AppClaimRequirement(SysClaims.Role.Create));
-            if (!result.Succeeded)
-            {
-                ModelState.AddModelError(string.Empty, "Can not create Role:");
-                ModelState.AddModelError(string.Empty, "You can not create a Role with more privileges than you have.");
-
-                _logger.LogWarning(
-                    "'{PrincipalEmail}' attempted to create {RoleType} with elevated privileges.",
-                    User.Identity.Name, typeof(TRole).Name
-                    );
-
-                return Page();
-            }
-
-            try
-            {
-                _repository.Roles.Add(role);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "Could not create Role:");
-                ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
-
-                _logger.LogError(
-                    ex, "'{PrincipalEmail}' could not create {RoleType} '{RoleName}' (ID: {RoleId}).",
-                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
-                    );
-
-                return Page();
-            }
-
-            SendNotification(
-                typeof(IndexModel), Severity.Normal,
-                $"Role '{role.Name}' successfully created."
-                );
-
-            _logger.LogInformation(
-                "'{PrincipalEmail}' created {RoleType} '{RoleName}' (ID: {RoleId}).",
-                User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
-                );
-
-            return RedirectToPage(IndexModel.PageName);
-
-        }
-
-        private static TRole CreateRole(RoleModel model)
-        {
-            var normalizer = new UpperInvariantLookupNormalizer();
-
-            var role = new TRole
-            {
-                Description = model.Description,
-                Name = model.Name,
-                NormalizedName = normalizer.NormalizeName(model.Name)
-            }.SetClaims(model.GetAssignedClaims());
-
-            return role;
+            return await _createHandler.OnPostAsync(RoleModel, this, hfClaimList);
         }
     }
 }

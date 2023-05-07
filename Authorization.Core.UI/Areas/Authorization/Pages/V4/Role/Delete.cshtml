@@ -3,11 +3,11 @@
 @{
     ViewData["Title"] = "Delete Role";
 
-    var message = Model.IsSystemRole
+    var message = Model.RoleModel.IsSystemRole
         ? "System Roles may not be deleted!"
         : "Are you sure you want to delete this role?";
 
-    var btnDeleteAttr = Model.IsSystemRole ? "disabled" : "";
+    var btnDeleteAttr = Model.RoleModel.IsSystemRole ? "disabled" : "";
 }
 
 <div class="row align-items-center">
@@ -82,7 +82,7 @@
 <div class="row mx-sm-1">
     <div class="col">
         <form id="formDelete" method="post">
-            <input type="hidden" asp-for="IsSystemRole" />
+            <input type="hidden" asp-for="RoleModel.IsSystemRole" />
             <input type="hidden" asp-for="RoleModel.Id" />
             <input type="hidden" asp-for="RoleModel.Name" />
             <input id="btnDelete" type="submit" value="Delete" class="btn btn-primary" @btnDeleteAttr /> |
