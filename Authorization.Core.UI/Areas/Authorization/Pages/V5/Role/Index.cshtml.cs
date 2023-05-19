@@ -23,12 +23,12 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
         private readonly IndexHandler<TUser, TRole> _indexHandler;
 
         /// <summary>
-        /// Creates a new IndexModel&lt;TUser, TRole&gt; class instance using the specified <see cref="IServiceProvider"/>.
+        /// Creates a new <see cref="IndexModel{TUser, TRole}"/> class instance using the specified parameters.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsModel.</param>
-        public IndexModel(IServiceProvider serviceProvider)
+        /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+        public IndexModel(IRepository<TUser, TRole> repository)
         {
-            _indexHandler = new IndexHandler<TUser, TRole>(serviceProvider);
+            _indexHandler = new IndexHandler<TUser, TRole>(repository);
         }
 
         public override async Task OnGetAsync()

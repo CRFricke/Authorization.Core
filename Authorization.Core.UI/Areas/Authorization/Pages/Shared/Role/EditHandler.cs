@@ -2,7 +2,6 @@
 using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -13,19 +12,39 @@ internal class EditHandler<TUser, TRole>
     where TRole : AuthUiRole
     where TUser : AuthUiUser
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly Type _notificationReceiver;
     private readonly IAuthorizationManager _authManager;
     private readonly IRepository<TUser, TRole> _repository;
+    private readonly ILogger<EditHandler> _logger;
+    private readonly Type _notificationReceiver;
 
-    public EditHandler(IServiceProvider serviceProvider, Type notificationReceiver)
+    /// <summary>
+    /// Creates a new <see cref="EditHandler{TUser, TRole}"/> class instance using the specified parameters.
+    /// </summary>
+    /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+    /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+    /// <param name="logger">The <see cref="ILogger{EditHandler}"/> instance to be used for logging.</param>
+    /// <param name="notificationReceiver">The <see cref="Type"/> of the Razor page to receive notification messages.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if any of the constructor's parameters are <see langword="null"/>.
+    /// </exception>
+    public EditHandler(
+        IAuthorizationManager authManager,
+        IRepository<TUser, TRole> repository,
+        ILogger<EditHandler> logger,
+        Type notificationReceiver)
     {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _authManager = authManager ?? throw new ArgumentNullException(nameof(authManager));
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _notificationReceiver = notificationReceiver ?? throw new ArgumentNullException(nameof(notificationReceiver));
-        _authManager = serviceProvider.GetRequiredService<IAuthorizationManager>();
-        _repository = serviceProvider.GetRequiredService<IRepository<TUser, TRole>>();
     }
 
+    /// <summary>
+    /// Called to initialize the <see cref="RoleModel"/> for the Edit Role page.
+    /// </summary>
+    /// <param name="roleModel">The <see cref="RoleModel"/> class instance to be initialized.</param>
+    /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Edit Role page.</param>
+    /// <returns>The <see cref="IActionResult"/> to be used to display the Edit Role page.</returns>
     public async Task<IActionResult> OnGetAsync(RoleModel roleModel, ModelBase modelBase, string id)
     {
         if (id == null)
@@ -52,11 +71,20 @@ internal class EditHandler<TUser, TRole>
         return modelBase.Page();
     }
 
+    /// <summary>
+    /// Called to update the Role in the database.
+    /// </summary>
+    /// <param name="roleModel">The <see cref="RoleModel"/> object to be used to update the Role.</param>
+    /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Edit Role page.</param>
+    /// <param name="hfClaimList">A list of Claims to be assigned to the Role.</param>
+    /// <returns>The <see cref="IActionResult"/> to be used to display the next Razor page.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if no <see cref="ILoggerFactory"/> implementation can be found by the the <see cref="IServiceProvider"/>.
+    /// </exception>
     public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string hfClaimList)
     {
-        var logger = _serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<EditHandler>();
         var modelState = modelBase.ModelState;
-        var user = modelBase.User;
+        var principal = modelBase.User;
 
         roleModel.InitRoleClaims(_authManager)
             .SetAssignedClaims(
@@ -87,7 +115,7 @@ internal class EditHandler<TUser, TRole>
 
         if (roleModel.ClaimsUpdated)
         {
-            var result = await _authManager.AuthorizeAsync(user, role, new AppClaimRequirement(SysClaims.Role.UpdateClaims));
+            var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.UpdateClaims));
             if (!result.Succeeded)
             {
                 modelState.AddModelError(string.Empty, "Can not update Role:");
@@ -96,17 +124,17 @@ internal class EditHandler<TUser, TRole>
                 {
                     var message = "You may not update the Claims assigned to a system Role.";
                     modelState.AddModelError(string.Empty, message);
-                    logger.LogWarning(
+                    _logger.LogWarning(
                         "'{PrincipalEmail}' attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                        user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                        principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                         );
                     return modelBase.Page();
                 }
 
                 modelState.AddModelError(string.Empty, "You can not give a Role more privileges than you have.");
-                logger.LogWarning(
+                _logger.LogWarning(
                     "'{PrincipalEmail}' attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
-                    user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                    principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                     );
                 return modelBase.Page();
             }
@@ -121,9 +149,9 @@ internal class EditHandler<TUser, TRole>
             modelState.AddModelError(string.Empty, "Could not update Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            logger.LogError(
+            _logger.LogError(
                 ex, "'{PrincipalEmail}' could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
-                user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             return modelBase.Page();
@@ -141,9 +169,9 @@ internal class EditHandler<TUser, TRole>
                 $"Role '{role.Name}' was successfully updated."
                 );
 
-            logger.LogInformation(
+            _logger.LogInformation(
                 "'{PrincipalEmail}' updated {RoleType} '{RoleName}' (ID: {RoleId}).",
-                user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                 );
         }
 

@@ -5,7 +5,7 @@
     ViewData["Title"] = "Edit User";
 }
 
-@if (Model.IsSystemUser)
+@if (Model.UserModel.IsSystemUser)
 {
 <style>
     td input[type=checkbox] {
@@ -32,6 +32,7 @@
                     <input type="hidden" asp-for="UserModel.Id" />
                     <input type="hidden" asp-for="UserModel.Password" />
                     <input type="hidden" asp-for="UserModel.ConfirmPassword" />
+                    <input type="hidden" asp-for="UserModel.IsSystemUser" />
                     <div class="form-group">
                         <label asp-for="UserModel.Email" class="control-label" aria-required="true"></label>
                         <input asp-for="UserModel.Email" class="form-control" />

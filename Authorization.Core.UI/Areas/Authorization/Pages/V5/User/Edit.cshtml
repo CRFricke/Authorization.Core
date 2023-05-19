@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Edit User";
 
-    var checkboxDisabled = (Model.IsSystemUser) ? "disabled" : "";
+    var checkboxDisabled = (Model.UserModel.IsSystemUser) ? "disabled" : "";
 }
 
 <div class="row">
@@ -19,50 +19,51 @@
         <div class="col-auto col-properties me-sm-5 mb-3">
             <h5 class="text-muted">Update the user's details:</h5>
             <hr />
-            <input type="hidden" asp-for="Input.Id" />
-            <input type="hidden" asp-for="Input.Password" />
-            <input type="hidden" asp-for="Input.ConfirmPassword" />
+            <input type="hidden" asp-for="UserModel.Id" />
+            <input type="hidden" asp-for="UserModel.Password" />
+            <input type="hidden" asp-for="UserModel.ConfirmPassword" />
+            <input type="hidden" asp-for="UserModel.IsSystemUser" />
             <div class="form-floating">
-                <input class="form-control" asp-for="Input.Email" autocomplete="email" aria-required="true" />
-                <label class="control-label" asp-for="Input.Email"></label>
-                <span class="text-danger" asp-validation-for="Input.Email"></span>
+                <input class="form-control" asp-for="UserModel.Email" autocomplete="email" aria-required="true" />
+                <label class="control-label" asp-for="UserModel.Email"></label>
+                <span class="text-danger" asp-validation-for="UserModel.Email"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="Input.GivenName" autocomplete="given-name" />
-                <label class="control-label" asp-for="Input.GivenName"></label>
-                <span class="text-danger" asp-validation-for="Input.GivenName"></span>
+                <input class="form-control" asp-for="UserModel.GivenName" autocomplete="given-name" />
+                <label class="control-label" asp-for="UserModel.GivenName"></label>
+                <span class="text-danger" asp-validation-for="UserModel.GivenName"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="Input.Surname" autocomplete="family-name" />
-                <label class="control-label" asp-for="Input.Surname"></label>
-                <span class="text-danger" asp-validation-for="Input.Surname"></span>
+                <input class="form-control" asp-for="UserModel.Surname" autocomplete="family-name" />
+                <label class="control-label" asp-for="UserModel.Surname"></label>
+                <span class="text-danger" asp-validation-for="UserModel.Surname"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="Input.PhoneNumber" autocomplete="tel" />
-                <label class="control-label" asp-for="Input.PhoneNumber"></label>
-                <span class="text-danger" asp-validation-for="Input.PhoneNumber"></span>
+                <input class="form-control" asp-for="UserModel.PhoneNumber" autocomplete="tel" />
+                <label class="control-label" asp-for="UserModel.PhoneNumber"></label>
+                <span class="text-danger" asp-validation-for="UserModel.PhoneNumber"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="Input.LockoutEnd" autocomplete="tel" />
-                <label class="control-label" asp-for="Input.LockoutEnd"></label>
-                <span class="text-danger" asp-validation-for="Input.LockoutEnd"></span>
+                <input class="form-control" asp-for="UserModel.LockoutEnd" autocomplete="tel" />
+                <label class="control-label" asp-for="UserModel.LockoutEnd"></label>
+                <span class="text-danger" asp-validation-for="UserModel.LockoutEnd"></span>
             </div>
             <div class="form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Input.EmailConfirmed" />
-                    @Html.DisplayNameFor(model => model.Input.EmailConfirmed)
+                    <input class="form-check-input" asp-for="UserModel.EmailConfirmed" />
+                    @Html.DisplayNameFor(model => model.UserModel.EmailConfirmed)
                 </label>
             </div>
             <div class="form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Input.PhoneNumberConfirmed" />
-                    @Html.DisplayNameFor(model => model.Input.PhoneNumberConfirmed)
+                    <input class="form-check-input" asp-for="UserModel.PhoneNumberConfirmed" />
+                    @Html.DisplayNameFor(model => model.UserModel.PhoneNumberConfirmed)
                 </label>
             </div>
             <div class="form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Input.LockoutEnabled" />
-                    @Html.DisplayNameFor(model => model.Input.LockoutEnabled)
+                    <input class="form-check-input" asp-for="UserModel.LockoutEnabled" />
+                    @Html.DisplayNameFor(model => model.UserModel.LockoutEnabled)
                 </label>
             </div>
             <div class="col-auto d-none d-sm-block align-items-center mt-3">
@@ -78,15 +79,15 @@
                     <thead>
                         <tr>
                             <th id="thSelect" class="col-auto" data-orderable="false">
-                                <label asp-for="Input.Roles.ElementAt(0).IsAssigned"></label>
+                                <label asp-for="UserModel.Roles.ElementAt(0).IsAssigned"></label>
                             </th>
-                            <th><label asp-for="Input.Roles.ElementAt(0).Name"></label></th>
-                            <th><label asp-for="Input.Roles.ElementAt(0).Description"></label></th>
+                            <th><label asp-for="UserModel.Roles.ElementAt(0).Name"></label></th>
+                            <th><label asp-for="UserModel.Roles.ElementAt(0).Description"></label></th>
                         </tr>
                     </thead>
                     <tbody>
                         @{
-                            foreach (var role in Model.Input.Roles)
+                            foreach (var role in Model.UserModel.Roles)
                             {
                                 var checkedVal = (role.IsAssigned) ? "checked" : "";
                                 <tr>

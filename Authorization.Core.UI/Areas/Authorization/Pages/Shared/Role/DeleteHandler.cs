@@ -2,7 +2,6 @@
 using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -12,22 +11,42 @@ using System.Threading.Tasks;
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
 internal class DeleteHandler<TUser, TRole>
-        where TUser : AuthUiUser
-        where TRole : AuthUiRole
+    where TUser : AuthUiUser
+    where TRole : AuthUiRole
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly Type _notificationReceiver;
     private readonly IAuthorizationManager _authManager;
     private readonly IRepository<TUser, TRole> _repository;
+    private readonly ILogger<DeleteHandler> _logger;
+    private readonly Type _notificationReceiver;
 
-    public DeleteHandler(IServiceProvider serviceProvider, Type notificationReceiver)
+    /// <summary>
+    /// Creates a new <see cref="DeleteHandler{TUser, TRole}"/> using the specified parameters. 
+    /// </summary>
+    /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+    /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+    /// <param name="logger">The <see cref="ILogger{DeleteHandler}"/> instance to be used for logging.</param>
+    /// <param name="notificationReceiver">The <see cref="Type"/> of the Razor page to receive notification messages.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if any of the constructor's parameters are <see langword="null"/>.
+    /// </exception>
+    public DeleteHandler(
+        IAuthorizationManager authManager,
+        IRepository<TUser, TRole> repository,
+        ILogger<DeleteHandler> logger,
+        Type notificationReceiver)
     {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _authManager = authManager ?? throw new ArgumentNullException(nameof(authManager));
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _notificationReceiver = notificationReceiver ?? throw new ArgumentNullException(nameof(notificationReceiver));
-        _authManager = serviceProvider.GetRequiredService<IAuthorizationManager>();
-        _repository = serviceProvider.GetRequiredService<IRepository<TUser, TRole>>();
     }
 
+    /// <summary>
+    /// Called to initialize the <see cref="RoleModel"/> for the Delete Role page.
+    /// </summary>
+    /// <param name="roleModel">The <see cref="RoleModel"/> class instance to be initialized.</param>
+    /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Delete Role page.</param>
+    /// <returns>The <see cref="IActionResult"/> to be used to display the Delete Role page.</returns>
     public async Task<IActionResult> OnGetAsync(RoleModel roleModel, ModelBase modelBase, string id)
     {
         if (id == null)
@@ -55,6 +74,13 @@ internal class DeleteHandler<TUser, TRole>
         return modelBase.Page();
     }
 
+    /// <summary>
+    /// Called to delete the specified Role from the database.
+    /// </summary>
+    /// <param name="roleModel">A <see cref="RoleModel"/> object that describes the Role to be deleted.</param>
+    /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Delete Role page.</param>
+    /// <param name="id">The key (database ID) of the User to be deleted.</param>
+    /// <returns>The <see cref="IActionResult"/> to be used to display the next Razor page.</returns>
     public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string id)
     {
         if (id == null)
@@ -62,9 +88,8 @@ internal class DeleteHandler<TUser, TRole>
             return modelBase.NotFound();
         }
 
-        var logger = _serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<DeleteHandler>();
         var modelState = modelBase.ModelState;
-        var user = modelBase.User;
+        var principal = modelBase.User;
 
         var role = await _repository.Roles.FindAsync(id);
         if (role == null)
@@ -80,15 +105,15 @@ internal class DeleteHandler<TUser, TRole>
         // Don't care about ModelState on Delete.
         modelState.Clear();
 
-        var result = await _authManager.AuthorizeAsync(user, role, new AppClaimRequirement(SysClaims.Role.Delete));
+        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Delete));
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not delete Role:");
             modelState.AddModelError(string.Empty, "System Roles may not be deleted.");
 
-            logger.LogWarning(
+            _logger.LogWarning(
                 "'{PrincipalEmail}' attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
@@ -116,9 +141,9 @@ internal class DeleteHandler<TUser, TRole>
             modelState.AddModelError(string.Empty, "Could not delete Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            logger.LogError(
+            _logger.LogError(
                 ex, "'{PrincipalEmail}' could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
-                user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
@@ -142,9 +167,9 @@ internal class DeleteHandler<TUser, TRole>
             $"Role '{role.Name}' successfully deleted."
             );
 
-        logger.LogInformation(
+        _logger.LogInformation(
             "'{PrincipalEmail}' deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
-            user.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

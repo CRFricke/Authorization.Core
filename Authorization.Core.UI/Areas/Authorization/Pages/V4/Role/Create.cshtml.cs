@@ -3,6 +3,7 @@ using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
 using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -27,12 +28,17 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
         private readonly CreateHandler<TUser, TRole> _createHandler;
 
         /// <summary>
-        /// Creates a new CreateModel&lt;TUser, TRole&gt; class instance using the specified <see cref="IServiceProvider"/> instance.
+        /// Creates a new <see cref="CreateModel{TUser, TRole}"/> class instance using the specified parameters.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsModel.</param>
-        public CreateModel(IServiceProvider serviceProvider)
+        /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+        /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+        /// <param name="logger">The <see cref="ILogger{CreateHandler}"/> instance to be used for logging.</param>
+        public CreateModel(
+            IAuthorizationManager authManager,
+            IRepository<TUser, TRole> repository,
+            ILogger<CreateHandler> logger)
         {
-            _createHandler = new CreateHandler<TUser, TRole>(serviceProvider, typeof(IndexModel));
+            _createHandler = new CreateHandler<TUser, TRole>(authManager, repository, logger, typeof(IndexModel));
         }
 
         public override IActionResult OnGet()

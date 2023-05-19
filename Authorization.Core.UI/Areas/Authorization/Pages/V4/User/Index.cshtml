@@ -28,25 +28,25 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Users[0].Email)
+                        @Html.DisplayNameFor(model => model.UserInfo[0].Email)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Users[0].DisplayName)
+                        @Html.DisplayNameFor(model => model.UserInfo[0].DisplayName)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Users[0].PhoneNumber)
+                        @Html.DisplayNameFor(model => model.UserInfo[0].PhoneNumber)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Users[0].LockoutEnd)
+                        @Html.DisplayNameFor(model => model.UserInfo[0].LockoutEnd)
                     </th>
                     <th>
-                        @Html.Raw(Html.DisplayNameFor(model => model.Users[0].AccessFailedCount))
+                        @Html.Raw(Html.DisplayNameFor(model => model.UserInfo[0].AccessFailedCount))
                     </th>
                     <th data-orderable="false"></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.Users)
+                @foreach (var item in Model.UserInfo)
                 {
                     <tr>
                         <td>

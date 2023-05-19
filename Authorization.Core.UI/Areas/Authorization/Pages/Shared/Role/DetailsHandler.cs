@@ -2,7 +2,6 @@
 using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -16,15 +15,25 @@ internal class DetailsHandler<TUser, TRole>
     private readonly IRepository<TUser, TRole> _repository;
 
     /// <summary>
-    /// Creates a new DetailsHandler class instance using the specified <see cref="IServiceProvider"/>.
+    /// Creates a new <see cref="DetailsHandler{TUser, TRole}"/> class instance using the specified parameters.
     /// </summary>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsHandler.</param>
-    public DetailsHandler(IServiceProvider serviceProvider)
+    /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+    /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if any of the constructor's parameters are <see langword="null"/>.
+    /// </exception>
+    public DetailsHandler(IAuthorizationManager authManager, IRepository<TUser, TRole> repository)
     {
-        _authManager = serviceProvider.GetRequiredService<IAuthorizationManager>();
-        _repository = serviceProvider.GetRequiredService<IRepository<TUser, TRole>>();
+        _authManager = authManager ?? throw new ArgumentNullException(nameof(authManager));
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
+    /// <summary>
+    /// Called to initialize the <see cref="RoleModel"/> for the Role Details page.
+    /// </summary>
+    /// <param name="roleModel">The <see cref="RoleModel"/> class instance to be initialized.</param>
+    /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Role Details page.</param>
+    /// <returns>The <see cref="IActionResult"/> to be used to display the Role Details page.</returns>
     public async Task<IActionResult> OnGetAsync(RoleModel roleModel, ModelBase modelBase, string id)
     {
         if (id == null)

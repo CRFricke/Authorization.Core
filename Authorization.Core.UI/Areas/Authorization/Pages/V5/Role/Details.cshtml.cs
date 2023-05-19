@@ -25,12 +25,13 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role
         private readonly DetailsHandler<TUser, TRole> _detailsHandler;
 
         /// <summary>
-        /// Creates a new DetailsModel&lt;TUser, TRole&gt; class instance using the specified <see cref="IServiceProvider"/>.
+        /// Creates a new <see cref="DetailsModel{TUser, TRole}"/> class instance using the specified authorization manager and repository.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to be used to initialize the DetailsModel.</param>
-        public DetailsModel(IServiceProvider serviceProvider)
+        /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+        /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+        public DetailsModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository)
         {
-            _detailsHandler = new DetailsHandler<TUser, TRole>(serviceProvider);
+            _detailsHandler = new DetailsHandler<TUser, TRole>(authManager, repository);
         }
 
         public override async Task<IActionResult> OnGetAsync(string id)

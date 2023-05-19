@@ -86,6 +86,7 @@ namespace CRFricke.Authorization.Core.UI.Models
 
         public bool ClaimsUpdated { get; private set; }
 
+        public bool IsSystemUser { get; set; }
 
         public override string ToString()
         {

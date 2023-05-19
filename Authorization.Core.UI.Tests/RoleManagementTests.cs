@@ -35,11 +35,10 @@ namespace Authorization.Core.UI.Tests
                 am.DefinedClaims == GetDefinedClaims()
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager
-            );
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<CreateHandler>();
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             model.OnGet();
 
             Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims.Count);
@@ -57,15 +56,11 @@ namespace Authorization.Core.UI.Tests
                 new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
             };
             var dbSet = roles.AsQueryable().BuildMockDbSet();
-            var dbContext = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == dbSet.Object
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == dbContext
-            );
-
-            var model = new IndexModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new IndexModel<ApplicationUser, ApplicationRole>(repository);
             await model.OnGetAsync();
 
             Assert.Equal(2, model.RoleInfo.Count);
@@ -101,17 +96,8 @@ namespace Authorization.Core.UI.Tests
                 .Returns((EntityEntry<ApplicationRole>)null);
 
             var logger = new TestLogger<CreateHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(CreateHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object 
-            );
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -154,17 +140,8 @@ namespace Authorization.Core.UI.Tests
                 .Returns((EntityEntry<ApplicationRole>)null);
 
             var logger = new TestLogger<CreateHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(CreateHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = new RoleModel { Name = name, Description = description },
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -208,17 +185,8 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
 
             var logger = new TestLogger<CreateHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(CreateHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 PageContext = new PageContext { HttpContext = httpContext }
@@ -268,17 +236,8 @@ namespace Authorization.Core.UI.Tests
                 .Returns((EntityEntry<ApplicationRole>)null);
 
             var logger = new TestLogger<CreateHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(CreateHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -320,17 +279,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<CreateHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(CreateHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -347,12 +297,11 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Edit Role [Get] returns NotFound for null ID")]
         public async Task RoleManagement_Test8Async()
         {
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == Mock.Of<IRepository<ApplicationUser, ApplicationRole>>()
-            );
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<EditHandler>();
 
-            var model = new EditModel<ApplicationUser, ApplicationRole> (serviceProvider);
+            var model = new EditModel<ApplicationUser, ApplicationRole> (authManager, repository, logger);
             var result = await model.OnGetAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -361,16 +310,13 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Edit Role [Get] returns NotFound for DB not found")]
         public async Task RoleManagement_Test9Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
+            var logger = new TestLogger<EditHandler>();
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(Guid.Empty.ToString());
 
             Assert.IsType<NotFoundResult>(result);
@@ -401,12 +347,9 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == roles.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
+            var logger = new TestLogger<EditHandler>();
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             await model.OnGetAsync(roles[0].Id);
 
             Assert.Equal(roles[0].Id, model.RoleModel.Id);
@@ -431,17 +374,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 TempData = new TestTempDataDictionary()
@@ -486,17 +420,8 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.SaveChangesAsync(default)).Throws(dbUpdateException);
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -538,17 +463,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 TempData = new TestTempDataDictionary()
@@ -590,17 +506,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Id = role.Id, Name = expectedName, Description = expectedDescription },
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -648,17 +555,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -700,17 +598,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -751,17 +640,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -781,12 +661,10 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Display Role returns NotFound for null ID")]
         public async Task RoleManagement_Test18Async()
         {
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == Mock.Of<IRepository<ApplicationUser, ApplicationRole>>()
-            );
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
             var result = await model.OnGetAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -795,16 +673,12 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Display Role returns NotFound for DB not found")]
         public async Task RoleManagement_Test19Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
             var result = await model.OnGetAsync(Guid.Empty.ToString());
 
             Assert.IsType<NotFoundResult>(result);
@@ -830,16 +704,11 @@ namespace Authorization.Core.UI.Tests
                 am.DefinedClaims == definedClaims
                 );
 
-            var dbContext = Mock.Of<ApplicationDbContext>(db =>
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == roles.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == dbContext
-            );
-
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
             await model.OnGetAsync(roles[0].Id);
 
             Assert.Equal(roles[0].Id, model.RoleModel.Id);
@@ -855,12 +724,11 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Get] returns NotFound for null ID")]
         public async Task RoleManagement_Test21Async()
         {
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == Mock.Of<IRepository<ApplicationUser, ApplicationRole>>()
-            );
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -869,16 +737,13 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Get] returns NotFound for DB not found")]
         public async Task RoleManagement_Test22Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
+            var logger = new TestLogger<DeleteHandler>();
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(Guid.Empty.ToString());
 
             Assert.IsType<NotFoundResult>(result);
@@ -907,12 +772,9 @@ namespace Authorization.Core.UI.Tests
                 db.UserClaims == userClaims.Object
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
+            var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(role.Id);
 
             Assert.IsType<PageResult>(result);
@@ -925,12 +787,11 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Post] returns NotFound for null ID")]
         public async Task RoleManagement_Test24Async()
         {
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>() &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == Mock.Of<IRepository<ApplicationUser, ApplicationRole>>()
-            );
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnPostAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -939,22 +800,13 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Post] sends notification for DB not found")]
         public async Task RoleManagement_Test25Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
-
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == Mock.Of<IAuthorizationManager>()  &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 TempData = new TestTempDataDictionary()
@@ -1001,17 +853,8 @@ namespace Authorization.Core.UI.Tests
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1074,17 +917,8 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.Users).Returns(users.Object);
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1147,17 +981,8 @@ namespace Authorization.Core.UI.Tests
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager.Object &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1210,17 +1035,8 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager.Object &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository.Object, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1272,17 +1088,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1329,23 +1136,14 @@ namespace Authorization.Core.UI.Tests
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
 
-            var dbContext = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == dbSet.Object &&
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == dbContext
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1389,17 +1187,8 @@ namespace Authorization.Core.UI.Tests
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1425,12 +1214,9 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
+            var logger = new TestLogger<EditHandler>();
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider);
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             await model.OnGetAsync(role.Id);
 
             Assert.True(model.RoleModel.IsSystemRole);
@@ -1461,17 +1247,8 @@ namespace Authorization.Core.UI.Tests
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
             var logger = new TestLogger<CreateHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(CreateHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 PageContext = new PageContext { HttpContext = httpContext }
@@ -1523,17 +1300,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var logger = new TestLogger<EditHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(EditHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository
-            );
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1597,17 +1365,8 @@ namespace Authorization.Core.UI.Tests
                 .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1659,17 +1418,8 @@ namespace Authorization.Core.UI.Tests
                 .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
 
             var logger = new TestLogger<DeleteHandler>();
-            var loggerFactory = Mock.Of<ILoggerFactory>(lf =>
-                lf.CreateLogger(typeof(DeleteHandler).FullName) == logger
-            );
 
-            var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IAuthorizationManager)) == authManager &&
-                sp.GetService(typeof(ILoggerFactory)) == loggerFactory &&
-                sp.GetService(typeof(IRepository<ApplicationUser, ApplicationRole>)) == repository.Object
-            );
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(serviceProvider)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },

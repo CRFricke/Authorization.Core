@@ -1,6 +1,7 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.UI.Pages.Shared.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
     public abstract class CreateModel : ModelBase
     {
         [BindProperty]
-        public UserModel Input { get; set; }
+        public UserModel UserModel { get; set; }
 
         public virtual Task<IActionResult> OnGetAsync() => throw new NotImplementedException();
 
@@ -25,89 +26,33 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User
         where TUser : AuthUiUser, new()
         where TRole : AuthUiRole
     {
-        private readonly IAuthorizationManager _authManager;
-        private readonly ILogger<CreateModel> _logger;
-        private readonly IRepository<TUser, TRole> _repository;
+        private readonly CreateHandler<TUser, TRole> _createHandler;
 
         /// <summary>
-        /// Creates a new CreateModel<TRole> class instance using the specified authorization manager and repository.
+        /// Creates a new <see cref="CreateModel{TUser, TRole}"/> class instance using the specified parameters.
         /// </summary>
-        /// <param name="authManager">The AuthorizationManager instance to be used to initialize the CreateModel.</param>
-        /// <param name="repository">The repository instance to be used to initialize the CreateModel.</param>
-        public CreateModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository, ILogger<CreateModel> logger)
+        /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+        /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+        /// <param name="logger">The <see cref="ILogger{CreateHandler}"/> instance to be used for logging.</param>
+        /// <param name="passwordHasher">The <see cref="IPasswordHasher{TUser}"/> instance to be used to hash the supplied password.</param>
+        public CreateModel(
+            IAuthorizationManager authManager, 
+            IRepository<TUser, TRole> repository, 
+            ILogger<CreateHandler> logger, 
+            IPasswordHasher<TUser> passwordHasher)
         {
-            _authManager = authManager;
-            _logger = logger;
-            _repository = repository;
+            _createHandler = new CreateHandler<TUser, TRole>(authManager, repository, logger, passwordHasher, typeof(IndexModel));
         }
 
         public override async Task<IActionResult> OnGetAsync()
         {
-            Input = await new UserModel()
-                .InitRoleInfoAsync(_repository);
-
-            return Page();
+            UserModel = new();
+            return await _createHandler.OnGetAsync(UserModel, this);
         }
 
         public override async Task<IActionResult> OnPostAsync(string hfRoleList)
         {
-            (await Input.InitRoleInfoAsync(_repository))
-                .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
-
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            var user = new TUser();
-            Input.UpdateUser(user);
-
-            var result = await _authManager.AuthorizeAsync(User, user, new AppClaimRequirement(SysClaims.User.Create));
-            if (!result.Succeeded)
-            {
-                ModelState.AddModelError(string.Empty, "Can not create User:");
-                ModelState.AddModelError(string.Empty, "You can not create a User with more privileges than you have.");
-
-                _logger.LogWarning(
-                    "'{PrincipalEmail}' attempted to create {UserType} with elevated privileges.",
-                    User.Identity.Name, typeof(TUser).Name
-                    );
-
-                return Page();
-            }
-
-            user.PasswordHash = new PasswordHasher<TUser>()
-                .HashPassword(user, Input.Password);
-
-            try
-            {
-                _repository.Users.Add(user);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "Could not create User:");
-                ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
-
-                _logger.LogError(
-                    ex, "'{PrincipalEmail}' could not create {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
-                    );
-
-                return Page();
-            }
-
-            SendNotification(
-                typeof(IndexModel), Severity.Normal,
-                $"User '{user.Email}' successfully created."
-                );
-
-            _logger.LogInformation(
-                "'{PrincipalEmail}' created {UserType} '{UserEmail}' (ID '{UserId}').",
-                User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
-                );
-
-            return RedirectToPage(IndexModel.PageName);
+            return await _createHandler.OnPostAsync(UserModel, this, hfRoleList);
         }
     }
 }
