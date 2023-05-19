@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit Role";
 
     var isAdminRole = Model.RoleModel.Id == SysGuids.Role.Administrator;
-    var checkboxDisbled = (Model.IsSystemRole) ? "disabled" : "";
+    var checkboxDisbled = (Model.RoleModel.IsSystemRole) ? "disabled" : "";
 }
 
 <div class="row">
@@ -77,6 +77,7 @@
         </div>
     </div>
 
+    <input type="hidden" asp-for="RoleModel.IsSystemRole" />
     <input id="hfClaimList" name="hfClaimList" type="hidden" value="" />
 </form>
 

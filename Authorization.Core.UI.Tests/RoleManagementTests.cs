@@ -2,7 +2,8 @@
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
 using CRFricke.Authorization.Core.UI.Models;
-using CRFricke.Authorization.Core.UI.Pages.V4.Role;
+using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
+using CRFricke.Authorization.Core.UI.Pages.V5.Role;
 using CRFricke.Test.Support.Fakes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -25,14 +26,19 @@ namespace Authorization.Core.UI.Tests
 {
     [Collection("Non-Parallel Tests")]
     [CollectionDefinition("Non-Parallel Tests", DisableParallelization = true)]
-    public class NonParallelTests
+    public class NonParallelTests : TestsBase
     {
         [Fact(DisplayName = "Create Role [Get] initializes RoleClaim collection")]
         public void RoleManagement_Test2()
         {
-            var authManager = (IAuthorizationManager)new AuthorizationManager<ApplicationUser, ApplicationRole>();
+            var authManager = Mock.Of<IAuthorizationManager>(am =>
+                am.DefinedClaims == GetDefinedClaims()
+                );
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, null, null);
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<CreateHandler>();
+
+            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             model.OnGet();
 
             Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims.Count);
@@ -50,16 +56,16 @@ namespace Authorization.Core.UI.Tests
                 new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
             };
             var dbSet = roles.AsQueryable().BuildMockDbSet();
-            var dbContext = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == dbSet.Object
                 );
 
-            var model = new IndexModel<ApplicationUser, ApplicationRole>(dbContext);
+            var model = new IndexModel<ApplicationUser, ApplicationRole>(repository);
             await model.OnGetAsync();
 
-            Assert.Equal(2, model.Roles.Count);
-            Assert.Equal(roles[0].Name, model.Roles[0].Name);
-            Assert.Equal(roles[1].Name, model.Roles[1].Name);
+            Assert.Equal(2, model.RoleInfo.Count);
+            Assert.Equal(roles[0].Name, model.RoleInfo[0].Name);
+            Assert.Equal(roles[1].Name, model.RoleInfo[1].Name);
         }
 
         [Fact(DisplayName = "Create Role [Post] sets assigned claims")]
@@ -89,7 +95,7 @@ namespace Authorization.Core.UI.Tests
                 .Callback((ApplicationRole ar) => { role = ar; })
                 .Returns((EntityEntry<ApplicationRole>)null);
 
-            var logger = new TestLogger<CreateModel>();
+            var logger = new TestLogger<CreateHandler>();
 
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -133,7 +139,7 @@ namespace Authorization.Core.UI.Tests
                 .Callback((ApplicationRole ar) => { role = ar; })
                 .Returns((EntityEntry<ApplicationRole>)null);
 
-            var logger = new TestLogger<CreateModel>();
+            var logger = new TestLogger<CreateHandler>();
 
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -178,7 +184,7 @@ namespace Authorization.Core.UI.Tests
             var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
             repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
 
-            var logger = new TestLogger<CreateModel>();
+            var logger = new TestLogger<CreateHandler>();
 
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -204,7 +210,7 @@ namespace Authorization.Core.UI.Tests
         }
 
         [Fact(DisplayName = "Create Role [Post] logs success")]
-        public async Task RoleManagement_Test6Async()
+        public async Task RoleManagement_Test6Async()   
         {
             ApplicationRole role = null;
 
@@ -229,7 +235,7 @@ namespace Authorization.Core.UI.Tests
                 .Callback((ApplicationRole ar) => { role = ar; })
                 .Returns((EntityEntry<ApplicationRole>)null);
 
-            var logger = new TestLogger<CreateModel>();
+            var logger = new TestLogger<CreateHandler>();
 
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -272,7 +278,7 @@ namespace Authorization.Core.UI.Tests
                 db.Roles.Add(It.IsAny<ApplicationRole>()) == null
                 );
 
-            var logger = new TestLogger<CreateModel>();
+            var logger = new TestLogger<CreateHandler>();
 
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -291,7 +297,11 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Edit Role [Get] returns NotFound for null ID")]
         public async Task RoleManagement_Test8Async()
         {
-            var model = new EditModel<ApplicationUser, ApplicationRole> (null, null, null);
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<EditHandler>();
+
+            var model = new EditModel<ApplicationUser, ApplicationRole> (authManager, repository, logger);
             var result = await model.OnGetAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -300,11 +310,13 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Edit Role [Get] returns NotFound for DB not found")]
         public async Task RoleManagement_Test9Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
+            var logger = new TestLogger<EditHandler>();
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(null, repository, null);
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(Guid.Empty.ToString());
 
             Assert.IsType<NotFoundResult>(result);
@@ -335,7 +347,9 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == roles.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, null);
+            var logger = new TestLogger<EditHandler>();
+
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             await model.OnGetAsync(roles[0].Id);
 
             Assert.Equal(roles[0].Id, model.RoleModel.Id);
@@ -359,7 +373,9 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, null)
+            var logger = new TestLogger<EditHandler>();
+
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 TempData = new TestTempDataDictionary()
@@ -403,7 +419,7 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.Roles).Returns(dbSet.Object);
             repository.Setup(db => db.SaveChangesAsync(default)).Throws(dbUpdateException);
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -446,7 +462,9 @@ namespace Authorization.Core.UI.Tests
                 db.SaveChangesAsync(default) == Task.FromResult(0)
                 );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, null)
+            var logger = new TestLogger<EditHandler>();
+
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 TempData = new TestTempDataDictionary()
@@ -487,7 +505,7 @@ namespace Authorization.Core.UI.Tests
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -536,7 +554,7 @@ namespace Authorization.Core.UI.Tests
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -579,7 +597,7 @@ namespace Authorization.Core.UI.Tests
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -621,7 +639,7 @@ namespace Authorization.Core.UI.Tests
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -643,7 +661,10 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Display Role returns NotFound for null ID")]
         public async Task RoleManagement_Test18Async()
         {
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(null, null);
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+
+            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
             var result = await model.OnGetAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -652,11 +673,12 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Display Role returns NotFound for DB not found")]
         public async Task RoleManagement_Test19Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
 
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(null, repository);
+            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
             var result = await model.OnGetAsync(Guid.Empty.ToString());
 
             Assert.IsType<NotFoundResult>(result);
@@ -682,11 +704,11 @@ namespace Authorization.Core.UI.Tests
                 am.DefinedClaims == definedClaims
                 );
 
-            var dbContext = Mock.Of<ApplicationDbContext>(db =>
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == roles.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, dbContext);
+            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
             await model.OnGetAsync(roles[0].Id);
 
             Assert.Equal(roles[0].Id, model.RoleModel.Id);
@@ -702,7 +724,11 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Get] returns NotFound for null ID")]
         public async Task RoleManagement_Test21Async()
         {
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(null, null, null);
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<DeleteHandler>();
+
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -711,11 +737,13 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Get] returns NotFound for DB not found")]
         public async Task RoleManagement_Test22Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
+            var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(null, repository, null);
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(Guid.Empty.ToString());
 
             Assert.IsType<NotFoundResult>(result);
@@ -744,7 +772,9 @@ namespace Authorization.Core.UI.Tests
                 db.UserClaims == userClaims.Object
                 );
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, null);
+            var logger = new TestLogger<DeleteHandler>();
+
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnGetAsync(role.Id);
 
             Assert.IsType<PageResult>(result);
@@ -757,7 +787,11 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Post] returns NotFound for null ID")]
         public async Task RoleManagement_Test24Async()
         {
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(null, null, null);
+            var authManager = Mock.Of<IAuthorizationManager>();
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            var logger = new TestLogger<DeleteHandler>();
+
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             var result = await model.OnPostAsync(null);
 
             Assert.IsType<NotFoundResult>(result);
@@ -766,11 +800,13 @@ namespace Authorization.Core.UI.Tests
         [Fact(DisplayName = "Delete Role [Post] sends notification for DB not found")]
         public async Task RoleManagement_Test25Async()
         {
+            var authManager = Mock.Of<IAuthorizationManager>();
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
                 );
+            var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(null, repository, null)
+            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
                 TempData = new TestTempDataDictionary()
@@ -804,6 +840,7 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
+                am.DefinedClaims == new List<string>() &&
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
             );
 
@@ -815,7 +852,7 @@ namespace Authorization.Core.UI.Tests
                 );
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -869,6 +906,7 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
+                am.DefinedClaims == new List<string>() &&
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
 
@@ -878,7 +916,7 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
             repository.Setup(db => db.Users).Returns(users.Object);
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -929,6 +967,7 @@ namespace Authorization.Core.UI.Tests
             authManager
                 .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
                 .Returns(Task.FromResult(AuthorizationResult.Success()));
+            authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
             authManager.Setup(am => am.RefreshRole(role.Id));
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
@@ -941,7 +980,7 @@ namespace Authorization.Core.UI.Tests
                 );
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository, logger)
             {
@@ -983,6 +1022,7 @@ namespace Authorization.Core.UI.Tests
             authManager
                 .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
                 .Returns(Task.FromResult(AuthorizationResult.Success()));
+            authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
             authManager.Setup(am => am.RefreshRole(role.Id));
 
             var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
@@ -994,7 +1034,7 @@ namespace Authorization.Core.UI.Tests
                 .Returns((EntityEntry<ApplicationRole>)null);
             repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository.Object, logger)
             {
@@ -1047,7 +1087,7 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -1096,14 +1136,14 @@ namespace Authorization.Core.UI.Tests
                 am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
 
-            var dbContext = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
                 db.Roles == dbSet.Object &&
                 db.SaveChangesAsync(default) == Task.FromResult(1)
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, dbContext, logger)
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
                 RoleModel = CreateModelFromRole(role),
                 PageContext = new PageContext { HttpContext = httpContext },
@@ -1132,7 +1172,8 @@ namespace Authorization.Core.UI.Tests
                 );
 
             var authManager = Mock.Of<IAuthorizationManager>(am =>
-               am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            am.DefinedClaims == new List<string>() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
                 );
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
@@ -1145,7 +1186,7 @@ namespace Authorization.Core.UI.Tests
                 );
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -1173,10 +1214,12 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, null);
+            var logger = new TestLogger<EditHandler>();
+
+            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
             await model.OnGetAsync(role.Id);
 
-            Assert.True(model.IsSystemRole);
+            Assert.True(model.RoleModel.IsSystemRole);
         }
 
         [Fact(DisplayName = "Create Role [Post] handles failed elevation check")]
@@ -1203,7 +1246,7 @@ namespace Authorization.Core.UI.Tests
 
             var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
-            var logger = new TestLogger<CreateModel>();
+            var logger = new TestLogger<CreateHandler>();
 
             var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -1256,7 +1299,7 @@ namespace Authorization.Core.UI.Tests
                 db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
                 );
 
-            var logger = new TestLogger<EditModel>();
+            var logger = new TestLogger<EditHandler>();
 
             var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
             {
@@ -1321,7 +1364,7 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
                 .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {
@@ -1374,7 +1417,7 @@ namespace Authorization.Core.UI.Tests
             repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
                 .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
 
-            var logger = new TestLogger<DeleteModel>();
+            var logger = new TestLogger<DeleteHandler>();
 
             var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
             {

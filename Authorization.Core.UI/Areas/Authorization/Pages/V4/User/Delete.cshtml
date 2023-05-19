@@ -4,11 +4,11 @@
 @{
     ViewData["Title"] = "Delete User";
 
-    var message = Model.IsSystemUser
+    var message = Model.UserModel.IsSystemUser
         ? "System accounts may not be deleted!"
         : "Are you sure you want to delete this user?";
 
-    var btnDeleteAttr = Model.IsSystemUser ? "disabled" : "";
+    var btnDeleteAttr = Model.UserModel.IsSystemUser ? "disabled" : "";
 }
 
 <div class="row align-items-center">
@@ -132,7 +132,7 @@
 <div class="form-row align-items-center mx-sm-1">
     <div class="col mx-sm-2">
         <form id="formDelete" method="post">
-            <input type="hidden" asp-for="IsSystemUser" />
+            <input type="hidden" asp-for="UserModel.IsSystemUser" />
             <input type="hidden" asp-for="UserModel.Id" />
             <input type="hidden" asp-for="UserModel.Email" />
             <input type="hidden" asp-for="UserModel.Password" />

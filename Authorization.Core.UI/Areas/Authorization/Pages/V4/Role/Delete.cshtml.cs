@@ -1,12 +1,10 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
@@ -15,9 +13,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
     [PageImplementationType(typeof(DeleteModel<,>))]
     public abstract class DeleteModel : ModelBase
     {
-        [BindProperty]
-        public bool IsSystemRole { get; protected set; }
-
         [BindProperty]
         public RoleModel RoleModel { get; set; }
 
@@ -30,123 +25,31 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role
         where TUser : AuthUiUser
         where TRole : AuthUiRole
     {
-        private readonly IAuthorizationManager _authManager;
-        private readonly ILogger<DeleteModel> _logger;
-        private readonly IRepository<TUser, TRole> _repository;
+        private readonly DeleteHandler<TUser, TRole> _deleteHandler;
 
-        public DeleteModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository, ILogger<DeleteModel> logger)
+        /// <summary>
+        /// Creates a new <see cref="DeleteHandler{TUser, TRole}"/> class instance using the specified parameters.
+        /// </summary>
+        /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+        /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+        /// <param name="logger">The <see cref="ILogger{DeleteHandler}"/> instance to be used for logging.</param>
+        public DeleteModel(
+            IAuthorizationManager authManager,
+            IRepository<TUser, TRole> repository,
+            ILogger<DeleteHandler> logger)
         {
-            _authManager = authManager;
-            _logger = logger;
-            _repository = repository;
+            _deleteHandler = new DeleteHandler<TUser, TRole>(authManager, repository, logger, typeof(IndexModel));
         }
 
         public override async Task<IActionResult> OnGetAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var role = await _repository.Roles
-                .Include(ar => ar.Claims)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            IsSystemRole = _authManager.DefinedGuids.Contains(role.Id);
-
-            RoleModel = await new RoleModel()
-                .InitRoleClaims(_authManager)
-                .InitFromRole(role)
-                .InitRoleUsersAsync(_repository);
-
-            return Page();
+            RoleModel = new RoleModel();
+            return await _deleteHandler.OnGetAsync(RoleModel, this, id);
         }
 
         public override async Task<IActionResult> OnPostAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var role = await _repository.Roles.FindAsync(id);
-            if (role == null)
-            {
-                SendNotification(typeof(IndexModel), Severity.High,
-                    $"Error: Role '{RoleModel.Name}' was not found in the database. Another user may have deleted it."
-                    );
-
-                return RedirectToPage(IndexModel.PageName);
-            }
-
-            await RoleModel.InitRoleUsersAsync(_repository);
-
-            var result = await _authManager.AuthorizeAsync(User, role, new AppClaimRequirement(SysClaims.Role.Delete));
-            if (!result.Succeeded)
-            {
-                ModelState.AddModelError(string.Empty, "Can not delete Role:");
-                ModelState.AddModelError(string.Empty, "System Roles may not be deleted.");
-
-                _logger.LogWarning(
-                    "'{PrincipalEmail}' attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
-                    );
-
-                return Page();
-            }
-
-            var userClaims = await (
-                from uc in _repository.UserClaims
-                join au in _repository.Users on uc.UserId equals au.Id
-                where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == role.Name
-                select uc
-                ).ToArrayAsync();
-
-            try
-            {
-                _repository.UserClaims.RemoveRange(userClaims);
-                _repository.Roles.Remove(role);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "Could not delete Role:");
-                ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
-
-                _logger.LogError(
-                    ex, "'{PrincipalEmail}' could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
-                    User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
-                    );
-
-                return Page();
-            }
-
-            // Remove any users that were assigned this role from the UserClaim cache
-            foreach (var claim in userClaims)
-            {
-                _authManager.RefreshUser(claim.UserId);
-            }
-
-            // Remove Role from RoleClaim cache
-            _authManager.RefreshRole(role.Id);
-
-            SendNotification(
-                typeof(IndexModel), Severity.Normal,
-                $"Role '{role.Name}' successfully deleted."
-                );
-
-            _logger.LogInformation(
-                "'{PrincipalEmail}' deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
-                User.Identity.Name, typeof(TRole).Name, role.Name, role.Id
-                );
-
-            return RedirectToPage(IndexModel.PageName);
+            return await _deleteHandler.OnPostAsync(RoleModel, this, id);
         }
     }
 }

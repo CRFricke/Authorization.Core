@@ -6,7 +6,7 @@
     var isAdminRole = Model.RoleModel.Id == SysGuids.Role.Administrator;
 }
 
-@if (Model.IsSystemRole)
+@if (Model.RoleModel.IsSystemRole)
 {
 <style>
     td input[type=checkbox] {
@@ -86,7 +86,8 @@
                 </div>
             </div>
 
-            <input id="hfClaimList" name="hfClaimList" type="hidden" value="" />
+            <input type="hidden" asp-for="RoleModel.IsSystemRole" />
+            <input type="hidden" id="hfClaimList" name="hfClaimList" value="" />
         </form>
     </div>
 </div>

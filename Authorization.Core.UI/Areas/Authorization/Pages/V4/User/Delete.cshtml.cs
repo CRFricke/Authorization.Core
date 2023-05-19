@@ -1,8 +1,8 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
+using CRFricke.Authorization.Core.UI.Pages.Shared.User;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -13,9 +13,6 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
     [PageImplementationType(typeof(DeleteModel<,>))]
     public abstract class DeleteModel : ModelBase
     {
-        [BindProperty]
-        public bool IsSystemUser { get; protected set; }
-
         [BindProperty]
         public UserModel UserModel { get; set; }
 
@@ -28,119 +25,31 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User
         where TUser : AuthUiUser
         where TRole : AuthUiRole
     {
-        private readonly IAuthorizationManager _authManager;
-        private readonly ILogger<DeleteModel> _logger;
-        private readonly IRepository<TUser, TRole> _repository;
+        private readonly DeleteHandler<TUser, TRole> _deleteHandler;
 
         /// <summary>
-        /// Creates a new EditModel<TUser> class instance using the specified authorization manager and repository.
+        /// Creates a new <see cref="DeleteHandler{TUser, TRole}"/> class instance using the specified parameters.
         /// </summary>
-        /// <param name="authManager">The AuthorizationManager instance to be used to initialize the EditModel.</param>
-        /// <param name="repository">The repository instance to be used to initialize the EditModel.</param>
-        public DeleteModel(IAuthorizationManager authManager, IRepository<TUser, TRole> repository, ILogger<DeleteModel> logger)
+        /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+        /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
+        /// <param name="logger">The <see cref="ILogger{DeleteHandler}"/> instance to be used for logging.</param>
+        public DeleteModel(
+            IAuthorizationManager authManager,
+            IRepository<TUser, TRole> repository,
+            ILogger<DeleteHandler> logger)
         {
-            _authManager = authManager;
-            _logger = logger;
-            _repository = repository;
+            _deleteHandler = new DeleteHandler<TUser, TRole>(authManager, repository, logger, typeof(IndexModel));
         }
 
         public override async Task<IActionResult> OnGetAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _repository.Users
-                .Include(au => au.Claims)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
-
-            UserModel = (await new UserModel()
-                .InitRoleInfoAsync(_repository))
-                .InitFromUser(user);
-
-            return Page();
+            UserModel = new();
+            return await _deleteHandler.OnGetAsync(UserModel, this, id);
         }
 
         public override async Task<IActionResult> OnPostAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _repository.Users
-                .Include(au => au.Claims)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (user == null)
-            {
-                SendNotification(typeof(IndexModel), Severity.High,
-                    $"Error: User '{UserModel.Email}' was not found in the database. Another user may have deleted it."
-                    );
-
-                return RedirectToPage(IndexModel.PageName);
-            }
-
-            var result = await _authManager.AuthorizeAsync(User, user, new AppClaimRequirement(SysClaims.User.Delete));
-            if (!result.Succeeded)
-            {
-                ModelState.AddModelError(string.Empty, "Can not delete User:");
-                ModelState.AddModelError(string.Empty, "System accounts may not be deleted.");
-
-                _logger.LogWarning(
-                    "'{PrincipalEmail}' attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
-                    );
-
-                await UserModel.InitRoleInfoAsync(_repository);
-                return Page();
-            }
-
-            try
-            {
-                _repository.Users.Remove(user);
-                await _repository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "Could not delete User:");
-                ModelState.AddModelError(string.Empty, ex.GetBaseException().Message);
-
-                _logger.LogError(
-                    ex, "'{PrincipalEmail}' could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
-                    User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
-                    );
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await UserModel.InitRoleInfoAsync(_repository);
-                return Page();
-            }
-
-            // Remove User from UserClaims cache
-            _authManager.RefreshUser(user.Id);
-
-            SendNotification(
-                typeof(IndexModel), Severity.Normal,
-                $"User '{user.Email}' successfully deleted."
-                );
-
-            _logger.LogInformation(
-                "'{PrincipalEmail}' deleted {UserType} '{UserEmail}' (ID '{UserId}').",
-                User.Identity.Name, typeof(TUser).Name, user.Email, user.Id
-                );
-
-            return RedirectToPage(IndexModel.PageName);
+            return await _deleteHandler.OnPostAsync(UserModel, this, id);
         }
     }
 }

@@ -85,6 +85,10 @@
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Areas\Authorization\Pages\Shared\Role\DetailsHandler.cs~RF570d251.TMP" />
+  </ItemGroup>
+
   <Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
     <PropertyGroup>
       <_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'">assets/BS5</_ReferenceAssetContentRoot>
