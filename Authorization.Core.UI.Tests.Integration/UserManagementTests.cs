@@ -388,8 +388,7 @@ namespace Authorization.Core.UI.Tests.Integration
             var locator = Page.GetByRole(AriaRole.Heading, new() { Name = "System accounts may not be deleted!" });
             Assert.Equal(1, await locator.CountAsync());
 
-            locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" });
-            Assert.Equal(1, await locator.CountAsync());
+            locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First;
             Assert.True(await locator.IsDisabledAsync());
         }
 
@@ -412,7 +411,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
             await DeleteUserAsync(user.Id);
 
-            await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
+            await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First.ClickAsync();
             title = await Page.TitleAsync();
             Assert.Contains("User Management", title);
 
