@@ -47,7 +47,7 @@ jobs:
 
     - name: Install Playwright
       shell: pwsh
-      run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net7.0/playwright.ps1 install
+      run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net8.0/playwright.ps1 install
 
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
