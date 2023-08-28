@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
-internal class DeleteHandler<TUser, TRole>
+internal class DeleteHandler<
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole>
     where TUser : AuthUiUser
     where TRole : AuthUiRole
 {
@@ -47,6 +50,7 @@ internal class DeleteHandler<TUser, TRole>
     /// <param name="roleModel">The <see cref="RoleModel"/> class instance to be initialized.</param>
     /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Delete Role page.</param>
     /// <returns>The <see cref="IActionResult"/> to be used to display the Delete Role page.</returns>
+    [RequiresUnreferencedCode("System.Linq.Expressions.Expression.New(ConstructorInfo, IEnumerable<Expression>, MemberInfo[]): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnGetAsync(RoleModel roleModel, ModelBase modelBase, string id)
     {
         if (id == null)
@@ -81,6 +85,7 @@ internal class DeleteHandler<TUser, TRole>
     /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Delete Role page.</param>
     /// <param name="id">The key (database ID) of the User to be deleted.</param>
     /// <returns>The <see cref="IActionResult"/> to be used to display the next Razor page.</returns>
+    [RequiresUnreferencedCode("System.Linq.Expressions.Expression.New(ConstructorInfo, IEnumerable<Expression>, MemberInfo[]): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string id)
     {
         if (id == null)

@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
-internal class CreateHandler<TUser, TRole>
+internal class CreateHandler<
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole>
     where TUser : AuthUiUser, new()
     where TRole : AuthUiRole
 {
@@ -50,6 +53,7 @@ internal class CreateHandler<TUser, TRole>
     /// <param name="userModel">The <see cref="UserModel"/> class instance to be initialized.</param>
     /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Create User page.</param>
     /// <returns>The <see cref="IActionResult"/> to be used to display the Create User page.</returns>
+    [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnGetAsync(UserModel userModel, ModelBase modelBase)
     {
         await userModel.InitRoleInfoAsync(_repository);
@@ -63,6 +67,7 @@ internal class CreateHandler<TUser, TRole>
     /// <param name="modelBase">The <see cref="ModelBase"/> class instance of the Create User page.</param>
     /// <param name="hfRoleList">A list of Roles to be assigned to the new User.</param>
     /// <returns>The <see cref="IActionResult"/> to be used to display the next Razor page.</returns>
+    [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string hfRoleList)
     {
         var modelState = modelBase.ModelState;

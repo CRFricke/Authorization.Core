@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CRFricke.Authorization.Core.UI
 {
@@ -17,6 +18,7 @@ namespace CRFricke.Authorization.Core.UI
         private const string AuthCoreUIAreaName = "Authorization";
         private readonly AuthCoreUIOptions _uiOptions;
 
+        [RequiresUnreferencedCode("System.Type.MakeGenericType(Type[]): can not be statically analyzed.")]
         public void PostConfigure(string name, RazorPagesOptions options)
         {
             name = name ?? throw new ArgumentNullException(nameof(name));
@@ -45,7 +47,7 @@ namespace CRFricke.Authorization.Core.UI
             options.Conventions.AddAreaFolderApplicationModelConvention(
                 AuthCoreUIAreaName,
                 "/",
-                pam => convention.Apply(pam));
+                convention.Apply);
         }
     }
 }
