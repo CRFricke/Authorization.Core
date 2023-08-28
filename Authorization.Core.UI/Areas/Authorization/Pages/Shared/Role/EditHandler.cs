@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
-internal class EditHandler<TUser, TRole>
+internal class EditHandler<
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole>
     where TRole : AuthUiRole
     where TUser : AuthUiUser
 {

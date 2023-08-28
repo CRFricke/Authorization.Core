@@ -24,7 +24,7 @@ jobs:
       shell: pwsh
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: 'v7.0'
+          TAG_PREFIX: 'v8.0'
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
@@ -33,7 +33,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -47,7 +47,7 @@ jobs:
 
     - name: Install Playwright
       shell: pwsh
-      run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net7.0/playwright.ps1 install
+      run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net8.0/playwright.ps1 install
 
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal

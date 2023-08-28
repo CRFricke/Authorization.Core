@@ -22,1413 +22,1412 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Authorization.Core.UI.Tests
+namespace Authorization.Core.UI.Tests;
+
+[Collection("Non-Parallel Tests")]
+[CollectionDefinition("Non-Parallel Tests", DisableParallelization = true)]
+public class NonParallelTests : TestsBase
 {
-    [Collection("Non-Parallel Tests")]
-    [CollectionDefinition("Non-Parallel Tests", DisableParallelization = true)]
-    public class NonParallelTests : TestsBase
+    [Fact(DisplayName = "Create Role [Get] initializes RoleClaim collection")]
+    public void RoleManagement_Test2()
     {
-        [Fact(DisplayName = "Create Role [Get] initializes RoleClaim collection")]
-        public void RoleManagement_Test2()
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+        var logger = new TestLogger<CreateHandler>();
+
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        model.OnGet();
+
+        Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims.Count);
+    }
+}
+
+public class RoleManagementTests : TestsBase
+{
+    [Fact(DisplayName = "RoleManagement page returns list of ApplicationRoles")]
+    public async Task RoleManagement_Test1Async()
+    {
+        var roles = new List<ApplicationRole>
         {
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+            new ApplicationRole { Name = "Administrator", Description = "Anyone with this role can do anything!" },
+            new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
+        };
+        var dbSet = roles.AsQueryable().BuildMockDbSet();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object
+            );
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-            var logger = new TestLogger<CreateHandler>();
+        var model = new IndexModel<ApplicationUser, ApplicationRole>(repository);
+        await model.OnGetAsync();
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            model.OnGet();
-
-            Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims.Count);
-        }
+        Assert.Equal(2, model.RoleInfo.Count);
+        Assert.Equal(roles[0].Name, model.RoleInfo[0].Name);
+        Assert.Equal(roles[1].Name, model.RoleInfo[1].Name);
     }
 
-    public class RoleManagementTests : TestsBase
+    [Fact(DisplayName = "Create Role [Post] sets assigned claims")]
+    public async Task RoleManagement_Test3Async()
     {
-        [Fact(DisplayName = "RoleManagement page returns list of ApplicationRoles")]
-        public async Task RoleManagement_Test1Async()
+        ApplicationRole role = null;
+        var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
+
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
+
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
+            .Callback((ApplicationRole ar) => { role = ar; })
+            .Returns((EntityEntry<ApplicationRole>)null);
+
+        var logger = new TestLogger<CreateHandler>();
+
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            var roles = new List<ApplicationRole>
-            {
-                new ApplicationRole { Name = "Administrator", Description = "Anyone with this role can do anything!" },
-                new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
-            };
-            var dbSet = roles.AsQueryable().BuildMockDbSet();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object
-                );
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new IndexModel<ApplicationUser, ApplicationRole>(repository);
-            await model.OnGetAsync();
+        await model.OnPostAsync(string.Join(',', expectedClaims));
 
-            Assert.Equal(2, model.RoleInfo.Count);
-            Assert.Equal(roles[0].Name, model.RoleInfo[0].Name);
-            Assert.Equal(roles[1].Name, model.RoleInfo[1].Name);
-        }
+        Assert.NotNull(role);
+        Assert.Equal(expectedClaims.Length, role.Claims.Count);
+        Assert.Equal(expectedClaims, role.Claims.Select(c => c.ClaimValue));
+    }
 
-        [Fact(DisplayName = "Create Role [Post] sets assigned claims")]
-        public async Task RoleManagement_Test3Async()
+    [Fact(DisplayName = "Create Role [Post] sets ApplicationRole properties")]
+    public async Task RoleManagement_Test4Async()
+    {
+        ApplicationRole role = null;
+        var name = "TestRole";
+        var description = "Can do tester stuff.";
+
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
+
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>> ();
+        repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
+            .Callback((ApplicationRole ar) => { role = ar; })
+            .Returns((EntityEntry<ApplicationRole>)null);
+
+        var logger = new TestLogger<CreateHandler>();
+
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            ApplicationRole role = null;
-            var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
+            RoleModel = new RoleModel { Name = name, Description = description },
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        await model.OnPostAsync(string.Empty);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.NotNull(role);
+        Assert.Equal(name, role.Name);
+        Assert.Equal(description, role.Description);
+        Assert.Equal(name.ToUpperInvariant(), role.NormalizedName);
+    }
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+    [Fact(DisplayName = "Create Role [Post] handles DB exception")]
+    public async Task RoleManagement_Test5Async()
+    {
+        var dbUpdateException =
+            new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
+            new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
+            );
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
-                .Callback((ApplicationRole ar) => { role = ar; })
-                .Returns((EntityEntry<ApplicationRole>)null);
+        var principalName = "TestUser@company.com";
+        var principalId = Guid.NewGuid().ToString();
 
-            var logger = new TestLogger<CreateHandler>();
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            await model.OnPostAsync(string.Join(',', expectedClaims));
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
 
-            Assert.NotNull(role);
-            Assert.Equal(expectedClaims.Length, role.Claims.Count);
-            Assert.Equal(expectedClaims, role.Claims.Select(c => c.ClaimValue));
-        }
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
 
-        [Fact(DisplayName = "Create Role [Post] sets ApplicationRole properties")]
-        public async Task RoleManagement_Test4Async()
+        var logger = new TestLogger<CreateHandler>();
+
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            ApplicationRole role = null;
-            var name = "TestRole";
-            var description = "Can do tester stuff.";
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            PageContext = new PageContext { HttpContext = httpContext }
+        };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        var result = await model.OnPostAsync(string.Empty);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.IsType<PageResult>(result);
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains("Role", errors[0].ErrorMessage);
+        Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>> ();
-            repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
-                .Callback((ApplicationRole ar) => { role = ar; })
-                .Returns((EntityEntry<ApplicationRole>)null);
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.NotNull(logger.LogEntries[0].Exception);
+    }
 
-            var logger = new TestLogger<CreateHandler>();
+    [Fact(DisplayName = "Create Role [Post] logs success")]
+    public async Task RoleManagement_Test6Async()   
+    {
+        ApplicationRole role = null;
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = new RoleModel { Name = name, Description = description },
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            await model.OnPostAsync(string.Empty);
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            Assert.NotNull(role);
-            Assert.Equal(name, role.Name);
-            Assert.Equal(description, role.Description);
-            Assert.Equal(name.ToUpperInvariant(), role.NormalizedName);
-        }
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
 
-        [Fact(DisplayName = "Create Role [Post] handles DB exception")]
-        public async Task RoleManagement_Test5Async()
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
+            .Callback((ApplicationRole ar) => { role = ar; })
+            .Returns((EntityEntry<ApplicationRole>)null);
+
+        var logger = new TestLogger<CreateHandler>();
+
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            var dbUpdateException =
-                new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
-                new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
-                );
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var principalName = "TestUser@company.com";
-            var principalId = Guid.NewGuid().ToString();
+        await model.OnPostAsync(string.Empty);
 
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        Assert.NotNull(role);
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+    }
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+    [Fact(DisplayName = "Create Role [Post] sends notification on success")]
+    public async Task RoleManagement_Test7Async()
+    {
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
 
-            var logger = new TestLogger<CreateHandler>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles.Add(It.IsAny<ApplicationRole>()) == null
+            );
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                PageContext = new PageContext { HttpContext = httpContext }
-            };
+        var logger = new TestLogger<CreateHandler>();
 
-            var result = await model.OnPostAsync(string.Empty);
-
-            Assert.IsType<PageResult>(result);
-
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains("Role", errors[0].ErrorMessage);
-            Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.NotNull(logger.LogEntries[0].Exception);
-        }
-
-        [Fact(DisplayName = "Create Role [Post] logs success")]
-        public async Task RoleManagement_Test6Async()   
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            ApplicationRole role = null;
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        await model.OnPostAsync(string.Empty);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.Single(model.TempData);
+        var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+    }
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+    [Fact(DisplayName = "Edit Role [Get] returns NotFound for null ID")]
+    public async Task RoleManagement_Test8Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+        var logger = new TestLogger<EditHandler>();
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
-                .Callback((ApplicationRole ar) => { role = ar; })
-                .Returns((EntityEntry<ApplicationRole>)null);
+        var model = new EditModel<ApplicationUser, ApplicationRole> (authManager, repository, logger);
+        var result = await model.OnGetAsync(null);
 
-            var logger = new TestLogger<CreateHandler>();
+        Assert.IsType<NotFoundResult>(result);
+    }
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+    [Fact(DisplayName = "Edit Role [Get] returns NotFound for DB not found")]
+    public async Task RoleManagement_Test9Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            );
+        var logger = new TestLogger<EditHandler>();
 
-            await model.OnPostAsync(string.Empty);
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        var result = await model.OnGetAsync(Guid.Empty.ToString());
 
-            Assert.NotNull(role);
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-        }
+        Assert.IsType<NotFoundResult>(result);
+    }
 
-        [Fact(DisplayName = "Create Role [Post] sends notification on success")]
-        public async Task RoleManagement_Test7Async()
+    [Fact(DisplayName = "Edit Role [Get] initializes RoleModel")]
+    public async Task RoleManagement_Test10Async()
+    {
+        var expectedValue = "Role.List";
+
+        var roles = new List<ApplicationRole>
         {
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+            new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
+        };
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        roles[0].Claims.Add(
+            new IdentityRoleClaim<string> { RoleId = roles[0].Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedValue }
+            );
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+        var definedClaims = GetDefinedClaims();
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles.Add(It.IsAny<ApplicationRole>()) == null
-                );
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedGuids == GetDefinedGuids() &&
+            am.DefinedClaims == definedClaims
+            );
 
-            var logger = new TestLogger<CreateHandler>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == roles.AsQueryable().BuildMockDbSet().Object
+            );
 
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var logger = new TestLogger<EditHandler>();
 
-            await model.OnPostAsync(string.Empty);
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        await model.OnGetAsync(roles[0].Id);
 
-            Assert.Equal(1, model.TempData.Count);
-            var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-            Assert.Contains(model.RoleModel.Name, notifications[0].Message);
-        }
+        Assert.Equal(roles[0].Id, model.RoleModel.Id);
+        Assert.Equal(roles[0].Description, model.RoleModel.Description);
+        Assert.Equal(roles[0].Name, model.RoleModel.Name);
+        Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
 
-        [Fact(DisplayName = "Edit Role [Get] returns NotFound for null ID")]
-        public async Task RoleManagement_Test8Async()
+        var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
+        Assert.Single(claims);
+        Assert.Equal(expectedValue, claims.First().Claim);
+    }
+
+    [Fact(DisplayName = "Edit Role [Post] sends notification for DB not found")]
+    public async Task RoleManagement_Test11Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-            var logger = new TestLogger<EditHandler>();
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new EditModel<ApplicationUser, ApplicationRole> (authManager, repository, logger);
-            var result = await model.OnGetAsync(null);
+        var result = await model.OnPostAsync(string.Empty);
 
-            Assert.IsType<NotFoundResult>(result);
-        }
+        Assert.IsType<RedirectToPageResult>(result);
+        Assert.Single(model.TempData);
+        var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+    }
 
-        [Fact(DisplayName = "Edit Role [Get] returns NotFound for DB not found")]
-        public async Task RoleManagement_Test9Async()
+    [Fact(DisplayName = "Edit Role [Post] handles DB exception")]
+    public async Task RoleManagement_Test12Async()
+    {
+        var dbUpdateException =
+            new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
+            new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
+            );
+
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
+
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles).Returns(dbSet.Object);
+        repository.Setup(db => db.SaveChangesAsync(default)).Throws(dbUpdateException);
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
-                );
-            var logger = new TestLogger<EditHandler>();
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            var result = await model.OnGetAsync(Guid.Empty.ToString());
+        var result = await model.OnPostAsync(string.Empty);
 
-            Assert.IsType<NotFoundResult>(result);
-        }
+        Assert.IsType<PageResult>(result);
 
-        [Fact(DisplayName = "Edit Role [Get] initializes RoleModel")]
-        public async Task RoleManagement_Test10Async()
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains("Role", errors[0].ErrorMessage);
+        Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
+
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+        Assert.NotNull(logger.LogEntries[0].Exception);
+    }
+
+    [Fact(DisplayName = "Edit Role [Post] sends no notification for no changes")]
+    public async Task RoleManagement_Test13Async()
+    {
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object &&
+            db.SaveChangesAsync(default) == Task.FromResult(0)
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var expectedValue = "Role.List";
+            RoleModel = CreateModelFromRole(role),
+            TempData = new TestTempDataDictionary()
+        };
 
-            var roles = new List<ApplicationRole>
-            {
-                new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
-            };
+        var result = await model.OnPostAsync(string.Empty);
 
-            roles[0].Claims.Add(
-                new IdentityRoleClaim<string> { RoleId = roles[0].Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedValue }
-                );
+        Assert.IsType<RedirectToPageResult>(result);
+        Assert.Empty(model.TempData);
+    }
 
-            var definedClaims = GetDefinedClaims();
+    [Fact(DisplayName = "Edit Role [Post] sets ApplicationRole properties")]
+    public async Task RoleManagement_Test14Async()
+    {
+        var expectedName = "TestManager";
+        var expectedDescription = "TestManagers do things related to testing.";
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedGuids == GetDefinedGuids() &&
-                am.DefinedClaims == definedClaims
-                );
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == roles.AsQueryable().BuildMockDbSet().Object
-                );
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var logger = new TestLogger<EditHandler>();
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            await model.OnGetAsync(roles[0].Id);
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
 
-            Assert.Equal(roles[0].Id, model.RoleModel.Id);
-            Assert.Equal(roles[0].Description, model.RoleModel.Description);
-            Assert.Equal(roles[0].Name, model.RoleModel.Name);
-            Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
 
-            var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
-            Assert.Single(claims);
-            Assert.Equal(expectedValue, claims.First().Claim);
-        }
+        var logger = new TestLogger<EditHandler>();
 
-        [Fact(DisplayName = "Edit Role [Post] sends notification for DB not found")]
-        public async Task RoleManagement_Test11Async()
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+            RoleModel = new RoleModel { Id = role.Id, Name = expectedName, Description = expectedDescription },
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
-                );
+        var result = await model.OnPostAsync(string.Empty);
 
-            var logger = new TestLogger<EditHandler>();
+        Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal(expectedDescription, role.Description);
+        Assert.Equal(expectedName, role.Name);
+        Assert.Equal(expectedName.ToUpperInvariant(), role.NormalizedName);
+    }
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                TempData = new TestTempDataDictionary()
-            };
+    [Fact(DisplayName = "Edit Role [Post] updates RoleClaims")]
+    public async Task RoleManagement_Test15Async()
+    {
+        var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
 
-            var result = await model.OnPostAsync(string.Empty);
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = SysClaims.User.Create });
+        role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedClaims[0] });
 
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
-            var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-            Assert.Contains(model.RoleModel.Name, notifications[0].Message);
-        }
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
 
-        [Fact(DisplayName = "Edit Role [Post] handles DB exception")]
-        public async Task RoleManagement_Test12Async()
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var dbUpdateException =
-                new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
-                new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
-                );
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var result = await model.OnPostAsync(string.Join(',', expectedClaims));
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal(expectedClaims.Length, role.Claims.Count);
+        Assert.NotNull(role.Claims.FirstOrDefault(c => c.ClaimValue == expectedClaims[0]));
+        Assert.NotNull(role.Claims.FirstOrDefault(c => c.ClaimValue == expectedClaims[1]));
+    }
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+    [Fact(DisplayName = "Edit Role [Post] sends notification for update")]
+    public async Task RoleManagement_Test16Async()
+    {
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles).Returns(dbSet.Object);
-            repository.Setup(db => db.SaveChangesAsync(default)).Throws(dbUpdateException);
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            var logger = new TestLogger<EditHandler>();
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
 
-            var result = await model.OnPostAsync(string.Empty);
+        var logger = new TestLogger<EditHandler>();
 
-            Assert.IsType<PageResult>(result);
-
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains("Role", errors[0].ErrorMessage);
-            Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-            Assert.NotNull(logger.LogEntries[0].Exception);
-        }
-
-        [Fact(DisplayName = "Edit Role [Post] sends no notification for no changes")]
-        public async Task RoleManagement_Test13Async()
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+        await model.OnPostAsync(string.Empty);
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object &&
-                db.SaveChangesAsync(default) == Task.FromResult(0)
-                );
+        Assert.Single(model.TempData);
+        var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+    }
 
-            var logger = new TestLogger<EditHandler>();
+    [Fact(DisplayName = "Edit Role [Post] logs success")]
+    public async Task RoleManagement_Test17Async()
+    {
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                TempData = new TestTempDataDictionary()
-            };
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var result = await model.OnPostAsync(string.Empty);
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(0, model.TempData.Count);
-        }
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims()
+            );
 
-        [Fact(DisplayName = "Edit Role [Post] sets ApplicationRole properties")]
-        public async Task RoleManagement_Test14Async()
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var expectedName = "TestManager";
-            var expectedDescription = "TestManagers do things related to testing.";
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        await model.OnPostAsync(string.Empty);
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+    }
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+    [Fact(DisplayName = "Display Role returns NotFound for null ID")]
+    public async Task RoleManagement_Test18Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+        var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
+        var result = await model.OnGetAsync(null);
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
+        Assert.IsType<NotFoundResult>(result);
+    }
 
-            var logger = new TestLogger<EditHandler>();
+    [Fact(DisplayName = "Display Role returns NotFound for DB not found")]
+    public async Task RoleManagement_Test19Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = new RoleModel { Id = role.Id, Name = expectedName, Description = expectedDescription },
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
+        var result = await model.OnGetAsync(Guid.Empty.ToString());
 
-            var result = await model.OnPostAsync(string.Empty);
+        Assert.IsType<NotFoundResult>(result);
+    }
 
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(expectedDescription, role.Description);
-            Assert.Equal(expectedName, role.Name);
-            Assert.Equal(expectedName.ToUpperInvariant(), role.NormalizedName);
-        }
+    [Fact(DisplayName = "Display Role initializes RoleModel")]
+    public async Task RoleManagement_Test20Async()
+    {
+        var expectedValue = "Role.List";
 
-        [Fact(DisplayName = "Edit Role [Post] updates RoleClaims")]
-        public async Task RoleManagement_Test15Async()
+        var roles = new List<ApplicationRole>
         {
-            var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
+            new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
+        };
 
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = SysClaims.User.Create });
-            role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedClaims[0] });
+        roles[0].Claims.Add(
+            new IdentityRoleClaim<string> { RoleId = roles[0].Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedValue }
+            );
 
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var definedClaims = GetDefinedClaims();
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == definedClaims
+            );
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == roles.AsQueryable().BuildMockDbSet().Object
+            );
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+        var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
+        await model.OnGetAsync(roles[0].Id);
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
+        Assert.Equal(roles[0].Id, model.RoleModel.Id);
+        Assert.Equal(roles[0].Description, model.RoleModel.Description);
+        Assert.Equal(roles[0].Name, model.RoleModel.Name);
+        Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
 
-            var logger = new TestLogger<EditHandler>();
+        var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
+        Assert.Single(claims);
+        Assert.Equal(expectedValue, claims.First().Claim);
+    }
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+    [Fact(DisplayName = "Delete Role [Get] returns NotFound for null ID")]
+    public async Task RoleManagement_Test21Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+        var logger = new TestLogger<DeleteHandler>();
 
-            var result = await model.OnPostAsync(string.Join(',', expectedClaims));
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        var result = await model.OnGetAsync(null);
 
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(expectedClaims.Length, role.Claims.Count);
-            Assert.NotNull(role.Claims.FirstOrDefault(c => c.ClaimValue == expectedClaims[0]));
-            Assert.NotNull(role.Claims.FirstOrDefault(c => c.ClaimValue == expectedClaims[1]));
-        }
+        Assert.IsType<NotFoundResult>(result);
+    }
 
-        [Fact(DisplayName = "Edit Role [Post] sends notification for update")]
-        public async Task RoleManagement_Test16Async()
+    [Fact(DisplayName = "Delete Role [Get] returns NotFound for DB not found")]
+    public async Task RoleManagement_Test22Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            );
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        var result = await model.OnGetAsync(Guid.Empty.ToString());
+
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact(DisplayName = "Delete Role [Get] initializes RoleUser collection")]
+    public async Task RoleManagement_Test23Async()
+    {
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
+        var roles = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+
+        var user = new ApplicationUser { Email = "MrTester@company.com", UserName = "MrTester@company.com", GivenName = "Chuck", Surname = "Fricke" };
+        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+
+        var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedGuids == GetDefinedGuids() &&
+            am.DefinedClaims == GetDefinedClaims()
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == roles.Object &&
+            db.Users == users.Object &&
+            db.UserClaims == userClaims.Object
+            );
+
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        var result = await model.OnGetAsync(role.Id);
+
+        Assert.IsType<PageResult>(result);
+        Assert.Equal(role.Id, model.RoleModel.Id);
+        Assert.Single(model.RoleModel.RoleUsers);
+        Assert.Equal(user.DisplayName, model.RoleModel.RoleUsers.First().Name);
+        Assert.Equal(user.Email, model.RoleModel.RoleUsers.First().Email);
+    }
+
+    [Fact(DisplayName = "Delete Role [Post] returns NotFound for null ID")]
+    public async Task RoleManagement_Test24Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        var result = await model.OnPostAsync(null);
+
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact(DisplayName = "Delete Role [Post] sends notification for DB not found")]
+    public async Task RoleManagement_Test25Async()
+    {
+        var authManager = Mock.Of<IAuthorizationManager>();
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            );
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        var result = await model.OnPostAsync(Guid.NewGuid().ToString());
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.IsType<RedirectToPageResult>(result);
+        Assert.Single(model.TempData);
+        var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+    }
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+    [Fact(DisplayName = "Delete Role [Post] prevents delete of System Role")]
+    public async Task RoleManagement_Test26Async()
+    {
+        var expectedMessage1 = "System Roles may not be deleted";
+        var expectedMessage2 = $"delete system {nameof(ApplicationRole)}";
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            var logger = new TestLogger<EditHandler>();
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            await model.OnPostAsync(string.Empty);
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == new List<string>() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
+        );
 
-            Assert.Equal(1, model.TempData.Count);
-            var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-            Assert.Contains(model.RoleModel.Name, notifications[0].Message);
-        }
+#pragma warning disable CA2012 // Use ValueTasks correctly
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
+            db.UserClaims == Enumerable.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object &&
+            db.Users == Enumerable.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object
+            );
+#pragma warning restore CA2012 // Use ValueTasks correctly
 
-        [Fact(DisplayName = "Edit Role [Post] logs success")]
-        public async Task RoleManagement_Test17Async()
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        var result = await model.OnPostAsync(role.Id);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.IsType<PageResult>(result);
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims()
-                );
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(expectedMessage2, logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+    }
 
-            var logger = new TestLogger<EditHandler>();
+    [Fact(DisplayName = "Delete Role [Post] handles DB exception")]
+    public async Task RoleManagement_Test27Async()
+    {
+        var dbUpdateException =
+            new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
+            new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
+            );
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            await model.OnPostAsync(string.Empty);
+        var user = new ApplicationUser("MrTester@company.com");
+        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
 
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-        }
+        var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
 
-        [Fact(DisplayName = "Display Role returns NotFound for null ID")]
-        public async Task RoleManagement_Test18Async()
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == new List<string>() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
+
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
+        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
+        repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
+        repository.Setup(db => db.Users).Returns(users.Object);
+
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-            var result = await model.OnGetAsync(null);
+        var result = await model.OnPostAsync(role.Id);
 
-            Assert.IsType<NotFoundResult>(result);
-        }
+        Assert.IsType<PageResult>(result);
 
-        [Fact(DisplayName = "Display Role returns NotFound for DB not found")]
-        public async Task RoleManagement_Test19Async()
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains("Role", errors[0].ErrorMessage);
+        Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
+
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+        Assert.NotNull(logger.LogEntries[0].Exception);
+    }
+
+    [Fact(DisplayName = "Delete Role [Post] sends notification for delete")]
+    public async Task RoleManagement_Test28Async()
+    {
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
+
+        var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
+        var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
+
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = new Mock<IAuthorizationManager>();
+        authManager
+            .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
+            .Returns(Task.FromResult(AuthorizationResult.Success()));
+        authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
+        authManager.Setup(am => am.RefreshRole(role.Id));
+
+#pragma warning disable CA2012 // Use ValueTasks correctly
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
+            db.UserClaims == dbsUserClaims &&
+            db.Users == dbsUsers &&
+            db.Roles.Remove(It.IsAny<ApplicationRole>()) == null &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
+#pragma warning restore CA2012 // Use ValueTasks correctly
+
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
-                );
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-            var result = await model.OnGetAsync(Guid.Empty.ToString());
+        var result = await model.OnPostAsync(role.Id);
 
-            Assert.IsType<NotFoundResult>(result);
-        }
+        Assert.IsType<RedirectToPageResult>(result);
+        Assert.Single(model.TempData);
+        var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.Contains(role.Name, notifications[0].Message);
+    }
 
-        [Fact(DisplayName = "Display Role initializes RoleModel")]
-        public async Task RoleManagement_Test20Async()
+    [Fact(DisplayName = "Delete Role [Post] logs success")]
+    public async Task RoleManagement_Test29Async()
+    {
+        ApplicationRole deletedRole = null;
+
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
+
+        var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
+        var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
+
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = new Mock<IAuthorizationManager>();
+        authManager
+            .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
+            .Returns(Task.FromResult(AuthorizationResult.Success()));
+        authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
+        authManager.Setup(am => am.RefreshRole(role.Id));
+
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
+        repository.Setup(db => db.UserClaims).Returns(dbsUserClaims);
+        repository.Setup(db => db.Users).Returns(dbsUsers);
+        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>()))
+            .Callback((ApplicationRole ar) => { deletedRole = ar; })
+            .Returns((EntityEntry<ApplicationRole>)null);
+        repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
+
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository.Object, logger)
         {
-            var expectedValue = "Role.List";
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var roles = new List<ApplicationRole>
-            {
-                new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
-            };
+        var result = await model.OnPostAsync(role.Id);
 
-            roles[0].Claims.Add(
-                new IdentityRoleClaim<string> { RoleId = roles[0].Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedValue }
-                );
+        Assert.IsType<RedirectToPageResult>(result);
 
-            var definedClaims = GetDefinedClaims();
+        Assert.NotNull(deletedRole);
+        Assert.True(ReferenceEquals(role, deletedRole));
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == definedClaims
-                );
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+    }
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == roles.AsQueryable().BuildMockDbSet().Object
-                );
+    [Fact(DisplayName = "Edit Role [Post] prevents update of System Role")]
+    public async Task RoleManagement_Test30Async()
+    {
+        var expectedMessage1 = "You may not update the Claims assigned to a system Role";
+        var expectedMessage2 = $"update the claims of system {nameof(ApplicationRole)}";
 
-            var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-            await model.OnGetAsync(roles[0].Id);
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
 
-            Assert.Equal(roles[0].Id, model.RoleModel.Id);
-            Assert.Equal(roles[0].Description, model.RoleModel.Description);
-            Assert.Equal(roles[0].Name, model.RoleModel.Name);
-            Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
-            Assert.Single(claims);
-            Assert.Equal(expectedValue, claims.First().Claim);
-        }
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-        [Fact(DisplayName = "Delete Role [Get] returns NotFound for null ID")]
-        public async Task RoleManagement_Test21Async()
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet().Object
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-            var logger = new TestLogger<DeleteHandler>();
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            var result = await model.OnGetAsync(null);
+        var result = await model.OnPostAsync(string.Empty);
 
-            Assert.IsType<NotFoundResult>(result);
-        }
+        Assert.IsType<PageResult>(result);
 
-        [Fact(DisplayName = "Delete Role [Get] returns NotFound for DB not found")]
-        public async Task RoleManagement_Test22Async()
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
+
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(expectedMessage2, logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+    }
+
+    [Fact(DisplayName = "Edit Role [Post] refreshes Role cache on success")]
+    public async Task RoleManagement_Test31Async()
+    {
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
+        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
+
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == dbSet.Object &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
-                );
-            var logger = new TestLogger<DeleteHandler>();
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            var result = await model.OnGetAsync(Guid.Empty.ToString());
+        await model.OnPostAsync(string.Empty);
 
-            Assert.IsType<NotFoundResult>(result);
-        }
+        Mock.Get(authManager).Verify(am => am.RefreshRole(role.Id));
+    }
 
-        [Fact(DisplayName = "Delete Role [Get] initializes RoleUser collection")]
-        public async Task RoleManagement_Test23Async()
-        {
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
-            var roles = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+    [Fact(DisplayName = "Delete Role [Post] refreshes Role cache on success")]
+    public async Task RoleManagement_Test32Async()
+    {
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            var user = new ApplicationUser { Email = "MrTester@company.com", UserName = "MrTester@company.com", GivenName = "Chuck", Surname = "Fricke" };
-            var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-            var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedGuids == GetDefinedGuids() &&
-                am.DefinedClaims == GetDefinedClaims()
-                );
-
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == roles.Object &&
-                db.Users == users.Object &&
-                db.UserClaims == userClaims.Object
-                );
-
-            var logger = new TestLogger<DeleteHandler>();
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            var result = await model.OnGetAsync(role.Id);
-
-            Assert.IsType<PageResult>(result);
-            Assert.Equal(role.Id, model.RoleModel.Id);
-            Assert.Single(model.RoleModel.RoleUsers);
-            Assert.Equal(user.DisplayName, model.RoleModel.RoleUsers.First().Name);
-            Assert.Equal(user.Email, model.RoleModel.RoleUsers.First().Email);
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] returns NotFound for null ID")]
-        public async Task RoleManagement_Test24Async()
-        {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-            var logger = new TestLogger<DeleteHandler>();
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            var result = await model.OnPostAsync(null);
-
-            Assert.IsType<NotFoundResult>(result);
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] sends notification for DB not found")]
-        public async Task RoleManagement_Test25Async()
-        {
-            var authManager = Mock.Of<IAuthorizationManager>();
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
-                );
-            var logger = new TestLogger<DeleteHandler>();
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(Guid.NewGuid().ToString());
-
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
-            var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-            Assert.Contains(model.RoleModel.Name, notifications[0].Message);
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] prevents delete of System Role")]
-        public async Task RoleManagement_Test26Async()
-        {
-            var expectedMessage1 = "System Roles may not be deleted";
-            var expectedMessage2 = $"delete system {nameof(ApplicationRole)}";
-
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == new List<string>() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+        am.DefinedClaims == new List<string>() &&
+        am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
-                db.UserClaims == new IdentityUserClaim<string>[] { }.AsQueryable().BuildMockDbSet().Object &&
-                db.Users == new ApplicationUser[] { }.AsQueryable().BuildMockDbSet().Object
-                );
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
+            db.UserClaims == new IdentityUserClaim<string>[0].AsQueryable().BuildMockDbSet().Object &&
+            db.Users == new ApplicationUser[0].AsQueryable().BuildMockDbSet().Object &&
+            db.Roles.Remove(role) == null &&
+            db.SaveChangesAsync(default) == Task.FromResult(1)
+            );
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
-            var logger = new TestLogger<DeleteHandler>();
+        var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(role.Id);
-
-            Assert.IsType<PageResult>(result);
-
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(expectedMessage2, logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] handles DB exception")]
-        public async Task RoleManagement_Test27Async()
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var dbUpdateException =
-                new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
-                new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
-                );
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
+        var result = await model.OnPostAsync(role.Id);
 
-            var user = new ApplicationUser("MrTester@company.com");
-            var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+        Mock.Get(authManager).Verify(am => am.RefreshRole(role.Id));
+    }
 
-            var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-            var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+    [Fact(DisplayName = "Edit Role [Get] sets IsSystemRole")]
+    public async Task RoleManagement_Test33Async()
+    {
+        var role = new ApplicationRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedGuids == GetDefinedGuids() &&
+            am.DefinedClaims == GetDefinedClaims()
+            );
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
+            );
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == new List<string>() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+        var logger = new TestLogger<EditHandler>();
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
-            repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
-            repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
-            repository.Setup(db => db.Users).Returns(users.Object);
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
+        await model.OnGetAsync(role.Id);
 
-            var logger = new TestLogger<DeleteHandler>();
+        Assert.True(model.RoleModel.IsSystemRole);
+    }
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+    [Fact(DisplayName = "Create Role [Post] handles failed elevation check")]
+    public async Task RoleManagement_Test34Async()
+    {
+        var expectedMessage = "can not create a Role with more privileges";
+        var expectedLogMessage = $"create {nameof(ApplicationRole)} with elevated privileges";
 
-            var result = await model.OnPostAsync(role.Id);
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            Assert.IsType<PageResult>(result);
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains("Role", errors[0].ErrorMessage);
-            Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Elevation(null))
+            );
 
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-            Assert.NotNull(logger.LogEntries[0].Exception);
-        }
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
-        [Fact(DisplayName = "Delete Role [Post] sends notification for delete")]
-        public async Task RoleManagement_Test28Async()
+        var logger = new TestLogger<CreateHandler>();
+
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
+            RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
+            PageContext = new PageContext { HttpContext = httpContext }
+        };
 
-            var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
-            var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
+        var result = await model.OnPostAsync(string.Empty);
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        Assert.IsType<PageResult>(result);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-            var authManager = new Mock<IAuthorizationManager>();
-            authManager
-                .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
-                .Returns(Task.FromResult(AuthorizationResult.Success()));
-            authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
-            authManager.Setup(am => am.RefreshRole(role.Id));
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
+        Assert.Null(logger.LogEntries[0].Exception);
+    }
 
-#pragma warning disable CA2012 // Use ValueTasks correctly
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
-                db.UserClaims == dbsUserClaims &&
-                db.Users == dbsUsers &&
-                db.Roles.Remove(It.IsAny<ApplicationRole>()) == null &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
-#pragma warning restore CA2012 // Use ValueTasks correctly
+    [Fact(DisplayName = "Edit Role [Post] handles failed elevation check")]
+    public async Task RoleManagement_Test35Async()
+    {
+        var expectedMessage = "can not give a Role more privileges";
+        var expectedLogMessage = "elevated privileges";
 
-            var logger = new TestLogger<DeleteHandler>();
+        var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
+        role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            var result = await model.OnPostAsync(role.Id);
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
-            var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-            Assert.Contains(role.Name, notifications[0].Message);
-        }
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Elevation(null))
+            );
 
-        [Fact(DisplayName = "Delete Role [Post] logs success")]
-        public async Task RoleManagement_Test29Async()
+        var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
+            db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
+            );
+
+        var logger = new TestLogger<EditHandler>();
+
+        var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            ApplicationRole deletedRole = null;
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
+        var result = await model.OnPostAsync(string.Empty);
 
-            var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
-            var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
+        Assert.IsType<PageResult>(result);
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        Assert.False(model.ModelState.IsValid);
+        Assert.Equal(2, model.ModelState.ErrorCount);
+        var errors = model.ModelState[string.Empty].Errors;
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
+        Assert.Single(logger.LogEntries);
+        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
+        Assert.Contains(principalName, logger.LogEntries[0].Message);
+        Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
+        Assert.Contains(role.Name, logger.LogEntries[0].Message);
+        Assert.Contains(role.Id, logger.LogEntries[0].Message);
+        Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
+        Assert.Null(logger.LogEntries[0].Exception);
+    }
 
-            var authManager = new Mock<IAuthorizationManager>();
-            authManager
-                .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
-                .Returns(Task.FromResult(AuthorizationResult.Success()));
-            authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
-            authManager.Setup(am => am.RefreshRole(role.Id));
+    [Fact(DisplayName = "Delete Role [Post] removes UserClaim associated with Role")]
+    public async Task RoleManagement_Test36Async()
+    {
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
-            repository.Setup(db => db.UserClaims).Returns(dbsUserClaims);
-            repository.Setup(db => db.Users).Returns(dbsUsers);
-            repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>()))
-                .Callback((ApplicationRole ar) => { deletedRole = ar; })
-                .Returns((EntityEntry<ApplicationRole>)null);
-            repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
+        var user = new ApplicationUser("MrTester@company.com");
+        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
 
-            var logger = new TestLogger<DeleteHandler>();
+        var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager.Object, repository.Object, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
+        IdentityUserClaim<string>[] removedClaims = null;
 
-            var result = await model.OnPostAsync(role.Id);
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
 
-            Assert.IsType<RedirectToPageResult>(result);
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
 
-            Assert.NotNull(deletedRole);
-            Assert.True(ReferenceEquals(role, deletedRole));
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-        }
-
-        [Fact(DisplayName = "Edit Role [Post] prevents update of System Role")]
-        public async Task RoleManagement_Test30Async()
-        {
-            var expectedMessage1 = "You may not update the Claims assigned to a system Role";
-            var expectedMessage2 = $"update the claims of system {nameof(ApplicationRole)}";
-
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.SystemObject(null))
-                );
-
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet().Object
-                );
-
-            var logger = new TestLogger<EditHandler>();
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(string.Empty);
-
-            Assert.IsType<PageResult>(result);
-
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(expectedMessage2, logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-        }
-
-        [Fact(DisplayName = "Edit Role [Post] refreshes Role cache on success")]
-        public async Task RoleManagement_Test31Async()
-        {
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
-            var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
-
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == dbSet.Object &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
-
-            var logger = new TestLogger<EditHandler>();
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            await model.OnPostAsync(string.Empty);
-
-            Mock.Get(authManager).Verify(am => am.RefreshRole(role.Id));
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] refreshes Role cache on success")]
-        public async Task RoleManagement_Test32Async()
-        {
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-            am.DefinedClaims == new List<string>() &&
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
+            );
 
-#pragma warning disable CA2012 // Use ValueTasks correctly
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
-                db.UserClaims == new IdentityUserClaim<string>[0].AsQueryable().BuildMockDbSet().Object &&
-                db.Users == new ApplicationUser[0].AsQueryable().BuildMockDbSet().Object &&
-                db.Roles.Remove(role) == null &&
-                db.SaveChangesAsync(default) == Task.FromResult(1)
-                );
-#pragma warning restore CA2012 // Use ValueTasks correctly
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
+        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null);
+        repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
+        repository.Setup(db => db.Users).Returns(users.Object);
+        repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
+            .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
 
-            var logger = new TestLogger<DeleteHandler>();
+        var logger = new TestLogger<DeleteHandler>();
 
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(role.Id);
-
-            Mock.Get(authManager).Verify(am => am.RefreshRole(role.Id));
-        }
-
-        [Fact(DisplayName = "Edit Role [Get] sets IsSystemRole")]
-        public async Task RoleManagement_Test33Async()
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            var role = new ApplicationRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedGuids == GetDefinedGuids() &&
-                am.DefinedClaims == GetDefinedClaims()
-                );
+        var result = await model.OnPostAsync(role.Id);
 
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
-                );
+        Assert.NotNull(removedClaims);
+        Assert.Single(removedClaims);
+        Assert.Equal(userClaim, removedClaims[0]);
+    }
 
-            var logger = new TestLogger<EditHandler>();
+    [Fact(DisplayName = "Delete Role [Post] refreshes UserClaim cache on success")]
+    public async Task RoleManagement_Test37Async()
+    {
+        var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-            await model.OnGetAsync(role.Id);
+        var user = new ApplicationUser("MrTester@company.com");
+        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
 
-            Assert.True(model.RoleModel.IsSystemRole);
-        }
+        var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
 
-        [Fact(DisplayName = "Create Role [Post] handles failed elevation check")]
-        public async Task RoleManagement_Test34Async()
+        var principalId = Guid.NewGuid().ToString();
+        var principalName = "TestUser@company.com";
+        var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
+            cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
+            cp.Identity.Name == principalName
+            );
+
+        var httpContext = Mock.Of<HttpContext>(hc =>
+            hc.User == claimsPrincipal
+            );
+
+        var authManager = Mock.Of<IAuthorizationManager>(am =>
+            am.DefinedClaims == GetDefinedClaims() &&
+            am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
+            );
+
+        IdentityUserClaim<string>[] removedClaims = null;
+
+        var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
+        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null);
+        repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
+        repository.Setup(db => db.Users).Returns(users.Object);
+        repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
+            .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
+
+        var logger = new TestLogger<DeleteHandler>();
+
+        var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
-            var expectedMessage = "can not create a Role with more privileges";
-            var expectedLogMessage = $"create {nameof(ApplicationRole)} with elevated privileges";
+            RoleModel = CreateModelFromRole(role),
+            PageContext = new PageContext { HttpContext = httpContext },
+            TempData = new TestTempDataDictionary()
+        };
 
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
+        var result = await model.OnPostAsync(role.Id);
 
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Elevation(null))
-                );
-
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-
-            var logger = new TestLogger<CreateHandler>();
-
-            var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = new RoleModel { Name = "TestRole", Description = "Can do tester stuff." },
-                PageContext = new PageContext { HttpContext = httpContext }
-            };
-
-            var result = await model.OnPostAsync(string.Empty);
-
-            Assert.IsType<PageResult>(result);
-
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains(expectedMessage, errors[1].ErrorMessage);
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
-            Assert.Null(logger.LogEntries[0].Exception);
-        }
-
-        [Fact(DisplayName = "Edit Role [Post] handles failed elevation check")]
-        public async Task RoleManagement_Test35Async()
-        {
-            var expectedMessage = "can not give a Role more privileges";
-            var expectedLogMessage = "elevated privileges";
-
-            var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-            role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Elevation(null))
-                );
-
-            var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-                db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
-                );
-
-            var logger = new TestLogger<EditHandler>();
-
-            var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(string.Empty);
-
-            Assert.IsType<PageResult>(result);
-
-            Assert.False(model.ModelState.IsValid);
-            Assert.Equal(2, model.ModelState.ErrorCount);
-            var errors = model.ModelState[string.Empty].Errors;
-            Assert.Contains(expectedMessage, errors[1].ErrorMessage);
-
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-            Assert.Contains(principalName, logger.LogEntries[0].Message);
-            Assert.Contains(nameof(ApplicationRole), logger.LogEntries[0].Message);
-            Assert.Contains(role.Name, logger.LogEntries[0].Message);
-            Assert.Contains(role.Id, logger.LogEntries[0].Message);
-            Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
-            Assert.Null(logger.LogEntries[0].Exception);
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] removes UserClaim associated with Role")]
-        public async Task RoleManagement_Test36Async()
-        {
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
-
-            var user = new ApplicationUser("MrTester@company.com");
-            var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
-
-            var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-            var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
-
-            IdentityUserClaim<string>[] removedClaims = null;
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
-
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
-            repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null);
-            repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
-            repository.Setup(db => db.Users).Returns(users.Object);
-            repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
-                .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
-
-            var logger = new TestLogger<DeleteHandler>();
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(role.Id);
-
-            Assert.NotNull(removedClaims);
-            Assert.Single(removedClaims);
-            Assert.Equal(userClaim, removedClaims[0]);
-        }
-
-        [Fact(DisplayName = "Delete Role [Post] refreshes UserClaim cache on success")]
-        public async Task RoleManagement_Test37Async()
-        {
-            var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
-
-            var user = new ApplicationUser("MrTester@company.com");
-            var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
-
-            var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-            var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
-
-            var principalId = Guid.NewGuid().ToString();
-            var principalName = "TestUser@company.com";
-            var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
-                cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-                cp.Identity.Name == principalName
-                );
-
-            var httpContext = Mock.Of<HttpContext>(hc =>
-                hc.User == claimsPrincipal
-                );
-
-            var authManager = Mock.Of<IAuthorizationManager>(am =>
-                am.DefinedClaims == GetDefinedClaims() &&
-                am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
-                );
-
-            IdentityUserClaim<string>[] removedClaims = null;
-
-            var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-            repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
-            repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null);
-            repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
-            repository.Setup(db => db.Users).Returns(users.Object);
-            repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
-                .Callback((IdentityUserClaim<string>[] claims) => removedClaims = claims);
-
-            var logger = new TestLogger<DeleteHandler>();
-
-            var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
-            {
-                RoleModel = CreateModelFromRole(role),
-                PageContext = new PageContext { HttpContext = httpContext },
-                TempData = new TestTempDataDictionary()
-            };
-
-            var result = await model.OnPostAsync(role.Id);
-
-            Mock.Get(authManager).Verify(am => am.RefreshUser(user.Id));
-        }
+        Mock.Get(authManager).Verify(am => am.RefreshUser(user.Id));
     }
 }

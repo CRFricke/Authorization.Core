@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
-internal class CreateHandler<TUser, TRole>
+internal class CreateHandler<
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole>
     where TRole : AuthUiRole, new()
     where TUser : AuthUiUser
 {

@@ -177,8 +177,8 @@ namespace CRFricke.Authorization.Core
                 return await AuthorizeAsync(principal, claimRequirement);
             }
 
-            if (principal == null) throw new ArgumentNullException(nameof(principal));
-            if (claimRequirement == null) throw new ArgumentNullException(nameof(claimRequirement));
+            ArgumentNullException.ThrowIfNull(principal);
+            ArgumentNullException.ThrowIfNull(claimRequirement);
             if (resource is not IRequiresAuthorization raObject)
                 throw new ArgumentException($"Argument does not implement {nameof(IRequiresAuthorization)} interface.", nameof(resource));
 
@@ -240,8 +240,8 @@ namespace CRFricke.Authorization.Core
         /// </returns>
         public async Task<AuthorizationResult> AuthorizeAsync(ClaimsPrincipal principal, AppClaimRequirement claimRequirement)
         {
-            if (principal == null) throw new ArgumentNullException(nameof(principal));
-            if (claimRequirement == null) throw new ArgumentNullException(nameof(claimRequirement));
+            ArgumentNullException.ThrowIfNull(principal);
+            ArgumentNullException.ThrowIfNull(claimRequirement);
 
             var userId = principal.UserId();
             if (userId == null)
@@ -397,7 +397,7 @@ namespace CRFricke.Authorization.Core
             {
                 var dbContext = (IRepository<TUser, TRole>)
                     _serviceProvider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
+                    .HttpContext!.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
 
                 hashSet = (await
                     dbContext.Set<IdentityRoleClaim<string>>()
@@ -424,7 +424,7 @@ namespace CRFricke.Authorization.Core
         {
             var dbContext = (IRepository<TUser, TRole>)
                 _serviceProvider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
+                    .HttpContext!.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
 
             var roleNames =
                 from uc in user.Claims
@@ -452,7 +452,7 @@ namespace CRFricke.Authorization.Core
             {
                 var dbContext = (IRepository<TUser, TRole>)
                     _serviceProvider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
+                    .HttpContext!.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
 
                 hashSet = (await (
                     from uc in dbContext.Set<IdentityUserClaim<string>>()

@@ -3,13 +3,16 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
-internal class DetailsHandler<TUser, TRole>
-        where TUser : AuthUiUser
-        where TRole : AuthUiRole
+internal class DetailsHandler<
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
+    [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole>
+    where TUser : AuthUiUser
+    where TRole : AuthUiRole
 {
     private readonly IAuthorizationManager _authManager;
     private readonly IRepository<TUser, TRole> _repository;
