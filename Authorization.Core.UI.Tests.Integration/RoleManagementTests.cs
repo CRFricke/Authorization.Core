@@ -339,14 +339,20 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
             .Filter(new() { HasText = nameof(AppGuids.Role.DocumentManager) })
             .GetByRole(AriaRole.Link, new() { Name = "Delete" })
             .ClickAsync();
+
+        await Page.WaitForTimeoutAsync(100);
         title = await Page.TitleAsync();
         Assert.Contains("Delete Role", title);
 
         var locator = Page.GetByRole(AriaRole.Heading, new() { Name = "System Roles may not be deleted!" });
         Assert.Equal(1, await locator.CountAsync());
 
+        // This test fails intermittently in the CI/CD pipeline due to a race condition where 
+        // the IsDisabled test on the 'Delete' button occurs before the button is actually
+        // disabled in the GUI. Adding the WaitForAsync call to try to eliminate this.
         locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" });
         Assert.Equal(1, await locator.CountAsync());
+        await locator.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         Assert.True(await locator.IsDisabledAsync());
     }
 
