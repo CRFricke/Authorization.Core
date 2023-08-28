@@ -388,7 +388,11 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         var locator = Page.GetByRole(AriaRole.Heading, new() { Name = "System accounts may not be deleted!" });
         Assert.Equal(1, await locator.CountAsync());
 
+        // This test fails intermittently in the CI/CD pipeline due to a race condition where 
+        // the IsDisabled test on the 'Delete' button occurs before the button is actually
+        // disabled in the GUI. Adding the WaitForAsync call to try to eliminate this.
         locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First;
+        await locator.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         Assert.True(await locator.IsDisabledAsync());
     }
 
