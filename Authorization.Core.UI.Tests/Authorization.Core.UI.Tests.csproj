@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CRFricke.Test.Support" Version="8.0.0-beta1.1" />
+    <PackageReference Include="CRFricke.Test.Support" Version="8.0.0-beta1.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
     <PackageReference Include="MockQueryable.Moq" Version="7.0.0" />
     <PackageReference Include="Moq" Version="4.20.69" />
