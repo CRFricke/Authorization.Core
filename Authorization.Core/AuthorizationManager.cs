@@ -51,6 +51,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Loads the Claims that are installed by the application.
         /// </summary>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SysClaims))]
         [RequiresUnreferencedCode("Types that implement IDefinesClaims might be removed if application is trimmed.")]
         private static void LoadSystemClaims(List<Assembly> assemblies)
         {
@@ -85,6 +86,7 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Loads the GUIDs of the entities installed by the application.
         /// </summary>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SysGuids))]
         [RequiresUnreferencedCode("Types that implement IDefinesGuids might be removed if application is trimmed.")]
         private static void LoadSystemGuids(List<Assembly> assemblies)
         {
