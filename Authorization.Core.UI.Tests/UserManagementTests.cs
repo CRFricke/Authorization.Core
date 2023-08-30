@@ -235,7 +235,7 @@ namespace Authorization.Core.UI.Tests
 
             var result = await model.OnPostAsync(string.Empty);
 
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(user.Email, notifications[0].Message);
         }
@@ -387,7 +387,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(string.Empty);
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(model.UserModel.Email, notifications[0].Message);
         }
@@ -474,7 +474,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(string.Empty);
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(0, model.TempData.Count);
+            Assert.Empty(model.TempData);
         }
 
         [Fact(DisplayName = "Edit User [Post] updates User properties")]
@@ -594,7 +594,7 @@ namespace Authorization.Core.UI.Tests
 
             var result = await model.OnPostAsync(string.Empty);
 
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(user.Email, notifications[0].Message);
         }
@@ -837,7 +837,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(Guid.Empty.ToString());
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(user.Email, notifications[0].Message);
         }
@@ -938,7 +938,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(user.Id);
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(user.Email, notifications[0].Message);
         }

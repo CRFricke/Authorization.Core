@@ -397,7 +397,7 @@ namespace CRFricke.Authorization.Core
             {
                 var dbContext = (IRepository<TUser, TRole>)
                     _serviceProvider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
+                    .HttpContext!.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
 
                 hashSet = (await
                     dbContext.Set<IdentityRoleClaim<string>>()
@@ -424,7 +424,7 @@ namespace CRFricke.Authorization.Core
         {
             var dbContext = (IRepository<TUser, TRole>)
                 _serviceProvider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
+                    .HttpContext!.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
 
             var roleNames =
                 from uc in user.Claims
@@ -452,7 +452,7 @@ namespace CRFricke.Authorization.Core
             {
                 var dbContext = (IRepository<TUser, TRole>)
                     _serviceProvider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
+                    .HttpContext!.RequestServices.GetRequiredService(typeof(IRepository<TUser, TRole>));
 
                 hashSet = (await (
                     from uc in dbContext.Set<IdentityUserClaim<string>>()

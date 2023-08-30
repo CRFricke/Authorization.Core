@@ -289,7 +289,7 @@ namespace Authorization.Core.UI.Tests
 
             await model.OnPostAsync(string.Empty);
 
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(model.RoleModel.Name, notifications[0].Message);
         }
@@ -384,7 +384,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(string.Empty);
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(model.RoleModel.Name, notifications[0].Message);
         }
@@ -473,7 +473,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(string.Empty);
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(0, model.TempData.Count);
+            Assert.Empty(model.TempData);
         }
 
         [Fact(DisplayName = "Edit Role [Post] sets ApplicationRole properties")]
@@ -608,7 +608,7 @@ namespace Authorization.Core.UI.Tests
 
             await model.OnPostAsync(string.Empty);
 
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(model.RoleModel.Name, notifications[0].Message);
         }
@@ -815,7 +815,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(Guid.NewGuid().ToString());
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(model.RoleModel.Name, notifications[0].Message);
         }
@@ -992,7 +992,7 @@ namespace Authorization.Core.UI.Tests
             var result = await model.OnPostAsync(role.Id);
 
             Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal(1, model.TempData.Count);
+            Assert.Single(model.TempData);
             var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
             Assert.Contains(role.Name, notifications[0].Message);
         }
