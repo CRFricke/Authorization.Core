@@ -374,7 +374,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
 
         await DeleteRoleAsync(role.Id);
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First.ClickAsync();
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
 
