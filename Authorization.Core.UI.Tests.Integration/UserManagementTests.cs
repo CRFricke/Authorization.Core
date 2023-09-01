@@ -359,7 +359,7 @@ namespace Authorization.Core.UI.Tests.Integration
                 .IsCheckedAsync();
             Assert.True(isChecked);
 
-            await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
+            await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First.ClickAsync();
             title = await Page.TitleAsync();
             Assert.Contains("User Management", title);
 
