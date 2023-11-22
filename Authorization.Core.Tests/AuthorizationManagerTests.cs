@@ -1,13 +1,13 @@
 using Authorization.Core.Tests.Data;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.Attributes;
-using CRFricke.Test.Support.Fakes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
@@ -35,7 +35,7 @@ namespace Authorization.Core.Tests
                 cp.Identity.Name == "TestUser@StEmilian.com"
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var serviceProvider = Mock.Of<IServiceProvider>();
 
             var authorizationManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
@@ -72,7 +72,7 @@ namespace Authorization.Core.Tests
                     )
                 ).Returns(true);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object &&
@@ -106,7 +106,7 @@ namespace Authorization.Core.Tests
                     )
                 ).Returns(true);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
@@ -145,7 +145,7 @@ namespace Authorization.Core.Tests
                     )
                 ).Returns(true);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object &&
@@ -188,7 +188,7 @@ namespace Authorization.Core.Tests
             Mock.Get(serviceProvider.GetRequiredService<IHttpContextAccessor>())
                 .Setup(hca => hca.HttpContext.RequestServices).Returns(serviceProvider);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var authorizationManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
             var result = await authorizationManager.AuthorizeAsync(claimsPrincipal, appClaimRequirement);
@@ -212,7 +212,7 @@ namespace Authorization.Core.Tests
                 cp.Identity.Name == "TestUser@StEmilian.com"
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var serviceProvider = Mock.Of<IServiceProvider>();
 
             var authorizationManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
@@ -239,7 +239,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var authorizationManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
             authorizationManager.RefreshUser(user.Id);
@@ -261,7 +261,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var authorizationManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
             authorizationManager.RefreshRole(role.Id);
@@ -287,7 +287,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, user.Id) } &&
@@ -341,7 +341,7 @@ namespace Authorization.Core.Tests
             Mock.Get(serviceProvider.GetRequiredService<IHttpContextAccessor>())
                 .Setup(hca => hca.HttpContext.RequestServices).Returns(serviceProvider);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
@@ -406,7 +406,7 @@ namespace Authorization.Core.Tests
             Mock.Get(serviceProvider.GetRequiredService<IHttpContextAccessor>())
                 .Setup(hca => hca.HttpContext.RequestServices).Returns(serviceProvider);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
@@ -462,7 +462,7 @@ namespace Authorization.Core.Tests
             Mock.Get(serviceProvider.GetRequiredService<IHttpContextAccessor>())
                 .Setup(hca => hca.HttpContext.RequestServices).Returns(serviceProvider);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
@@ -494,7 +494,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
@@ -541,7 +541,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
@@ -589,7 +589,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
                 cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
@@ -631,7 +631,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var result = await new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger)
                 .IsAuthorizedAsync(claimsPrincipal, SysClaims.User.Read);
@@ -668,7 +668,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
 
             var result = await new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger)
                 .IsAuthorizedAsync(claimsPrincipal, SysClaims.Role.Read);
@@ -711,7 +711,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppUser("Administrator@StEmilian.com") { Id = SysGuids.User.Administrator };
@@ -722,13 +722,13 @@ namespace Authorization.Core.Tests
                 .HandleAsync(authContext);
 
             Assert.False(authContext.HasSucceeded);
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(appClaimRequirement.ToString(), logger.LogEntries[0].Message);
-            Assert.Contains(typeof(AppUser).Name, logger.LogEntries[0].Message);
-            Assert.Contains(resource.UserName, logger.LogEntries[0].Message);
-            Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
-            Assert.Contains("restricted operation on system", logger.LogEntries[0].Message);
+            Assert.Equal(1,logger.Collector.Count);
+            Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+            Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
+            Assert.Contains(typeof(AppUser).Name, logger.LatestRecord.Message);
+            Assert.Contains(resource.UserName, logger.LatestRecord.Message);
+            Assert.Contains(principal.UserName, logger.LatestRecord.Message);
+            Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
         }
 
         [Fact(DisplayName = "AppClaimRequirementHandler [User] fails claim update request for system user")]
@@ -751,7 +751,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppUser("Administrator@StEmilian.com") { Id = SysGuids.User.Administrator };
@@ -762,13 +762,13 @@ namespace Authorization.Core.Tests
                 .HandleAsync(authContext);
 
             Assert.False(authContext.HasSucceeded);
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(appClaimRequirement.ToString(), logger.LogEntries[0].Message);
-            Assert.Contains(typeof(AppUser).Name, logger.LogEntries[0].Message);
-            Assert.Contains(resource.UserName, logger.LogEntries[0].Message);
-            Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
-            Assert.Contains("restricted operation on system", logger.LogEntries[0].Message);
+            Assert.Equal(1, logger.Collector.Count);
+            Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+            Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
+            Assert.Contains(typeof(AppUser).Name, logger.LatestRecord.Message);
+            Assert.Contains(resource.UserName, logger.LatestRecord.Message);
+            Assert.Contains(principal.UserName, logger.LatestRecord.Message);
+            Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
         }
 
         [Fact(DisplayName = "AppClaimRequirementHandler [User] allows update request for non-system user")]
@@ -809,7 +809,7 @@ namespace Authorization.Core.Tests
             Mock.Get(serviceProvider.GetRequiredService<IHttpContextAccessor>())
                 .Setup(hca => hca.HttpContext.RequestServices).Returns(serviceProvider);
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppUser("ExistingUser@StEmilian.com");
@@ -842,7 +842,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppRole() { Id = TestGuids.Role.RoleManager, Name = nameof(TestGuids.Role.RoleManager) };
@@ -853,13 +853,13 @@ namespace Authorization.Core.Tests
                 .HandleAsync(authContext);
 
             Assert.False(authContext.HasSucceeded);
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(appClaimRequirement.ToString(), logger.LogEntries[0].Message);
-            Assert.Contains(typeof(AppRole).Name, logger.LogEntries[0].Message);
-            Assert.Contains(resource.Name, logger.LogEntries[0].Message);
-            Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
-            Assert.Contains("restricted operation on system", logger.LogEntries[0].Message);
+            Assert.Equal(1, logger.Collector.Count);
+            Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+            Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
+            Assert.Contains(typeof(AppRole).Name, logger.LatestRecord.Message);
+            Assert.Contains(resource.Name, logger.LatestRecord.Message);
+            Assert.Contains(principal.UserName, logger.LatestRecord.Message);
+            Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
         }
 
         [Fact(DisplayName = "AppClaimRequirementHandler [Role] fails claim update request for system role")]
@@ -882,7 +882,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppRole() { Id = TestGuids.Role.RoleManager, Name = nameof(TestGuids.Role.RoleManager) };
@@ -893,13 +893,13 @@ namespace Authorization.Core.Tests
                 .HandleAsync(authContext);
 
             Assert.False(authContext.HasSucceeded);
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.Contains(appClaimRequirement.ToString(), logger.LogEntries[0].Message);
-            Assert.Contains(typeof(AppRole).Name, logger.LogEntries[0].Message);
-            Assert.Contains(resource.Name, logger.LogEntries[0].Message);
-            Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
-            Assert.Contains("restricted operation on system", logger.LogEntries[0].Message);
+            Assert.Equal(1, logger.Collector.Count);
+            Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+            Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
+            Assert.Contains(typeof(AppRole).Name, logger.LatestRecord.Message);
+            Assert.Contains(resource.Name, logger.LatestRecord.Message);
+            Assert.Contains(principal.UserName, logger.LatestRecord.Message);
+            Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
         }
 
         [Fact(DisplayName = "AppClaimRequirementHandler [Role] allows update request for non-system role")]
@@ -930,7 +930,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppRole() { Name = "ExistingRole" };
@@ -971,7 +971,7 @@ namespace Authorization.Core.Tests
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
 
-            var logger = new TestLogger<AuthorizationManager>();
+            var logger = new FakeLogger<AuthorizationManager>();
             var authManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
 
             var resource = new AppRole() { Id = TestGuids.Role.UserManager, Name = nameof(TestGuids.Role.UserManager) };
@@ -982,9 +982,9 @@ namespace Authorization.Core.Tests
                 .HandleAsync(authContext);
 
             Assert.False(authContext.HasSucceeded);
-            Assert.Single(logger.LogEntries);
-            Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-            Assert.DoesNotContain(SysClaims.Role.Read, logger.LogEntries[0].Message);
+            Assert.Equal(1, logger.Collector.Count);
+            Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+            Assert.DoesNotContain(SysClaims.Role.Read, logger.LatestRecord.Message);
         }
     }
 }

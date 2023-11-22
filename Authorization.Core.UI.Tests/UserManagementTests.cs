@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using MockQueryable.Moq;
 using Moq;
 using System;
@@ -67,7 +68,7 @@ public class UserManagementTests : TestsBase
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
-        var logger = new TestLogger<CreateHandler>();
+        var logger = new FakeLogger<CreateHandler>();
 
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger, passwordHasher);
         _ = await model.OnGetAsync();
@@ -114,7 +115,7 @@ public class UserManagementTests : TestsBase
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
-        var logger = new TestLogger<CreateHandler>();
+        var logger = new FakeLogger<CreateHandler>();
 
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
         {
@@ -165,7 +166,7 @@ public class UserManagementTests : TestsBase
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
-        var logger = new TestLogger<CreateHandler>();
+        var logger = new FakeLogger<CreateHandler>();
 
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
         {
@@ -184,13 +185,13 @@ public class UserManagementTests : TestsBase
         Assert.Contains("User", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.NotNull(logger.LogEntries[0].Exception);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Create User [Post] sends notification on success")]
@@ -224,7 +225,7 @@ public class UserManagementTests : TestsBase
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
-        var logger = new TestLogger<CreateHandler>();
+        var logger = new FakeLogger<CreateHandler>();
 
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
         {
@@ -271,7 +272,7 @@ public class UserManagementTests : TestsBase
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
-        var logger = new TestLogger<CreateHandler>();
+        var logger = new FakeLogger<CreateHandler>();
 
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
         {
@@ -283,12 +284,12 @@ public class UserManagementTests : TestsBase
         await model.OnPostAsync(string.Empty);
 
         Assert.NotNull(user);
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains($"created {nameof(ApplicationUser)}", logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains($"created {nameof(ApplicationUser)}", logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Edit User [Get] returns NotFound for null ID")]
@@ -296,7 +297,7 @@ public class UserManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         var result = await model.OnGetAsync(null);
@@ -342,7 +343,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         var result = await model.OnGetAsync(user.Id);
@@ -376,7 +377,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -421,7 +422,7 @@ public class UserManagementTests : TestsBase
         repository.Setup(db => db.Users).Returns(users.AsQueryable().BuildMockDbSet().Object);
         repository.Setup(db => db.SaveChangesAsync(default)).Throws(dbUpdateException);
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
@@ -440,13 +441,13 @@ public class UserManagementTests : TestsBase
         Assert.Contains("User", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(users[0].Id, logger.LogEntries[0].Message);
-        Assert.Contains(users[0].Email, logger.LogEntries[0].Message);
-        Assert.NotNull(logger.LogEntries[0].Exception);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(users[0].Id, logger.LatestRecord.Message);
+        Assert.Contains(users[0].Email, logger.LatestRecord.Message);
+        Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit User [Post] sends no notification for no changes")]
@@ -463,7 +464,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(0)
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -526,7 +527,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(0)
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -583,7 +584,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -626,7 +627,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -638,12 +639,12 @@ public class UserManagementTests : TestsBase
         await model.OnPostAsync(string.Empty);
 
         Assert.NotNull(user);
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Display User returns NotFound for null ID")]
@@ -734,7 +735,7 @@ public class UserManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         var result = await model.OnGetAsync(null);
@@ -751,7 +752,7 @@ public class UserManagementTests : TestsBase
             db.Users == new List<ApplicationUser>().AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         var result = await model.OnGetAsync(Guid.Empty.ToString());
@@ -789,7 +790,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         await model.OnGetAsync(users[1].Id);
@@ -806,7 +807,7 @@ public class UserManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         var result = await model.OnPostAsync(null);
@@ -826,7 +827,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -872,7 +873,7 @@ public class UserManagementTests : TestsBase
         repository.Setup(db => db.Users.Remove(It.IsAny<ApplicationUser>())).Throws(dbUpdateException);
         repository.Setup(db => db.Roles).Returns(new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object);
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
@@ -891,13 +892,13 @@ public class UserManagementTests : TestsBase
         Assert.Contains("User", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Error, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
-        Assert.NotNull(logger.LogEntries[0].Exception);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Delete User [Post] sends notification for delete")]
@@ -926,7 +927,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -972,7 +973,7 @@ public class UserManagementTests : TestsBase
             .Returns((EntityEntry<ApplicationUser>)null);
         repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger)
         {
@@ -988,12 +989,12 @@ public class UserManagementTests : TestsBase
         Assert.NotNull(deletedUser);
         Assert.True(ReferenceEquals(user, deletedUser));
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Information, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Delete User [Post] prevents delete of System User")]
@@ -1024,7 +1025,7 @@ public class UserManagementTests : TestsBase
             db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -1042,13 +1043,13 @@ public class UserManagementTests : TestsBase
         var errors = model.ModelState[string.Empty].Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains("delete system", logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains("delete system", logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Edit User [Post] prevents update of System User")]
@@ -1092,7 +1093,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, dbContext, logger)
         {
@@ -1110,12 +1111,12 @@ public class UserManagementTests : TestsBase
         var errors = model.ModelState[string.Empty].Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Edit User [Post] refreshes User cache on success")]
@@ -1157,7 +1158,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -1200,7 +1201,7 @@ public class UserManagementTests : TestsBase
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
-        var logger = new TestLogger<DeleteHandler>();
+        var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -1234,7 +1235,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, dbContext, logger);
         await model.OnGetAsync(user.Id);
@@ -1271,7 +1272,7 @@ public class UserManagementTests : TestsBase
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
-        var logger = new TestLogger<CreateHandler>();
+        var logger = new FakeLogger<CreateHandler>();
 
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger, passwordHasher)
         {
@@ -1289,11 +1290,11 @@ public class UserManagementTests : TestsBase
         var errors = model.ModelState[string.Empty].Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalName, logger.LogEntries[0].Message);
-        Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
-        Assert.Null(logger.LogEntries[0].Exception);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
+        Assert.Contains(principalName, logger.LatestRecord.Message);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Null(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit User [Post] handles failed elevation check")]
@@ -1334,7 +1335,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -1352,14 +1353,14 @@ public class UserManagementTests : TestsBase
         var errors = model.ModelState[string.Empty].Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principalUser.UserName, logger.LogEntries[0].Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LogEntries[0].Message);
-        Assert.Contains(user.Email, logger.LogEntries[0].Message);
-        Assert.Contains(user.Id, logger.LogEntries[0].Message);
-        Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
-        Assert.Null(logger.LogEntries[0].Exception);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
+        Assert.Contains(principalUser.UserName, logger.LatestRecord.Message);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
+        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Null(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit User [Post] handles elevation of self")]
@@ -1400,7 +1401,7 @@ public class UserManagementTests : TestsBase
             db.Users == users.AsQueryable().BuildMockDbSet().Object
             );
 
-        var logger = new TestLogger<EditHandler>();
+        var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
@@ -1418,10 +1419,10 @@ public class UserManagementTests : TestsBase
         var errors = model.ModelState[string.Empty].Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
-        Assert.Single(logger.LogEntries);
-        Assert.Equal(LogLevel.Warning, logger.LogEntries[0].LogLevel);
-        Assert.Contains(principal.UserName, logger.LogEntries[0].Message);
-        Assert.Contains(expectedLogMessage, logger.LogEntries[0].Message);
-        Assert.Null(logger.LogEntries[0].Exception);
+        Assert.Equal(1, logger.Collector.Count);
+        Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
+        Assert.Contains(principal.UserName, logger.LatestRecord.Message);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Null(logger.LatestRecord.Exception);
     }
 }
