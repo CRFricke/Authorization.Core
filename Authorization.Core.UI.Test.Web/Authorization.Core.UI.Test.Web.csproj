@@ -35,7 +35,8 @@
   <PropertyGroup>
     <_CoreUiProjectName>Authorization.Core.UI</_CoreUiProjectName>
     <_CoreUiPackageName>CRFricke.$(_CoreUiProjectName)</_CoreUiPackageName>
-    <_CoreUiProjectPath>$(MSBuildStartupDirectory)\$(_CoreUiProjectName)</_CoreUiProjectPath>
+    <_SolutionDirectory>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</_SolutionDirectory>
+    <_CoreUiProjectPath>$(_SolutionDirectory)\$(_CoreUiProjectName)</_CoreUiProjectPath>
     <_CoreUiProjectBundleName>$(_CoreUiPackageName).bundle.scp.css</_CoreUiProjectBundleName>
   </PropertyGroup>
 
