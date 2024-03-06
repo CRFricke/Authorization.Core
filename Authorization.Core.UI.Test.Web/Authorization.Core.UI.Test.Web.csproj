@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -34,7 +34,8 @@
   <PropertyGroup>
     <_CoreUiProjectName>Authorization.Core.UI</_CoreUiProjectName>
     <_CoreUiPackageName>CRFricke.$(_CoreUiProjectName)</_CoreUiPackageName>
-    <_CoreUiProjectPath>$(MSBuildStartupDirectory)\$(_CoreUiProjectName)</_CoreUiProjectPath>
+    <_SolutionDirectory>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</_SolutionDirectory>
+    <_CoreUiProjectPath>$(_SolutionDirectory)\$(_CoreUiProjectName)</_CoreUiProjectPath>
     <_CoreUiProjectBundleName>$(_CoreUiPackageName).bundle.scp.css</_CoreUiProjectBundleName>
   </PropertyGroup>
 
