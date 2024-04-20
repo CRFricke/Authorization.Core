@@ -1,9 +1,8 @@
-﻿.col-properties {
+﻿.ac-col-properties {
     min-width: 25rem;
     max-width: 30rem;
 }
 
-.col-roles {
+.ac-col-roles {
     min-width: 25rem;
 }
-

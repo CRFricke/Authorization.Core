@@ -1,18 +1,93 @@
+@import '/_content/CRFricke.Authorization.Core.UI/css/site.css';
+
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
+/*********************************************************************************/
+/* The following CSS rules are to test the new theme support in Bootstrap v5.3.3 */
+
+:root, [data-bs-theme="light"] {
+    --se-body-bg: #CDBBBB;
+    --se-navbar-bg: #6E4545;
+    --se-nav-link-color: #FFF;
+    --se-heading-color: #8B0000;
+    --se-card-bg: #FFF;
+    --se-image-inverse-filter: 0;
+    --se-accordion-button-bg: #D3D3D3;
+}
+
+[data-bs-theme="dark"] {
+    --se-body-bg: #333333;
+    --se-navbar-bg: var(--bs-body-bg);
+    --se-heading-color: #E70000;
+    --se-card-bg: #606060;
+    --se-image-inverse-filter: .91;
+    --se-accordion-button-bg: #031633;
+}
+
+
+
 body {
-  margin-bottom: 60px;
+    background-color: var(--se-body-bg);
+    margin-bottom: 60px;
+    padding-top: 4.2rem; /* Space for fixed-top navbar */
+}
+
+/* 
+    The nav-links & the navbar-brand definitions are here rather than in 
+    _Layout.cshtml.css because CSS Isolation does not support the html generated 
+    by tag helpers (which is done at run-time rather than compile-time).
+*/
+.navbar-brand, .nav-link {
+    color: var(--se-nav-link-color);
+}
+
+h1, h2, h3 {
+    color: var(--se-heading-color);
+}
+
+.dark-red {
+    color: var(--se-heading-color);
+}
+
+.dataTable, th, td {
+    background-color: var(--se-body-bg) !important;
+}
+
+.form-floating {
+    margin-bottom: .5rem;
+}
+
+.form-check {
+    margin-bottom: .5rem;
+}
+
+.form-floating > .se-textarea-tall {
+    height: 15rem;
+}
+
+a .ac-icon-button > svg {
+    color: var(--bs-link-color);
+    opacity: .5;
+}
+
+a .ac-icon-button > svg:hover {
+    color: var(--bs-link-hover-color);
+    opacity: 1;
 }

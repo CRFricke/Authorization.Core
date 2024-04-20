@@ -8,7 +8,7 @@
     var classDetails = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Read)) ? "" : "disabled";
     var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? "" : "disabled";
 }
-
+<partial name="_ButtonSvgs" />
 <div class="row align-items-center">
     <div class="col-lg-4">
         <h2>@ViewData["Title"]</h2>
@@ -23,7 +23,7 @@
         <p>
             <a class="@classCreate" asp-page="Create">Create New</a>
         </p>
-        <table class="table table-sm">
+        <table class="table table-sm w-100">
             <thead>
                 <tr>
                     <th>
@@ -46,9 +46,15 @@
                             @Html.DisplayFor(modelItem => item.Description)
                         </td>
                         <td>
-                            <a class="@classEdit" asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                            <a class="@classDetails" asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                            <a class="@classDelete" asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                            <a class="ac-icon-button @classEdit" asp-page="./Edit" asp-route-id="@item.Id" title="Edit">
+                                <svg><use href="#pencil-square"></use></svg>
+                            </a>
+                            <a class="ac-icon-button @classDetails" asp-page="./Details" asp-route-id="@item.Id" title="View">
+                                <svg><use href="#binoculars"></use></svg>
+                            </a>
+                            <a class="ac-icon-button @classDelete" asp-page="./Delete" asp-route-id="@item.Id" title="Delete">
+                                <svg><use href="#trash"></use></svg>
+                            </a>
                         </td>
                     </tr>
                 }

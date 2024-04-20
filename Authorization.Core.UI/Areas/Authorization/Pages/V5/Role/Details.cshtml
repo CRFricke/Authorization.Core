@@ -17,7 +17,7 @@
     </div>
 </div>
 <div class="row mx-sm-1">
-    <div class="col col-properties me-sm-5">
+    <div class="col ac-col-properties me-sm-5">
         <h5 class="text-muted">The role's properties:</h5>
         <hr />
         <div class="form-floating">
@@ -29,17 +29,15 @@
             <label class="control-label" asp-for="RoleModel.Name"></label>
         </div>
         <div class="form-floating mb-3">
-            <textarea class="form-control textarea-tall" id="RoleModel_Description" disabled>@Model.RoleModel.Description</textarea>
+            <textarea class="form-control ac-textarea-tall" id="RoleModel_Description" disabled>@Model.RoleModel.Description</textarea>
             <label class="control-label" asp-for="RoleModel.Description"></label>
         </div>
-        <div class="row d-none d-sm-block align-items-center mt-3">
-            <div class="col-auto">
-                <a class="btn btn-primary @classEdit" asp-page="./Edit" asp-route-id="@Model.RoleModel.Id">Edit</a>
-                <a class="btn btn-secondary" asp-page="Index">Cancel</a>
-            </div>
+        <div class="d-none d-sm-flex ac-button-footer mt-3">
+            <a class="btn btn-primary @classEdit" asp-page="./Edit" asp-route-id="@Model.RoleModel.Id">Edit</a>
+            <a class="btn btn-secondary" asp-page="Index">Cancel</a>
         </div>
     </div>
-    <div class="col col-claims">
+    <div class="col ac-col-claims">
         <h5 class="text-center text-muted mb-3">The role's claim assignments:</h5>
         <hr />
         <div class="row mx-auto">
@@ -69,11 +67,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="row d-block d-sm-none align-items-center mt-3">
-            <div class="col-auto">
-                <a class="btn btn-primary @classEdit" asp-page="./Edit" asp-route-id="@Model.RoleModel.Id">Edit</a>
-                <a class="btn btn-secondary" asp-page="Index">Cancel</a>
-            </div>
+        <div class="d-flex d-sm-none ac-button-footer mt-3">
+            <a class="btn btn-primary @classEdit" asp-page="./Edit" asp-route-id="@Model.RoleModel.Id">Edit</a>
+            <a class="btn btn-secondary" asp-page="Index">Cancel</a>
         </div>
     </div>
 </div>

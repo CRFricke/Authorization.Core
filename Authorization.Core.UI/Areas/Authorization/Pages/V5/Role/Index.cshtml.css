@@ -1,14 +1,14 @@
-﻿.col-properties {
+﻿.ac-col-properties {
     min-width: 25rem;
     max-width: 30rem;
 }
 
-.col-claims,
-.col-users {
+.ac-col-claims,
+.ac-col-users {
     min-width: 25rem;
     max-width: 35rem;
 }
 
-.textarea-tall {
+.form-floating > .ac-textarea-tall {
     height: 10rem;
 }
