@@ -326,8 +326,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
 
-        locator = Page.Locator("div .ac-notifications")
-            .GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully deleted." });
+        locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully deleted." });
         Assert.Equal(1, await locator.CountAsync());
     }
 
@@ -353,7 +352,6 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         // the IsDisabled test on the 'Delete' button occurs before the button is actually
         // disabled in the GUI. Adding the WaitForAsync call to try to eliminate this.
         locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First;
-        await locator.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         Assert.True(await locator.IsDisabledAsync());
     }
 

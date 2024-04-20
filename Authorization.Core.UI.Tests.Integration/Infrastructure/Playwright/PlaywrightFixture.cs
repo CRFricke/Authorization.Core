@@ -28,8 +28,6 @@ namespace Authorization.Core.UI.Tests.Integration.Infrastructure.Playwright;
 
 public class PlaywrightFixture : IAsyncLifetime
 {
-    private static readonly Task<IPlaywright> _playwrightTask = Microsoft.Playwright.Playwright.CreateAsync();
-
     public IPlaywright Playwright { get; private set; } = null!;
 
     public string BrowserName { get; private set; } = null!;
@@ -38,7 +36,7 @@ public class PlaywrightFixture : IAsyncLifetime
 
     public virtual async Task InitializeAsync()
     {
-        Playwright = await _playwrightTask.ConfigureAwait(false);
+        Playwright = await Microsoft.Playwright.Playwright.CreateAsync().ConfigureAwait(false);
         BrowserName = PlaywrightSettingsProvider.BrowserName;
         BrowserType = Playwright[BrowserName];
         Playwright.Selectors.SetTestIdAttribute("data-testid");
