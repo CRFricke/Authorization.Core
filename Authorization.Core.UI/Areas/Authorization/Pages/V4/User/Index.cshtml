@@ -79,6 +79,14 @@
 @section scripts {
 
     <script defer>
-        $('table').DataTable();
+        $('table').DataTable({
+            columnDefs: [
+                {
+                    target: 3,
+                    render: DataTable.render.datetime('MM/dd/yyyy hh:mm:ss a'),
+                    type: 'date'
+                }
+            ]
+        });
     </script>
 }

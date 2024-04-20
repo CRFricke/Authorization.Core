@@ -38,8 +38,8 @@
             <label class="control-label" asp-for="UserModel.PhoneNumber"></label>
         </div>
         <div class="form-floating">
-            <input class="form-control" id="UserModel_LockoutEnd" type="text" value="@Model.UserModel.LockoutEnd" disabled />
-            <label class="control-label" asp-for="UserModel.LockoutEnd"></label>
+            <input class="form-control" id="UserModel_LockoutEnd" type="text" value="@Model.UserModel.LockoutEndUtc" disabled />
+            <label class="control-label" asp-for="UserModel.LockoutEndUtc"></label>
         </div>
         <div class="form-floating">
             <input class="form-control" id="UserModel_AccessFailedCount" type="text" value="@Model.UserModel.AccessFailedCount" disabled />
