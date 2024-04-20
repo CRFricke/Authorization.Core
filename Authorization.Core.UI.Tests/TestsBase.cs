@@ -28,7 +28,7 @@ public class TestsBase
     {
         return new UserModel {
             Id = user.Id, AccessFailedCount = user.AccessFailedCount, Email = user.Email, EmailConfirmed = user.EmailConfirmed,
-            GivenName = user.GivenName, LockoutEnabled = user.LockoutEnabled, LockoutEnd = user.LockoutEnd,
+            GivenName = user.GivenName, LockoutEnabled = user.LockoutEnabled, LockoutEndUtc = user.LockoutEnd,
             PhoneNumber = user.PhoneNumber, PhoneNumberConfirmed = user.PhoneNumberConfirmed, Surname = user.Surname
         };
     }

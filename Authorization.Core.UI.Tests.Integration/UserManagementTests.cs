@@ -181,7 +181,7 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
 
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
-        var locator = Page.Locator("div .notifications")
+        var locator = Page.Locator("div .ac-notifications")
             .GetByRole(AriaRole.Heading, new() { Name = $"User '{userEmail}' successfully created." });
         Assert.Equal(1, await locator.CountAsync());
 
@@ -364,7 +364,7 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
 
-        var locator = Page.Locator("div .notifications")
+        var locator = Page.Locator("div .ac-notifications")
             .GetByRole(AriaRole.Heading, new() { Name = $"User '{user.Email}' successfully deleted." });
         Assert.Equal(1, await locator.CountAsync());
 

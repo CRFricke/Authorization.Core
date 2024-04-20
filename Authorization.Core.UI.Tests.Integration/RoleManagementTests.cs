@@ -159,7 +159,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
 
         await Page.GetByLabel("Name").FillAsync(roleName);
         await Page.GetByLabel("Description").FillAsync("Test Role");
-        await Page.GetByLabel("Search:").FillAsync("List");
+        await Page.Locator(".dataTables_filter input").First.FillAsync("List");
         await Page.GetByRole(AriaRole.Row, new() { Name = "Bulletin.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
         await Page.GetByRole(AriaRole.Row, new() { Name = "Calendar.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
         await Page.GetByRole(AriaRole.Row, new() { Name = "Document.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
@@ -170,7 +170,8 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
 
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
-        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{roleName}' successfully created." });
+        var locator = Page.Locator("div .ac-notifications")
+            .GetByRole(AriaRole.Heading, new() { Name = $"Role '{roleName}' successfully created." });
         Assert.Equal(1, await locator.CountAsync());
 
         await VerifyRoleExistsAsync(roleName);
@@ -186,7 +187,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
-            .GetByRole(AriaRole.Link, new() { Name = "Details" })
+            .GetByRole(AriaRole.Link, new() { Name = "View" })
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.Contains("Role Details", title);
@@ -268,7 +269,8 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
-        locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' was successfully updated." });
+        locator = Page.Locator("div .ac-notifications")
+            .GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' was successfully updated." });
         Assert.NotNull(locator);
 
         role.SetClaims(AppClaims.News.DefinedClaims);
@@ -324,7 +326,8 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
 
-        locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully deleted." });
+        locator = Page.Locator("div .ac-notifications")
+            .GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully deleted." });
         Assert.Equal(1, await locator.CountAsync());
     }
 
@@ -377,7 +380,8 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
         title = await Page.TitleAsync();
         Assert.Contains("Role Management", title);
 
-        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Error: Role '{role.Name}' was not found in the database." });
+        var locator = Page.Locator("div .ac-notifications")
+            .GetByRole(AriaRole.Heading, new() { Name = $"Error: Role '{role.Name}' was not found in the database." });
         Assert.Equal(1, await locator.CountAsync());
     }
 }
