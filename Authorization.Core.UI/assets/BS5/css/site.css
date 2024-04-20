@@ -1,2 +1,30 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
+
+.ac-button-footer {
+    align-items: center !important;
+    column-gap: 1rem !important;
+    justify-content: center !important;
+}
+
+.ac-button-footer .btn {
+    min-width: 4.5rem;
+}
+
+.ac-hide-lastpass ~ div[data-lastpass-icon-root] {
+    display: none;
+}
+
+.ac-icon-button {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: .5rem;
+}
+
+.ac-icon-button > svg {
+    vertical-align: sub;
+    background-size: 1.2rem 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+}

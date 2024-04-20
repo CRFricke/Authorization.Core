@@ -55,9 +55,10 @@ namespace CRFricke.Authorization.Core.UI.Models
         [Display(Name = "Lockout Enabled")]
         public bool LockoutEnabled { get; set; } = true;
 
-        [Display(Name = "Lockout Ends On")]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm:ss tt}")]
-        public DateTimeOffset? LockoutEnd { get; set; }
+        [Display(Name = "Lockout Ends On (UTC)")]
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(DataFormatString = "{0:M/d/yyyy h:m:ss tt K}")]
+        public DateTimeOffset? LockoutEndUtc { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
@@ -110,7 +111,7 @@ namespace CRFricke.Authorization.Core.UI.Models
             Email = user.Email;
             EmailConfirmed = user.EmailConfirmed;
             LockoutEnabled = user.LockoutEnabled;
-            LockoutEnd = user.LockoutEnd;
+            LockoutEndUtc = user.LockoutEnd;
             Password = "Only used in create mode";
             ConfirmPassword = Password;
             PhoneNumber = user.PhoneNumber;
@@ -201,9 +202,9 @@ namespace CRFricke.Authorization.Core.UI.Models
                 user.LockoutEnabled = LockoutEnabled;
             }
 
-            if (LockoutEnd != user.LockoutEnd)
+            if (LockoutEndUtc != user.LockoutEnd)
             {
-                user.LockoutEnd = LockoutEnd;
+                user.LockoutEnd = LockoutEndUtc;
             }
 
             if (PhoneNumber != user.PhoneNumber)

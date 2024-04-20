@@ -1,7 +1,7 @@
 ﻿@model ModelBase
 @if (Model.Notifications != null)
 {
-    <div class="col mx-md-2">
+    <div class="col mx-md-2 ac-notifications">
         @foreach (var notification in Model.Notifications)
         {
             var textClass = notification.Severity == Severity.High ? "text-danger" : "text-success";

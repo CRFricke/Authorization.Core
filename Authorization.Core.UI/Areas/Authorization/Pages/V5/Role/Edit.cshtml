@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit Role";
 
     var isAdminRole = Model.RoleModel.Id == SysGuids.Role.Administrator;
-    var checkboxDisbled = (Model.RoleModel.IsSystemRole) ? "disabled" : "";
+    var checkboxDisabled = (Model.RoleModel.IsSystemRole) ? "disabled" : "";
 }
 
 <div class="row">
@@ -16,28 +16,26 @@
 <form id="formEdit" method="post">
     <div class="row">
         <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
-        <div class="col col-properties me-sm-5 mb-3">
+        <div class="col ac-col-properties me-sm-5 mb-3">
             <h5 class="text-muted">Enter the role's details:</h5>
             <hr />
             <input asp-for="RoleModel.Id" hidden />
             <div class="form-floating">
-                <input class="form-control" asp-for="RoleModel.Name" aria-required="true" />
+                <input class="form-control" asp-for="RoleModel.Name" placeholder="" aria-required="true" />
                 <label class="control-label" asp-for="RoleModel.Name"></label>
                 <span class="text-danger" asp-validation-for="RoleModel.Name"></span>
             </div>
             <div class="form-floating mb-3">
-                <textarea class="form-control textarea-tall" id="RoleModel_Description" name="RoleModel.Description">@Model.RoleModel.Description</textarea>
+                <textarea class="form-control ac-textarea-tall" id="RoleModel_Description" name="RoleModel.Description" placeholder="">@Model.RoleModel.Description</textarea>
                 <label class="control-label" asp-for="RoleModel.Description"></label>
                 <span class="text-danger" asp-validation-for="RoleModel.Description"></span>
             </div>
-            <div class="row d-none d-sm-block align-items-center mt-3">
-                <div class="col-auto">
-                    <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
-                    <a class="btn btn-secondary" asp-page="Index">Cancel</a>
-                </div>
+            <div class="d-none d-sm-flex ac-button-footer mt-3">
+                <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
+                <a class="btn btn-secondary" asp-page="Index">Cancel</a>
             </div>
         </div>
-        <div class="col col-claims">
+        <div class="col ac-col-claims">
             <h5 class="text-muted text-center mb-3">Select the role's claim assignments:</h5>
             <hr />
             <div class="mx-auto">
@@ -57,7 +55,7 @@
                                 var checkedVal = (claim.IsAssigned || isAdminRole) ? "checked" : "";
                                 <tr>
                                     <td class="align-middle">
-                                        <input class="form-check ms-3" type="checkbox" @checkedVal @checkboxDisbled />
+                                        <input class="form-check ms-3" type="checkbox" @checkedVal @checkboxDisabled />
                                     </td>
                                     <td>
                                         @Html.DisplayFor(x => claim.Claim)
@@ -68,11 +66,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="row d-block d-sm-none align-items-center mt-3">
-                <div class="col-auto">
-                    <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
-                    <a class="btn btn-secondary" asp-page="Index">Cancel</a>
-                </div>
+            <div class="d-flex d-sm-none ac-button-footer mt-3">
+                <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
+                <a class="btn btn-secondary" asp-page="Index">Cancel</a>
             </div>
         </div>
     </div>

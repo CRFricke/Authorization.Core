@@ -181,7 +181,8 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
 
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
-        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{userEmail}' successfully created." });
+        var locator = Page.Locator("div .ac-notifications")
+            .GetByRole(AriaRole.Heading, new() { Name = $"User '{userEmail}' successfully created." });
         Assert.Equal(1, await locator.CountAsync());
 
         var user = await GetUserByEmailAsync(userEmail);
@@ -209,7 +210,7 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = user!.Email })
-            .GetByRole(AriaRole.Link, new() { Name = "Details" })
+            .GetByRole(AriaRole.Link, new() { Name = "View" })
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.Contains("User Details", title);
@@ -224,7 +225,7 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         Assert.Equal(user.Surname, value);
         value = await Page.GetByLabel("Phone Number", new() { Exact = true }).InputValueAsync();
         Assert.Equal(user.PhoneNumber, value);
-        value = await Page.GetByLabel("Lockout Ends On").InputValueAsync();
+        value = await Page.Locator("#UserModel_LockoutEnd").First.InputValueAsync();
         Assert.Equal(user.LockoutEnd?.ToString() ?? string.Empty, value);
         value = await Page.GetByLabel("Failed Logins").InputValueAsync();
         Assert.Equal(user.AccessFailedCount, int.Parse(value));
@@ -343,7 +344,7 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         Assert.Equal(user.Surname, value);
         value = await Page.GetByLabel("Phone Number", new() { Exact = true }).InputValueAsync();
         Assert.Equal(user.PhoneNumber, value);
-        value = await Page.GetByLabel("Lockout Ends On").InputValueAsync();
+        value = await Page.Locator("#UserModel_LockoutEnd").First.InputValueAsync();
         Assert.Equal(user.LockoutEnd?.ToString() ?? string.Empty, value);
         value = await Page.GetByLabel("Failed Logins").InputValueAsync();
         Assert.Equal(user.AccessFailedCount, int.Parse(value));
@@ -363,7 +364,8 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
 
-        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{user.Email}' successfully deleted." });
+        var locator = Page.Locator("div .ac-notifications")
+            .GetByRole(AriaRole.Heading, new() { Name = $"User '{user.Email}' successfully deleted." });
         Assert.Equal(1, await locator.CountAsync());
 
         Assert.Null(await GetUserByIdAsync(user.Id));
@@ -385,7 +387,8 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         title = await Page.TitleAsync();
         Assert.Contains("Delete User", title);
 
-        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = "System accounts may not be deleted!" });
+        var locator = Page.Locator(".ac-warning-message")
+            .GetByRole(AriaRole.Heading, new() { Name = "System accounts may not be deleted!" });
         Assert.Equal(1, await locator.CountAsync());
 
         // This test fails intermittently in the CI/CD pipeline due to a race condition where 
@@ -421,5 +424,67 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
 
         var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Error: User '{user.Email}' was not found in the database." });
         Assert.Equal(1, await locator.CountAsync());
+    }
+
+    [Fact(DisplayName = "New user can log in")]
+    public async Task UserManagementTest07Async()
+    {
+        var login = new Login("Test07User@company.com", "SuperSecret07!");
+
+        await LogUserInAsync(Logins.Administrator, "/Admin/User");
+        var title = await Page.TitleAsync();
+        Assert.Contains("User Management", title);
+
+        await Page.GetByRole(AriaRole.Link, new() { Name = "Create New" }).ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Create User", title);
+
+        await Page.GetByLabel("Email").FillAsync(login.Email);
+        await Page.GetByLabel("Password", new() { Exact = true }).FillAsync(login.Password);
+        await Page.GetByLabel("Confirm password").FillAsync(login.Password);
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
+
+        title = await Page.TitleAsync();
+        Assert.Contains("User Management", title);
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{login.Email}' successfully created." });
+        Assert.Equal(1, await locator.CountAsync());
+
+        await Page.GotoAsync(HostUri);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).ClickAsync();
+
+        await LogUserInAsync(login, "/Admin");
+        title = await Page.TitleAsync();
+        Assert.Contains("Administration", title);
+    }
+
+    [Fact(DisplayName = "Create User returns validation errors for bad password")]
+    public async Task UserManagementTest08Async()
+    {
+        var login = new Login("Test08User@company.com", "bad_password");
+
+        await LogUserInAsync(Logins.Administrator, "/Admin/User");
+        var title = await Page.TitleAsync();
+        Assert.Contains("User Management", title);
+
+        await Page.GetByRole(AriaRole.Link, new() { Name = "Create New" }).ClickAsync();
+        title = await Page.TitleAsync();
+        Assert.Contains("Create User", title);
+
+        await Page.Locator("#UserModel_Email").FillAsync(login.Email);
+        await Page.GetByLabel("Password", new() { Exact = true }).FillAsync(login.Password);
+        await Page.GetByLabel("Confirm password").FillAsync(login.Password);
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
+
+        title = await Page.TitleAsync();
+        Assert.Contains("Create User", title);
+
+        var locator = Page.Locator(".validation-summary-errors")
+            .GetByRole(AriaRole.Listitem);
+        Assert.Equal(2, await locator.CountAsync());
+        var errMessages = await locator.AllInnerTextsAsync();
+        Assert.Contains(errMessages, m => m.Contains("one digit"));
+        Assert.Contains(errMessages, m => m.Contains("one upper"));
     }
 }

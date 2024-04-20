@@ -38,16 +38,16 @@ internal class CreateModel<
     /// Creates a new <see cref="CreateModel{TUser, TRole}"/> class instance using the specified parameters.
     /// </summary>
     /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
+    /// <param name="userManager">The <see cref="UserManager{TUser}"/> instance to be used for user validation.</param>
     /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
     /// <param name="logger">The <see cref="ILogger{CreateHandler}"/> instance to be used for logging.</param>
-    /// <param name="passwordHasher">The <see cref="IPasswordHasher{TUser}"/> instance to be used to hash the supplied password.</param>
     public CreateModel(
         IAuthorizationManager authManager, 
+        UserManager<TUser> userManager,
         IRepository<TUser, TRole> repository, 
-        ILogger<CreateHandler> logger, 
-        IPasswordHasher<TUser> passwordHasher)
+        ILogger<CreateHandler> logger)
     {
-        _createHandler = new CreateHandler<TUser, TRole>(authManager, repository, logger, passwordHasher, typeof(IndexModel));
+        _createHandler = new CreateHandler<TUser, TRole>(authManager, userManager, repository, logger, typeof(IndexModel));
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]

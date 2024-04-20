@@ -59,7 +59,7 @@ public class UserInfo
     public string PhoneNumber { get; set; }
 
     [Display(Name = "Lockout Ends On")]
-    [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy hh:mm:ss tt}")]
+    [DisplayFormat(DataFormatString = "{0:o}")]
     [DataType(DataType.DateTime)]
     public DateTimeOffset? LockoutEnd { get; set; }
 

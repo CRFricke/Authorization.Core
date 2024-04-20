@@ -16,7 +16,7 @@
 <form id="formEdit" method="post">
     <div class="row">
         <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
-        <div class="col-auto col-properties me-sm-5 mb-3">
+        <div class="col-auto ac-col-properties me-sm-5 mb-3">
             <h5 class="text-muted">Update the user's details:</h5>
             <hr />
             <input type="hidden" asp-for="UserModel.Id" />
@@ -24,29 +24,29 @@
             <input type="hidden" asp-for="UserModel.ConfirmPassword" />
             <input type="hidden" asp-for="UserModel.IsSystemUser" />
             <div class="form-floating">
-                <input class="form-control" asp-for="UserModel.Email" autocomplete="email" aria-required="true" />
+                <input class="form-control" asp-for="UserModel.Email" autocomplete="email" placeholder="" aria-required="true" />
                 <label class="control-label" asp-for="UserModel.Email"></label>
                 <span class="text-danger" asp-validation-for="UserModel.Email"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="UserModel.GivenName" autocomplete="given-name" />
+                <input class="form-control" asp-for="UserModel.GivenName" autocomplete="given-name" placeholder="" />
                 <label class="control-label" asp-for="UserModel.GivenName"></label>
                 <span class="text-danger" asp-validation-for="UserModel.GivenName"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="UserModel.Surname" autocomplete="family-name" />
+                <input class="form-control" asp-for="UserModel.Surname" autocomplete="family-name" placeholder="" />
                 <label class="control-label" asp-for="UserModel.Surname"></label>
                 <span class="text-danger" asp-validation-for="UserModel.Surname"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="UserModel.PhoneNumber" autocomplete="tel" />
+                <input class="form-control" asp-for="UserModel.PhoneNumber" autocomplete="tel" placeholder="" />
                 <label class="control-label" asp-for="UserModel.PhoneNumber"></label>
                 <span class="text-danger" asp-validation-for="UserModel.PhoneNumber"></span>
             </div>
             <div class="form-floating">
-                <input class="form-control" asp-for="UserModel.LockoutEnd" autocomplete="tel" />
-                <label class="control-label" asp-for="UserModel.LockoutEnd"></label>
-                <span class="text-danger" asp-validation-for="UserModel.LockoutEnd"></span>
+                <input class="form-control" asp-for="UserModel.LockoutEndUtc" placeholder="" />
+                <label class="control-label" asp-for="UserModel.LockoutEndUtc"></label>
+                <span class="text-danger" asp-validation-for="UserModel.LockoutEndUtc"></span>
             </div>
             <div class="form-check">
                 <label class="form-check-label">
@@ -66,12 +66,12 @@
                     @Html.DisplayNameFor(model => model.UserModel.LockoutEnabled)
                 </label>
             </div>
-            <div class="col-auto d-none d-sm-block align-items-center mt-3">
+            <div class="d-none d-sm-flex ac-button-footer mt-3">
                 <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
                 <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
             </div>
         </div>
-        <div class="col col-roles mb-3">
+        <div class="col ac-col-roles mb-3">
             <h5 class="text-muted text-center mb-3">Select the user's role assignments:</h5>
             <hr />
             <div class="mx-auto">
@@ -106,7 +106,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-auto d-block d-sm-none align-items-center mt-3">
+            <div class="d-flex d-sm-none ac-button-footer mt-3">
                 <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
                 <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
             </div>
