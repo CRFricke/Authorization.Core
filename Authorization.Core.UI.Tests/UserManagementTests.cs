@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
+using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
 using System;
@@ -27,6 +28,32 @@ namespace Authorization.Core.UI.Tests;
 
 public class UserManagementTests : TestsBase
 {
+    private static UserManager<ApplicationUser> CreateUserManagerMock(
+        IUserStore<ApplicationUser> userStore = null,
+        IOptions<IdentityOptions> optionsAccessor = null,
+        IPasswordHasher<ApplicationUser> passwordHasher = null,
+        IEnumerable<IUserValidator<ApplicationUser>> userValidators = null,
+        IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators = null,
+        ILookupNormalizer keyNormalizer = null,
+        IdentityErrorDescriber errors = null,
+        IServiceProvider services = null
+        )
+    {
+        var userMock = new Mock<UserManager<ApplicationUser>>(
+            userStore ?? Mock.Of<IUserStore<ApplicationUser>>(),
+            optionsAccessor,
+            passwordHasher ?? Mock.Of<IPasswordHasher<ApplicationUser>>(),
+            userValidators,
+            passwordValidators,
+            keyNormalizer ?? Mock.Of<ILookupNormalizer>(),
+            errors ?? Mock.Of<IdentityErrorDescriber>(),
+            services,
+            new FakeLogger<UserManager<ApplicationUser>>()
+            );
+
+        return userMock.Object;
+    }
+
     [Fact(DisplayName = "UserManagement page returns list of Users")]
     public async Task UserManagement_Test1Async()
     {
@@ -62,15 +89,15 @@ public class UserManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
+        var userManager = CreateUserManagerMock();
+
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
             db.Roles == roles.AsQueryable().BuildMockDbSet().Object
             );
 
-        var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
-
         var logger = new FakeLogger<CreateHandler>();
 
-        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger, passwordHasher);
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository, logger);
         _ = await model.OnGetAsync();
 
         Assert.Equal(3, model.UserModel.Roles.Count);
@@ -107,17 +134,17 @@ public class UserManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
+        var userManager = CreateUserManagerMock();
+
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
         repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { user = au; })
             .Returns((EntityEntry<ApplicationUser>)null);
 
-        var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
-
         var logger = new FakeLogger<CreateHandler>();
 
-        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository.Object, logger)
         {
             UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
             PageContext = new PageContext { HttpContext = httpContext },
@@ -158,6 +185,8 @@ public class UserManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
+        var userManager = CreateUserManagerMock();
+
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
         repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
@@ -168,7 +197,7 @@ public class UserManagementTests : TestsBase
 
         var logger = new FakeLogger<CreateHandler>();
 
-        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository.Object, logger)
         {
             UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
             PageContext = new PageContext { HttpContext = httpContext },
@@ -217,6 +246,8 @@ public class UserManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
+        var userManager = CreateUserManagerMock();
+
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
         repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
@@ -227,7 +258,7 @@ public class UserManagementTests : TestsBase
 
         var logger = new FakeLogger<CreateHandler>();
 
-        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository.Object, logger)
         {
             UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
             PageContext = new PageContext { HttpContext = httpContext },
@@ -264,6 +295,8 @@ public class UserManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
+        var userManager = CreateUserManagerMock();
+
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
         repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
@@ -274,7 +307,7 @@ public class UserManagementTests : TestsBase
 
         var logger = new FakeLogger<CreateHandler>();
 
-        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository.Object, logger, passwordHasher)
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository.Object, logger)
         {
             UserModel = new UserModel { Email = "TestUser@company.com", Password = "MyStrongPassword" },
             PageContext = new PageContext { HttpContext = httpContext },
@@ -354,7 +387,7 @@ public class UserManagementTests : TestsBase
         Assert.Equal(user.EmailConfirmed, model.UserModel.EmailConfirmed);
         Assert.Equal(user.GivenName, model.UserModel.GivenName);
         Assert.Equal(user.LockoutEnabled, model.UserModel.LockoutEnabled);
-        Assert.Equal(user.LockoutEnd, model.UserModel.LockoutEnd);
+        Assert.Equal(user.LockoutEnd, model.UserModel.LockoutEndUtc);
         Assert.Equal(user.PhoneNumber, model.UserModel.PhoneNumber);
         Assert.Equal(user.PhoneNumberConfirmed, model.UserModel.PhoneNumberConfirmed);
         Assert.Equal(user.Surname, model.UserModel.Surname);
@@ -511,7 +544,7 @@ public class UserManagementTests : TestsBase
             EmailConfirmed = true,
             GivenName = "Test",
             LockoutEnabled = true,
-            LockoutEnd = new DateTimeOffset(DateTime.Now),
+            LockoutEndUtc = new DateTimeOffset(DateTime.Now),
             PhoneNumber = "123-456-7890",
             PhoneNumberConfirmed = true,
             Surname = "User"
@@ -544,7 +577,7 @@ public class UserManagementTests : TestsBase
         Assert.Equal(userModel.EmailConfirmed, user.EmailConfirmed);
         Assert.Equal(userModel.GivenName, user.GivenName);
         Assert.Equal(userModel.LockoutEnabled, user.LockoutEnabled);
-        Assert.Equal(userModel.LockoutEnd, user.LockoutEnd);
+        Assert.Equal(userModel.LockoutEndUtc, user.LockoutEnd);
         Assert.Equal(userModel.PhoneNumber, user.PhoneNumber);
         Assert.Equal(userModel.PhoneNumberConfirmed, user.PhoneNumberConfirmed);
         Assert.Equal(userModel.Surname, user.Surname);
@@ -720,7 +753,7 @@ public class UserManagementTests : TestsBase
         Assert.Equal(user.EmailConfirmed, model.UserModel.EmailConfirmed);
         Assert.Equal(user.GivenName, model.UserModel.GivenName);
         Assert.Equal(user.LockoutEnabled, model.UserModel.LockoutEnabled);
-        Assert.Equal(user.LockoutEnd, model.UserModel.LockoutEnd);
+        Assert.Equal(user.LockoutEnd, model.UserModel.LockoutEndUtc);
         Assert.Equal(user.PhoneNumber, model.UserModel.PhoneNumber);
         Assert.Equal(user.PhoneNumberConfirmed, model.UserModel.PhoneNumberConfirmed);
         Assert.Equal(user.Surname, model.UserModel.Surname);
@@ -1266,6 +1299,8 @@ public class UserManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationUser>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Elevation(null))
             );
 
+        var userManager = CreateUserManagerMock();
+
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
             db.Roles == Enumerable.Empty<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
             );
@@ -1274,7 +1309,7 @@ public class UserManagementTests : TestsBase
 
         var logger = new FakeLogger<CreateHandler>();
 
-        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger, passwordHasher)
+        var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository, logger)
         {
             UserModel = CreateModelFromUser(user),
             PageContext = new PageContext { HttpContext = httpContext },

@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
@@ -16,9 +18,9 @@ internal class CreateHandler<
     where TRole : AuthUiRole
 {
     private readonly IAuthorizationManager _authManager;
+    private readonly UserManager<TUser> _userManager;
     private readonly IRepository<TUser, TRole> _repository;
     private readonly ILogger<CreateHandler> _logger;
-    private readonly IPasswordHasher<TUser> _passwordHasher;
     private readonly Type _notificationReceiver;
 
     /// <summary>
@@ -27,23 +29,24 @@ internal class CreateHandler<
     /// <param name="authManager">The <see cref="IAuthorizationManager"/> instance to be used for authorization.</param>
     /// <param name="repository">The <see cref="IRepository{TUser, TRole}"/> instance to be used for database access.</param>
     /// <param name="logger">The <see cref="ILogger{CreateHandler}"/> instance to be used for logging.</param>
-    /// <param name="passwordHasher">The <see cref="IPasswordHasher{TUser}"/> instance to be used to hash the supplied password.</param>
+    /// <param name="userManager">The <see cref="UserManager{TUser}"/> instance to be used for user validation.</param>
     /// <param name="notificationReceiver">The <see cref="Type"/> of the Razor page to receive notification messages.</param>
     /// <exception cref="ArgumentNullException">
     /// Thrown if any of the constructor's parameters are <see langword="null"/>.
     /// </exception>
     public CreateHandler(
-        IAuthorizationManager authManager, 
-        IRepository<TUser, TRole> repository, 
-        ILogger<CreateHandler> logger, 
-        IPasswordHasher<TUser> passwordHasher, 
+        IAuthorizationManager authManager,
+        UserManager<TUser> userManager,
+        IRepository<TUser, TRole> repository,
+        ILogger<CreateHandler> logger,
         Type notificationReceiver)
     {
         _authManager = authManager ?? throw new ArgumentNullException(nameof(authManager));
+        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         _notificationReceiver = notificationReceiver ?? throw new ArgumentNullException(nameof(notificationReceiver));
+
     }
 
 
@@ -98,7 +101,18 @@ internal class CreateHandler<
             return modelBase.Page();
         }
 
-        _passwordHasher.HashPassword(user, userModel.Password);
+        var identityResult = await ValidPasswordAsync(user, userModel.Password);
+        if (!identityResult.Succeeded)
+        {
+            foreach (var error in identityResult.Errors)
+            {
+                modelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return modelBase.Page();
+        }
+
+        user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, userModel.Password);
 
         try
         {
@@ -129,6 +143,42 @@ internal class CreateHandler<
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);
+    }
+
+    private async Task<IdentityResult> ValidPasswordAsync(TUser user, string password)
+    {
+        List<IdentityError> errors = null;
+        bool isValid = true;
+        foreach (var passwordValidator in _userManager.PasswordValidators)
+        {
+            IdentityResult identityResult = await passwordValidator.ValidateAsync(_userManager, user, password).ConfigureAwait(continueOnCapturedContext: false);
+            if (identityResult.Succeeded)
+            {
+                continue;
+            }
+
+            if (identityResult.Errors.Any())
+            {
+                if (errors == null)
+                {
+                    errors = [];
+                }
+                errors.AddRange(identityResult.Errors);
+            }
+
+            isValid = false;
+        }
+
+        if (!isValid)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("User password validation failed: {errors}.", string.Join(";", errors?.Select((IdentityError e) => e.Code) ?? []));
+            }
+            return IdentityResult.Failed([.. errors]);
+        }
+
+        return IdentityResult.Success;
     }
 }
 
