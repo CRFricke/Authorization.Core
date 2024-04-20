@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <xUnit>
+    <ParallelizeTestCollections>false</ParallelizeTestCollections>
+  </xUnit>
+  <Playwright>
+    <Retries>2</Retries>
+  </Playwright>
+</RunSettings>

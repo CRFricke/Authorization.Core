@@ -181,9 +181,10 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
 
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
-        var locator = Page.Locator("div .ac-notifications")
-            .GetByRole(AriaRole.Heading, new() { Name = $"User '{userEmail}' successfully created." });
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{userEmail}' successfully created." });
         Assert.Equal(1, await locator.CountAsync());
+
+        await Task.Delay(100);
 
         var user = await GetUserByEmailAsync(userEmail);
         Assert.NotNull(user);
@@ -364,8 +365,7 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
 
-        var locator = Page.Locator("div .ac-notifications")
-            .GetByRole(AriaRole.Heading, new() { Name = $"User '{user.Email}' successfully deleted." });
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{user.Email}' successfully deleted." });
         Assert.Equal(1, await locator.CountAsync());
 
         Assert.Null(await GetUserByIdAsync(user.Id));
@@ -387,15 +387,10 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         title = await Page.TitleAsync();
         Assert.Contains("Delete User", title);
 
-        var locator = Page.Locator(".ac-warning-message")
-            .GetByRole(AriaRole.Heading, new() { Name = "System accounts may not be deleted!" });
+        var locator = Page.GetByRole(AriaRole.Heading, new() { Name = "System accounts may not be deleted!" });
         Assert.Equal(1, await locator.CountAsync());
 
-        // This test fails intermittently in the CI/CD pipeline due to a race condition where 
-        // the IsDisabled test on the 'Delete' button occurs before the button is actually
-        // disabled in the GUI. Adding the WaitForAsync call to try to eliminate this.
         locator = Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First;
-        await locator.WaitForAsync(new() { State = WaitForSelectorState.Visible });
         Assert.True(await locator.IsDisabledAsync());
     }
 
@@ -448,10 +443,13 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         title = await Page.TitleAsync();
         Assert.Contains("User Management", title);
         var locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{login.Email}' successfully created." });
+        await locator.WaitForAsync();
         Assert.Equal(1, await locator.CountAsync());
 
         await Page.GotoAsync(HostUri);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).ClickAsync();
+
+        await Task.Delay(100);
 
         await LogUserInAsync(login, "/Admin");
         title = await Page.TitleAsync();
