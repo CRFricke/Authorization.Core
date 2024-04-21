@@ -302,6 +302,8 @@ public class UserManagementTests : PageTest, IClassFixture<PlaywrightTestFixture
         locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"User '{user.Email}' successfully updated." });
         Assert.NotNull(locator);
 
+        await Task.Delay(100);
+
         var dbUser = await GetUserByIdAsync(user.Id);
         Assert.NotNull(dbUser);
         Assert.Equal(user.Email, dbUser.Email);

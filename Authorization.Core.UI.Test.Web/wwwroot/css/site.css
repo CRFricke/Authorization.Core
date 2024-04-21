@@ -81,13 +81,3 @@ h1, h2, h3 {
 .form-floating > .se-textarea-tall {
     height: 15rem;
 }
-
-a .ac-icon-button > svg {
-    color: var(--bs-link-color);
-    opacity: .5;
-}
-
-a .ac-icon-button > svg:hover {
-    color: var(--bs-link-hover-color);
-    opacity: 1;
-}
