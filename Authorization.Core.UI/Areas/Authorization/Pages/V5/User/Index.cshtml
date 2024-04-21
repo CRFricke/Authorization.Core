@@ -9,7 +9,7 @@
     var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Update)) ? "" : "disabled";
 }
 
-<partial name="_ButtonSvgs" />
+@* <partial name="_ButtonSvgs" /> *@
 <div class="row align-items-center">
     <div class="col-lg-4">
         <h2>@ViewData["Title"]</h2>
@@ -66,15 +66,12 @@
                             @Html.DisplayFor(modelItem => item.AccessFailedCount)
                         </td>
                         <td>
-                            <a class="ac-icon-button @classEdit" asp-page="./Edit" asp-route-id="@item.Id" title="Edit">
-                                <svg><use href="#pencil-square"></use></svg>
-                            </a>
-                            <a class="ac-icon-button @classDetails" asp-page="./Details" asp-route-id="@item.Id" title="View">
-                                <svg><use href="#binoculars"></use></svg>
-                            </a>
-                            <a class="ac-icon-button @classDelete" asp-page="./Delete" asp-route-id="@item.Id" title="Delete">
-                                <svg><use href="#trash"></use></svg>
-                            </a>
+                            <a class="bi bi-pencil-square ac-icon-button @classEdit" 
+                                asp-page="./Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit" />
+                            <a class="bi bi-binoculars ac-icon-button @classDetails"
+                               asp-page="./Details" asp-route-id="@item.Id" title="View" aria-label="View" />
+                            <a class="bi bi-trash ac-icon-button @classDelete"
+                               asp-page="./Delete" asp-route-id="@item.Id" title="Delete" aria-label="Delete" />
                         </td>
                     </tr>
                 }
