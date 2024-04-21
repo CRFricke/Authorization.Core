@@ -159,7 +159,7 @@ public partial class RoleManagementTests : PageTest, IClassFixture<PlaywrightTes
 
         await Page.GetByLabel("Name").FillAsync(roleName);
         await Page.GetByLabel("Description").FillAsync("Test Role");
-        await Page.Locator(".dataTables_filter input").First.FillAsync("List");
+        await Page.GetByLabel("Search:").FillAsync("List");
         await Page.GetByRole(AriaRole.Row, new() { Name = "Bulletin.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
         await Page.GetByRole(AriaRole.Row, new() { Name = "Calendar.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
         await Page.GetByRole(AriaRole.Row, new() { Name = "Document.List" }).GetByRole(AriaRole.Checkbox).CheckAsync();
