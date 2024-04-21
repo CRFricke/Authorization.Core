@@ -39,15 +39,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\assets\icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Areas\Authorization\Pages\V5\Role\*.cshtml.css" CssScope="b-role-mgmt" />
     <None Update="Areas\Authorization\Pages\V5\User\*.cshtml.css" CssScope="b-user-mgmt" />
+    <None Include="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
+    <None Include="..\assets\icon.png" Pack="True" PackagePath="\" />
+    <None Include="libman.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,6 +71,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
+    <Content Remove="libman.json" />
     <Content Update="**\*.cshtml" Pack="false" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
     <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
