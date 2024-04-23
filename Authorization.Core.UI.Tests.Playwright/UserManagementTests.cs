@@ -187,7 +187,7 @@ internal class UserManagementTests : PageTest
         await locator.FillAsync(user.PhoneNumber);
 
         locator = Page.GetByLabel("Lockout Ends On (UTC)");
-        await Expect(locator).ToHaveValueAsync($"{user.LockoutEnd:yyyy-MM-dd}T{user.LockoutEnd:HH:mm:ss.fff}");
+        await Expect(locator).ToHaveValueAsync($"{user.LockoutEnd!.Value.ToString("yyyy-MM-ddTHH:mm:ss.fff").TrimEnd('0')}");
         user.LockoutEnd = null;
         await locator.FillAsync(string.Empty);
 
