@@ -199,78 +199,78 @@ namespace Authorization.Core.UI.Tests.Integration
         }
 
 
-        public static IEnumerable<object[]> Test01Data => new List<object[]>
+        public static TheoryData<string, bool> Test01Data => new()
         {
-            new object[] { "/Admin/Role", false },
-            new object[] { "/Admin/Role/Create", false },
-            new object[] { "/Admin/Role/Delete", true },
-            new object[] { "/Admin/Role/Details", true },
-            new object[] { "/Admin/Role/Edit", true },
-            new object[] { "/Admin/Role/Index", false },
-            new object[] { "/Admin/User", false },
-            new object[] { "/Admin/User/Create", false },
-            new object[] { "/Admin/User/Delete", true },
-            new object[] { "/Admin/User/Details", true },
-            new object[] { "/Admin/User/Edit", true },
-            new object[] { "/Admin/User/Index", false }
+            { "/Admin/Role", false },
+            { "/Admin/Role/Create", false },
+            { "/Admin/Role/Delete", true },
+            { "/Admin/Role/Details", true },
+            { "/Admin/Role/Edit", true },
+            { "/Admin/Role/Index", false },
+            { "/Admin/User", false },
+            { "/Admin/User/Create", false },
+            { "/Admin/User/Delete", true },
+            { "/Admin/User/Details", true },
+            { "/Admin/User/Edit", true },
+            { "/Admin/User/Index", false }
         };
 
-        public static IEnumerable<object[]> Test03Data => new List<object[]>
+        public static TheoryData<string, bool> Test03Data => new()
         {
-            new object[] { "/Authorization/Role", false },
-            new object[] { "/Authorization/Role/Create", false },
-            new object[] { "/Authorization/Role/Delete", true },
-            new object[] { "/Authorization/Role/Details", true },
-            new object[] { "/Authorization/Role/Edit", true },
-            new object[] { "/Authorization/Role/Index", false },
-            new object[] { "/Authorization/User", false },
-            new object[] { "/Authorization/User/Create", false },
-            new object[] { "/Authorization/User/Delete", true },
-            new object[] { "/Authorization/User/Details", true },
-            new object[] { "/Authorization/User/Edit", true },
-            new object[] { "/Authorization/User/Index", false }
+            { "/Authorization/Role", false },
+            { "/Authorization/Role/Create", false },
+            { "/Authorization/Role/Delete", true },
+            { "/Authorization/Role/Details", true },
+            { "/Authorization/Role/Edit", true },
+            { "/Authorization/Role/Index", false },
+            { "/Authorization/User", false },
+            { "/Authorization/User/Create", false },
+            { "/Authorization/User/Delete", true },
+            { "/Authorization/User/Details", true },
+            { "/Authorization/User/Edit", true },
+            { "/Authorization/User/Index", false }
         };
 
-        public static IEnumerable<object[]> Test04Data => new List<object[]>
+        public static TheoryData<string> Test04Data => new()
         {
-            new object[] { "/Admin/Role" },
-            new object[] { "/Admin/Role/Create" },
-            new object[] { "/Admin/Role/Delete" },
-            new object[] { "/Admin/Role/Details" },
-            new object[] { "/Admin/Role/Edit" },
-            new object[] { "/Admin/Role/Index" },
-            new object[] { "/Admin/User" },
-            new object[] { "/Admin/User/Create" },
-            new object[] { "/Admin/User/Delete" },
-            new object[] { "/Admin/User/Details" },
-            new object[] { "/Admin/User/Edit" },
-            new object[] { "/Admin/User/Index" }
+            { "/Admin/Role" },
+            { "/Admin/Role/Create" },
+            { "/Admin/Role/Delete" },
+            { "/Admin/Role/Details" },
+            { "/Admin/Role/Edit" },
+            { "/Admin/Role/Index" },
+            { "/Admin/User" },
+            { "/Admin/User/Create" },
+            { "/Admin/User/Delete" },
+            { "/Admin/User/Details" },
+            { "/Admin/User/Edit" },
+            { "/Admin/User/Index" }
         };
 
-        public static IEnumerable<object[]> Test05Data => new List<object[]>
+        public static TheoryData<string, string, bool> Test05Data => new()
         {
-            new object[] { "/Admin/Role", SysClaims.Role.List, false },
-            new object[] { "/Admin/Role/Create", SysClaims.Role.Create, false },
-            new object[] { "/Admin/Role/Delete", SysClaims.Role.Delete, true },
-            new object[] { "/Admin/Role/Details", SysClaims.Role.Read, true },
-            new object[] { "/Admin/Role/Edit", SysClaims.Role.Update, true },
-            new object[] { "/Admin/Role/Index", SysClaims.Role.List, false },
-            new object[] { "/Admin/User", SysClaims.User.List, false },
-            new object[] { "/Admin/User/Create", SysClaims.User.Create, false },
-            new object[] { "/Admin/User/Delete", SysClaims.User.Delete, true },
-            new object[] { "/Admin/User/Details", SysClaims.User.Read, true },
-            new object[] { "/Admin/User/Edit", SysClaims.User.Update, true },
-            new object[] { "/Admin/User/Index", SysClaims.User.List, false }
+            { "/Admin/Role", SysClaims.Role.List, false },
+            { "/Admin/Role/Create", SysClaims.Role.Create, false },
+            { "/Admin/Role/Delete", SysClaims.Role.Delete, true },
+            { "/Admin/Role/Details", SysClaims.Role.Read, true },
+            { "/Admin/Role/Edit", SysClaims.Role.Update, true },
+            { "/Admin/Role/Index", SysClaims.Role.List, false },
+            { "/Admin/User", SysClaims.User.List, false },
+            { "/Admin/User/Create", SysClaims.User.Create, false },
+            { "/Admin/User/Delete", SysClaims.User.Delete, true },
+            { "/Admin/User/Details", SysClaims.User.Read, true },
+            { "/Admin/User/Edit", SysClaims.User.Update, true },
+            { "/Admin/User/Index", SysClaims.User.List, false }
         };
 
-        public static IEnumerable<object[]> Test06Data => new List<object[]>
+        public static TheoryData<string> Test06Data => new()
         {
-            new object[] { "/Admin/Role/Delete" },
-            new object[] { "/Admin/Role/Details" },
-            new object[] { "/Admin/Role/Edit" },
-            new object[] { "/Admin/User/Delete" },
-            new object[] { "/Admin/User/Details" },
-            new object[] { "/Admin/User/Edit" }
+            { "/Admin/Role/Delete" },
+            { "/Admin/Role/Details" },
+            { "/Admin/Role/Edit" },
+            { "/Admin/User/Delete" },
+            { "/Admin/User/Details" },
+            { "/Admin/User/Edit" }
         };
     }
 }
