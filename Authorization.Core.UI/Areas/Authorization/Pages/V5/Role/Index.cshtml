@@ -8,7 +8,6 @@
     var classDetails = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Read)) ? "" : "disabled";
     var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? "" : "disabled";
 }
-<partial name="_ButtonSvgs" />
 <div class="row align-items-center">
     <div class="col-lg-4">
         <h2>@ViewData["Title"]</h2>
@@ -19,7 +18,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-10 mx-sm-3">
+    <div class="col-lg-11 col-xxl-8 mx-sm-3 pe-sm-4">
         <p>
             <a class="@classCreate" asp-page="Create">Create New</a>
         </p>
