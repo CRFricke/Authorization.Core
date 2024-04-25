@@ -22,7 +22,7 @@
         <p>
             <a class="@classCreate" asp-page="Create">Create New</a>
         </p>
-        <table class="table table-sm w-100">
+        <table class="table table-sm opacity-0" style="width:98%">
             <thead>
                 <tr>
                     <th>
@@ -62,6 +62,12 @@
 @section scripts {
 
     <script defer>
-        $('table').DataTable();
+        var $table = $('table');
+
+        $table.DataTable({
+            initComplete: function (settings, json) {
+                $table.removeClass('opacity-0');
+            }
+        });
     </script>
 }
