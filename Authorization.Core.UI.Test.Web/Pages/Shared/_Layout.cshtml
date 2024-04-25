@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Authorization.Core.UI.Test.Web</title>
+    <title>@ViewData["Title"] - Authorization.Core.Test.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/theme-picker.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -16,15 +16,15 @@
 <body>
     <partial name="_ThemePickerSvgs" />
     <header>
-        <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
+        <nav class="navbar fixed-top navbar-expand-lg navbar-toggleable-lg border-bottom box-shadow mb-3">
             <div class="container-fluid align-items-center">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Authorization.Core.UI.Test.Web</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Authorization.Core.Test.Web</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
                         </li>
@@ -36,9 +36,7 @@
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
-                    <ul class="navbar-nav">
-                        <partial name="_ThemePickerPartial" />
-                    </ul>
+                    <partial name="_ThemePickerPartial" />
                 </div>
             </div>
         </nav>
@@ -51,7 +49,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container-fluid">
-            &copy; @DateTime.Now.Year - Authorization.Core.UI.Test.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year - Authorization.Core.Test.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
 
