@@ -1,4 +1,8 @@
-﻿.ac-button-footer {
+﻿.ac-hide-lastpass ~ div[data-lastpass-icon-root] {
+    display: none;
+}
+
+.ac-button-footer {
     align-items: center !important;
     column-gap: 1rem !important;
     justify-content: center !important;
@@ -6,10 +10,6 @@
 
 .ac-button-footer .btn {
     min-width: 4.5rem;
-}
-
-.ac-hide-lastpass ~ div[data-lastpass-icon-root] {
-    display: none;
 }
 
 .ac-icon-button {
@@ -20,4 +20,95 @@
 
 .ac-icon-button::before {
     vertical-align: baseline;
+}
+
+.form-floating > .ac-textarea-tall {
+    height: 10rem;
+}
+
+.ac-role-properties {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.ac-role-claims {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+ac-role-users {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.ac-user-properties {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.ac-user-roles {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+@media (min-width: 576px) {
+    .ac-role-properties {
+        width: 50%;
+    }
+
+    .ac-role-claims {
+        width: 45%;
+    }
+
+    .ac-role-users {
+        width: 47%;
+    }
+
+    .ac-user-properties {
+        width: 40%;
+    }
+
+    .ac-user-roles {
+        width: 55%;
+    }
+}
+
+@media (min-width: 768px) {
+    .ac-role-properties {
+        width: 50%;
+    }
+
+    .ac-role-claims {
+        width: 42%;
+    }
+
+    .ac-role-users {
+        width: 47%;
+    }
+
+    .ac-user-properties {
+        width: 38%;
+    }
+}
+
+@media (min-width: 992px) {
+    .ac-role-properties {
+        width: 30rem;
+    }
+
+    .ac-role-claims {
+        width: 30rem;
+    }
+
+    .ac-role-users {
+        width: 30rem;
+    }
+
+    .ac-user-properties {
+        width: 24rem;
+    }
+
+    .ac-user-roles {
+        width: 37rem;
+    }
 }

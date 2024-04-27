@@ -7,8 +7,8 @@
     var checkboxDisabled = (Model.UserModel.IsSystemUser) ? "disabled" : "";
 }
 
-<div class="row">
-    <div class="col">
+<div class="row align-items-center">
+    <div class="col-sm-4 text-center text-sm-start">
         <h3>@ViewData["Title"]</h3>
         <hr />
     </div>
@@ -16,7 +16,7 @@
 <form id="formEdit" method="post">
     <div class="row">
         <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
-        <div class="col-auto ac-col-properties me-sm-5 mb-3">
+        <div class="ac-user-properties me-sm-3 mb-3">
             <h5 class="text-muted">Update the user's details:</h5>
             <hr />
             <input type="hidden" asp-for="UserModel.Id" />
@@ -71,11 +71,11 @@
                 <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
             </div>
         </div>
-        <div class="col ac-col-roles mb-3">
-            <h5 class="text-muted text-center mb-3">Select the user's role assignments:</h5>
+        <div class="ac-user-roles">
+            <h5 class="text-muted text-sm-center mb-3">Select the user's role assignments:</h5>
             <hr />
             <div class="mx-auto">
-                <table class="table table-sm" data-order='[[1,"asc"]]'>
+                <table class="table table-sm w-100" data-order='[[1,"asc"]]'>
                     <thead>
                         <tr>
                             <th id="thSelect" class="col-auto" data-orderable="false">
@@ -106,7 +106,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex d-sm-none ac-button-footer mt-3">
+            <div class="d-flex d-sm-none border-top ac-button-footer mt-4 pt-3">
                 <input class="btn btn-primary" id="btnSave" type="submit" value="Save" />
                 <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
             </div>

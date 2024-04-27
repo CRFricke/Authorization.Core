@@ -5,7 +5,7 @@
 }
 
 <div class="row">
-    <div class="col">
+    <div class="col-sm-4 text-center text-sm-start">
         <h2>@ViewData["Title"]</h2>
         <hr />
     </div>
@@ -13,7 +13,7 @@
 <form id="formCreate" method="post">
     <div class="row">
         <div asp-validation-summary="ModelOnly" class="col-12 text-danger"></div>
-        <div class="col ac-col-properties me-sm-5 mb-3">
+        <div class="ac-role-properties me-sm-3 mb-3">
             <h5 class="text-muted">Enter the role's details:</h5>
             <hr />
             <div class="form-floating">
@@ -32,11 +32,11 @@
                 <a class="btn btn-secondary" asp-page="Index">Cancel</a>
             </div>
         </div>
-        <div class="col ac-col-claims">
-            <h5 class="text-muted text-center mb-3">Select the role's claim assignments:</h5>
+        <div class="ac-role-claims">
+            <h5 class="text-muted text-sm-center mb-3">Select the role's claim assignments:</h5>
             <hr />
             <div class="mx-auto">
-                <table class="table table-sm" data-order='[[1,"asc"]]'>
+                <table class="table table-sm w-100" data-order='[[1,"asc"]]'>
                     <thead>
                         <tr>
                             <th id="thSelect" class="col-auto" data-orderable="false">
@@ -63,7 +63,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex d-sm-none ac-button-footer mt-3">
+            <div class="d-flex d-sm-none border-top ac-button-footer mt-4 pt-3">
                 <input class="btn btn-primary" id="btnCreate" type="submit" value="Create" />
                 <a class="btn btn-secondary" asp-page="Index">Cancel</a>
             </div>
