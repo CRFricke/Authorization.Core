@@ -9,7 +9,7 @@
     var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? "" : "disabled";
 }
 <div class="row align-items-center">
-    <div class="col-lg-4">
+    <div class="col-sm-4 text-center text-sm-start">
         <h2>@ViewData["Title"]</h2>
     </div>
     <partial name="_NotificationPartial" />
@@ -22,7 +22,7 @@
         <p>
             <a class="@classCreate" asp-page="Create">Create New</a>
         </p>
-        <table class="table table-sm w-100 opacity-0" style="width:95%">
+        <table class="table table-sm w-100 opacity-0">
             <thead>
                 <tr>
                     <th>

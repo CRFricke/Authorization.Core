@@ -7,14 +7,14 @@
     var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Update)) ? "" : "disabled";
 }
 
-<div class="row">
-    <div class="col">
+<div class="row align-items-center">
+    <div class="col-sm-4 text-center text-sm-start">
         <h3>@ViewData["Title"]</h3>
         <hr />
     </div>
 </div>
-<div class="row mx-sm-1">
-    <div class="col-auto ac-col-properties me-sm-5 mb-3">
+<div class="row">
+    <div class="ac-user-properties me-sm-3 mb-3">
         <h5 class="text-muted">The user's properties:</h5>
         <hr />
         <div class="form-floating">
@@ -71,11 +71,11 @@
             <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
         </div>
     </div>
-    <div class="col ac-col-roles mb-3">
-        <h5 class="text-center text-muted mb-3">The user's role assignments:</h5>
+    <div class="ac-user-roles">
+        <h5 class="text-sm-center text-muted mb-3">The user's role assignments:</h5>
         <hr />
         <div class="mx-auto">
-            <table class="table table-sm" data-order='[[1,"asc"]]'>
+            <table class="table table-sm w-100" data-order='[[1,"asc"]]'>
                 <thead>
                     <tr>
                         <th class="select-col" data-orderable="false">
@@ -106,7 +106,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="d-flex d-sm-none ac-button-footer mt-3">
+        <div class="d-flex d-sm-none border-top ac-button-footer mt-4 pt-3">
             <a class="btn btn-primary @classEdit" asp-page="./Edit" asp-route-id="@Model.UserModel.Id">Edit</a>
             <a class="btn btn-secondary" asp-page="./Index">Cancel</a>
         </div>
