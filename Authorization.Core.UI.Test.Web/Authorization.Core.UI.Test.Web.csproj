@@ -36,46 +36,20 @@
     <_CoreUiPackageName>CRFricke.$(_CoreUiProjectName)</_CoreUiPackageName>
     <_SolutionDirectory>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</_SolutionDirectory>
     <_CoreUiProjectPath>$(_SolutionDirectory)\$(_CoreUiProjectName)</_CoreUiProjectPath>
-    <_CoreUiProjectBundleName>$(_CoreUiPackageName).bundle.scp.css</_CoreUiProjectBundleName>
   </PropertyGroup>
 
-  <Target Name="CopyCoreUiAssets">
+  <Target Name="CopyCoreUiAssets" AfterTargets="PostBuildEvent">
 
     <PropertyGroup>
       <_CoreUiContentPath>$(MSBuildThisFileDirectory)wwwroot\_content\$(_CoreUiPackageName)</_CoreUiContentPath>
-      <_CoreUiCssBundlePath>$(_CoreUiProjectPath)\$(IntermediateOutputPath)scopedcss\projectbundle\$(_CoreUiProjectBundleName)</_CoreUiCssBundlePath>
     </PropertyGroup>
 
     <ItemGroup>
       <_AssetItems Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'" Include="$(_CoreUiProjectPath)\assets\BS4\**" />
       <_AssetItems Condition="'$(IdentityDefaultUIFramework)' != 'Bootstrap4'" Include="$(_CoreUiProjectPath)\assets\BS5\**" />
-      <_AssetItems Include="$(_CoreUiCssBundlePath)" />
     </ItemGroup>
 
     <Copy SourceFiles="@(_AssetItems)" DestinationFiles="$(_CoreUiContentPath)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    
-  </Target>
-
-  <!--
-    Now we need to add/fixup the @import statement at the beginning of this project's scoped CSS bundle.
-  -->
-
-  <Target Name="FixupScopedCssBundle" DependsOnTargets="CopyCoreUiAssets" AfterTargets="PostBuildEvent">
-
-    <PropertyGroup>
-      <_SearchText>_content/$(MSBuildProjectName)/_content</_SearchText>
-      <_ReplaceText>_content</_ReplaceText>
-      <_BundlePath>$(MSBuildThisFileDirectory)$(IntermediateOutputPath)scopedcss\bundle\$(MSBuildProjectName).styles.css</_BundlePath>
-      <_BundleText>$([System.IO.File]::ReadAllText($(_BundlePath)).Replace($(_SearchText), $(_ReplaceText)))</_BundleText>
-      <_ImportStatement>@import '_content/$(_CoreUiPackageName)/$(_CoreUiProjectBundleName)'%3B</_ImportStatement>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <_BundleLines Condition="$(_BundleText.StartsWith(&quot;@import&quot;)) == false" Include="$(_ImportStatement)" />
-      <_BundleLines Include="$(_BundleText)" />
-    </ItemGroup>
-
-    <WriteLinesToFile File="$(_BundlePath)" Lines="@(_BundleLines)" Overwrite="true" />
 
   </Target>
 
