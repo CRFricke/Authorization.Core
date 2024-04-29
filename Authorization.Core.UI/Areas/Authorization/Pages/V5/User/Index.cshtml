@@ -25,7 +25,7 @@
         <table class="table table-sm w-100 opacity-0">
             <thead>
                 <tr>
-                    <th>
+                    <th data-priority="1">
                         @Html.DisplayNameFor(model => model.UserInfo[0].Email)
                     </th>
                     <th>
@@ -40,7 +40,7 @@
                     <th>
                         @Html.Raw(Html.DisplayNameFor(model => model.UserInfo[0].AccessFailedCount))
                     </th>
-                    <th data-orderable="false"></th>
+                    <th data-priority="1" data-orderable="false"></th>
                 </tr>
             </thead>
             <tbody>
@@ -82,17 +82,32 @@
     <script defer>
         var $table = $('table');
 
-        $table.DataTable({
-            initComplete: function (settings, json) {
-                $table.removeClass('opacity-0');
-            },
-            columnDefs: [
-                {
-                    target: 3,
-                    render: DataTable.render.datetime('MM/dd/yyyy hh:mm:ss a'),
-                    type: 'date'
-                }
-            ]
-        });
+        function initDataTable() {
+            return $table.DataTable({
+                initComplete: function (settings, json) {
+                    $table.removeClass('opacity-0');
+                },
+                responsive: {
+                    details: {
+                        type: 'none'
+                    }
+                },
+                columnDefs: [
+                    {
+                        target: 3,
+                        render: DataTable.render.datetime('MM/dd/yyyy hh:mm:ss a'),
+                        type: 'date'
+                    }
+                ]
+            });
+        }
+
+        var dataTable = initDataTable();
+
+        screen.orientation.addEventListener("change", (event) => {
+            $table.addClass('opacity-0');
+            dataTable.destroy();
+            dataTable = initDataTable();
+        })
     </script>
 }
