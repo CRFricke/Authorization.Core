@@ -61,7 +61,7 @@ public partial class RoleManagementTests : PageTest
         var role = new ApplicationRole
         {
             Name = "Test01Role", Description = "Test Role"
-        }.SetClaims("Bulletin.List", "Calendar.List", "Document.List", "News.List", "Role.List", "User.List");
+        }.SetClaims("Calendar.List", "Document.List", "Role.List", "User.List");
 
         await Page.GetByLabel("Name").FillAsync(role.Name!);
         await Page.GetByLabel("Description").FillAsync(role.Description);
@@ -134,7 +134,7 @@ public partial class RoleManagementTests : PageTest
         {
             Name = "Test03Role",
             Description = "Can list and view news items."
-        }.SetClaims(AppClaims.News.List, AppClaims.News.Read);
+        }.SetClaims(AppClaims.Calendar.List, AppClaims.Calendar.Read);
         await _webAppFactory.EnsureRoleAsync(role);
 
         await Page.LogUserInAsync(Logins.Administrator, "/Admin/Role");
@@ -158,23 +158,23 @@ public partial class RoleManagementTests : PageTest
         role.Description = "Can create, delete, list, read, and update news items.";
         await locator.FillAsync(role.Description);
 
-        await Page.GetByLabel("Search:").FillAsync("News");
+        await Page.GetByLabel("Search:").FillAsync("Calendar");
 
-        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.List }).GetByRole(AriaRole.Checkbox);
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.Calendar.List }).GetByRole(AriaRole.Checkbox);
         await Expect(locator).ToBeCheckedAsync();
 
-        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Read }).GetByRole(AriaRole.Checkbox);
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.Calendar.Read }).GetByRole(AriaRole.Checkbox);
         await Expect(locator).ToBeCheckedAsync();
 
-        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Create }).GetByRole(AriaRole.Checkbox);
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.Calendar.Create }).GetByRole(AriaRole.Checkbox);
         await Expect(locator).Not.ToBeCheckedAsync();
         await locator.CheckAsync();
 
-        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Delete }).GetByRole(AriaRole.Checkbox);
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.Calendar.Delete }).GetByRole(AriaRole.Checkbox);
         await Expect(locator).Not.ToBeCheckedAsync();
         await locator.CheckAsync();
 
-        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.News.Update }).GetByRole(AriaRole.Checkbox);
+        locator = Page.GetByRole(AriaRole.Row, new() { Name = AppClaims.Calendar.Update }).GetByRole(AriaRole.Checkbox);
         await Expect(locator).Not.ToBeCheckedAsync();
         await locator.CheckAsync();
 
@@ -184,7 +184,7 @@ public partial class RoleManagementTests : PageTest
         locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' was successfully updated." });
         Assert.That(locator, Is.Not.Null);
 
-        role.SetClaims(AppClaims.News.DefinedClaims);
+        role.SetClaims(AppClaims.Calendar.DefinedClaims);
 
         var dbRole = await _webAppFactory.GetRoleByIdAsync(role.Id);
         Assert.That(dbRole, Is.Not.Null);

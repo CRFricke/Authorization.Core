@@ -6,14 +6,14 @@
       "library": "bootstrap@5.3.3",
       "destination": "assets/BS5/lib/bootstrap/",
       "files": [
-        "js/bootstrap.min.js",
-        "js/bootstrap.js",
-        "js/bootstrap.js.map",
-        "js/bootstrap.min.js.map",
         "css/bootstrap.css",
         "css/bootstrap.css.map",
         "css/bootstrap.min.css",
-        "css/bootstrap.min.css.map"
+        "css/bootstrap.min.css.map",
+        "js/bootstrap.bundle.js",
+        "js/bootstrap.bundle.js.map",
+        "js/bootstrap.bundle.min.js",
+        "js/bootstrap.bundle.min.js.map"
       ]
     },
     {
