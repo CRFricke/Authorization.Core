@@ -24,7 +24,7 @@ namespace CRFricke.Authorization.Core
     /// <typeparam name="TRole">The <see cref="Type"/> of role objects. The Type must be or extend from <see cref="AuthRole"/>.</typeparam>
     public sealed class AuthorizationManager<
         [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TUser,
-        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole> : IAuthorizationManager
+        [DynamicallyAccessedMembers(IRepository.DynamicallyAccessedMemberTypes)] TRole> : IAuthorizationManager, IAuthorizationServices
         where TUser : AuthUser
         where TRole : AuthRole
     {
@@ -37,12 +37,14 @@ namespace CRFricke.Authorization.Core
             Assembly thisAssembly = typeof(AuthorizationManager<TUser, TRole>).Assembly;
             string assemblyName = thisAssembly.GetName().Name!;
 
-            List<Assembly> assemblies = new() { thisAssembly };
-            assemblies.AddRange(
-                AppDomain.CurrentDomain.GetAssemblies()
+            List<Assembly> assemblies =
+            [
+                thisAssembly,
+                .. AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)   // Ignore Mocked assemblies during testing (GetExportedTypes() throws exception)
                     .Where(a => a.GetReferencedAssemblies().Any(an => an.Name == assemblyName))
-                );
+,
+            ];
 
             LoadSystemClaims(assemblies);
             LoadSystemGuids(assemblies);
@@ -55,7 +57,7 @@ namespace CRFricke.Authorization.Core
         [RequiresUnreferencedCode("Types that implement IDefinesClaims might be removed if application is trimmed.")]
         private static void LoadSystemClaims(List<Assembly> assemblies)
         {
-            List<IDefinesClaims> claimClasses = new();
+            List<IDefinesClaims> claimClasses = [];
 
             // Load all classes that implement IDefinesClaims interface.
             foreach (Assembly assembly in assemblies)
@@ -90,7 +92,7 @@ namespace CRFricke.Authorization.Core
         [RequiresUnreferencedCode("Types that implement IDefinesGuids might be removed if application is trimmed.")]
         private static void LoadSystemGuids(List<Assembly> assemblies)
         {
-            List<IDefinesGuids> guidClasses = new();
+            List<IDefinesGuids> guidClasses = [];
 
             // Load all classes that implement IDefinesGuids interface.
             foreach (Assembly assembly in assemblies)
@@ -113,17 +115,17 @@ namespace CRFricke.Authorization.Core
         /// <summary>
         /// Contains the Claims that are restricted by the application.
         /// </summary>
-        private static List<string> RestrictedClaims { get; } = new List<string>();
+        private static List<string> RestrictedClaims { get; } = [];
 
         /// <summary>
         /// Contains the application Claims installed by the application.
         /// </summary>
-        private static List<string> DefinedClaims { get; } = new List<string>();
+        private static List<string> DefinedClaims { get; } = [];
 
         /// <summary>
         /// Contains the GUIDs of the entities installed by the application.
         /// </summary>
-        private static List<string> DefinedGuids { get; } = new List<string>();
+        private static List<string> DefinedGuids { get; } = [];
 
 
         private readonly IServiceProvider _serviceProvider;
@@ -219,14 +221,16 @@ namespace CRFricke.Authorization.Core
                 return result;
             }
 
-            if (resource is TRole role && !claimRequirement.ClaimValues.Contains(SysClaims.Role.Delete))
-            {
-                return await ElevationCheckAsync(principalId, role);
-            }
+            // See if there is a IResourceHandler implementation for the resource 
+            var handler = _serviceProvider.GetRequiredService(
+                typeof(IResourceHandler<>).MakeGenericType(resource.GetType())
+                ) as IResourceHandler;
 
-            if (resource is TUser user && !claimRequirement.ClaimValues.Contains(SysClaims.User.Delete))
+            if (handler is not null)
             {
-                return await ElevationCheckAsync(principalId, user);
+                return await handler.HandleAsync(
+                    new ResourceHandlerContext(this, resource, principal, claimRequirement)
+                    );
             }
 
             return result;
@@ -296,84 +300,10 @@ namespace CRFricke.Authorization.Core
         }
 
         /// <summary>
-        /// Determines whether the supplied User object has more privileges than the logged in user has.
-        /// </summary>
-        /// <param name="principalId">The ID of the logged in user.</param>
-        /// <param name="user">The User object to be checked.</param>
-        /// <returns>An <see cref="AuthorizationResult"/> object that indicates the results of the check.</returns>
-        private async Task<AuthorizationResult> ElevationCheckAsync(string principalId, TUser user)
-        {
-            var principalRoles = await GetUserRolesAsync(principalId);
-            if (principalRoles.Contains(SysGuids.Role.Administrator))
-            {
-                return AuthorizationResult.Success();
-            }
-
-            var userRoles = await GetUserRolesAsync(user);
-            if (userRoles.Contains(SysGuids.Role.Administrator))
-            {
-                return AuthorizationResult.Elevation(new[] { nameof(SysGuids.Role.Administrator) });
-            }
-
-            var principalClaims = await GetRoleClaimsAsync(principalRoles);
-            var userClaims = await GetRoleClaimsAsync(userRoles);
-
-            if (userClaims.IsSubsetOf(principalClaims))
-            {
-                return AuthorizationResult.Success();
-            };
-
-            return AuthorizationResult.Elevation(
-                userClaims.Except(principalClaims)
-                );
-        }
-
-        /// <summary>
-        /// Determines whether the supplied Role object has more privileges than the logged in user has.
-        /// </summary>
-        /// <param name="principalId">The ID of the logged in user.</param>
-        /// <param name="role">The Role object to be checked.</param>
-        /// <returns>An <see cref="AuthorizationResult"/> object that indicates the results of the check.</returns>
-        private async Task<AuthorizationResult> ElevationCheckAsync(string principalId, TRole role)
-        {
-            var principalRoles = await GetUserRolesAsync(principalId);
-            if (principalRoles.Contains(SysGuids.Role.Administrator))
-            {
-                return AuthorizationResult.Success();
-            }
-
-            var principalClaims = await GetRoleClaimsAsync(principalRoles);
-            var roleClaims = AuthorizationManager<TUser, TRole>.GetRoleClaims(role);
-
-            if (roleClaims.IsSubsetOf(principalClaims))
-            {
-                return AuthorizationResult.Success();
-            }
-
-            return AuthorizationResult.Elevation(
-                roleClaims.Except(principalClaims)
-                );
-        }
-
-        /// <summary>
-        /// Returns the claims associated with the specified Role.
-        /// </summary>
-        /// <param name="role">The Role whose claims are to be retrieved.</param>
-        /// <returns>A HashSet containing the IDs of the associated claims.</returns>
-        private static HashSet<string> GetRoleClaims(TRole role)
-        {
-            return (
-                from ar in role.Claims
-                where ar.ClaimType == SysClaims.ClaimType
-                select ar.ClaimValue
-                ).ToHashSet();
-        }
-
-        /// <summary>
         /// Returns the claims associated with the specified Roles.
         /// </summary>
         /// <param name="roleIds">A HashSet containing the IDs of the Roles whose claims are to be retrieved.</param>
-        /// <returns>A HashSet containing the IDs of the associated claims.</returns>
+        /// <returns>A HashSet containing the associated claims.</returns>
         private async Task<HashSet<string>> GetRoleClaimsAsync(HashSet<string> roleIds)
         {
             var claimHash = new HashSet<string>();
@@ -390,7 +320,7 @@ namespace CRFricke.Authorization.Core
         /// Returns the claims associated with the specified Role.
         /// </summary>
         /// <param name="roleId">The ID of the Role whose claims are to be retrieved.</param>
-        /// <returns>A HashSet containing the IDs of the associated claims.</returns>
+        /// <returns>A HashSet containing the associated claims.</returns>
         private async Task<HashSet<string>> GetRoleClaimsAsync(string roleId)
         {
             var roleClaimCache = _serviceProvider.GetRequiredService<RoleClaimCache>();
@@ -505,6 +435,18 @@ namespace CRFricke.Authorization.Core
             _serviceProvider.GetRequiredService<UserRoleCache>()
                 .Remove(userId);
         }
+
+        ///<inheritdoc/>
+        Task<HashSet<string>> IAuthorizationServices.GetRoleClaimsAsync(HashSet<string> roleIds) 
+            => GetRoleClaimsAsync(roleIds);
+
+        ///<inheritdoc/>
+        Task<HashSet<string>> IAuthorizationServices.GetRoleClaimsAsync(string roleId)
+            => GetRoleClaimsAsync(roleId);
+
+        ///<inheritdoc/>
+        Task<HashSet<string>> IAuthorizationServices.GetUserRolesAsync(string userId)
+            => GetUserRolesAsync(userId);
     }
 
     /// <summary>

@@ -60,6 +60,12 @@ namespace CRFricke.Authorization.Core
                 .AddSingleton(typeof(IAuthorizationManager), authManagerType)
                 .AddSingleton<IAuthorizationPolicyProvider, AppClaimRequirementProvider>()
                 .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>()
+                .AddSingleton(
+                    typeof(IResourceHandler<>).MakeGenericType(roleType),
+                    typeof(RoleResourceHandler<>).MakeGenericType(roleType) )
+                .AddSingleton(
+                    typeof(IResourceHandler<>).MakeGenericType(builder.UserType),
+                    typeof(UserResourceHandler<>).MakeGenericType(builder.UserType) )
                 .AddDbInitializer(options =>
                     options.UseDbContext(contextType, dbInitializationOption)
                     );
