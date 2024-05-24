@@ -10,5 +10,5 @@ framework that sits on top of Microsoft's ASP.NET Core Identity Framework. The p
 on its own or with the Authorization.Core.UI package to provide a rich GUI for managing your 
 application's Users and Roles.
 
-The repository wiki describes the installation, configuration, and use of these packages.
+The repository's wiki describes the installation, configuration, and use of these packages.
 It can ve viewed [here](https://github.com/CRFricke/Authorization.Core/wiki).

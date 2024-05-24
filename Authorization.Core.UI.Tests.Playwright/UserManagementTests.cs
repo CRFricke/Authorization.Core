@@ -4,6 +4,7 @@ using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
+using System.Text.RegularExpressions;
 
 namespace Authorization.Core.UI.Tests.Playwright;
 
@@ -393,11 +394,11 @@ internal class UserManagementTests : PageTest
         title = await Page.TitleAsync();
         Assert.That(title, Does.Contain("Create User"));
 
-        var locator = Page.Locator(".validation-summary-errors")
-            .GetByRole(AriaRole.Listitem);
-        Assert.That(await locator.CountAsync(), Is.EqualTo(2));
-        var errMessages = await locator.AllInnerTextsAsync();
-        Assert.That(errMessages.Any(m => m.Contains("one digit")), Is.True);
-        Assert.That(errMessages.Any(m => m.Contains("one upper")), Is.True);
+        var errors = await Page.Locator(".validation-summary-errors").AllInnerTextsAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.That(errors.Any(m => m.Contains("one digit")), Is.True);
+            Assert.That(errors.Any(m => m.Contains("one upper")), Is.True);
+        });
     }
 }

@@ -46,7 +46,7 @@ namespace CRFricke.Authorization.Core
         public string? FailureReason { get; private set; }
 
         /// <summary>
-        /// The missing claims which caused authorization to fail.
+        /// The missing claims that caused authorization to fail.
         /// </summary>
         public string[]? FailingClaims { get; private set; }
 
