@@ -14,20 +14,20 @@ public interface IAuthorizationServices
     /// <param name="roleIds">
     /// A HashSet containing the IDs of the Roles whose claims are to be retrieved.
     /// </param>
-    /// <returns>A HashSet containing the associated claims.</returns>
+    /// <returns>A <see cref="HashSet{T}">HashSet</see> containing the claims associated with the specified Role.</returns>
     Task<HashSet<string>> GetRoleClaimsAsync(HashSet<string> roleIds);
 
     /// <summary>
     /// Returns the claims associated with the specified Role.
     /// </summary>
     /// <param name="roleId">The ID of the Role whose claims are to be retrieved.</param>
-    /// <returns>A HashSet containing the associated claims.</returns>
+    /// <returns>A <see cref="HashSet{T}">HashSet</see> containing the claims associated with the specified Role.</returns>
     Task<HashSet<string>> GetRoleClaimsAsync(string roleId);
 
     /// <summary>
     /// Returns the IDs of any Roles assigned to the specified user.
     /// </summary>
     /// <param name="userId">The Id of the user whose Role IDs are to be returned.</param>
-    /// <returns>A HashSet containing the IDs of the assigned roles.</returns>
+    /// <returns>A HashSet containing the IDs of the roles assigned to the specified user.</returns>
     Task<HashSet<string>> GetUserRolesAsync(string userId);
 }

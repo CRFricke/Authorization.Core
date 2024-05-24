@@ -9,17 +9,18 @@ namespace CRFricke.Authorization.Core;
 /// Performs additional authorization checks for a specified Role.
 /// </summary>
 /// <typeparam name="TRole">The type of application's role objects.</typeparam>
-public class RoleResourceHandler<TRole> : IResourceHandler<TRole>
+public class RoleAuthorizationHandler<TRole> : IResourceAuthorizationHandler<TRole>
     where TRole : AuthRole, new()
 {
     ///<inheritdoc/>
-    public async Task<AuthorizationResult> HandleAsync(ResourceHandlerContext context)
+    public async Task<AuthorizationResult> HandleAsync(ResourceAuthorizationHandlerContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         if (context.ClaimRequirements.ClaimValues.Contains(SysClaims.Role.Delete))
         {
-            // Nothing to check if the Role is being deleted.
+            // Nothing to check if the Role is being deleted (we've already 
+            // checked that the user has the 'Role.Delete' claim).
             return AuthorizationResult.Success();
         }
 
@@ -28,7 +29,7 @@ public class RoleResourceHandler<TRole> : IResourceHandler<TRole>
             return AuthorizationResult.Success();
         }
 
-        // Principal.UserId() is verified before the ResourceHandler is called.
+        // Principal.UserId() is verified before the ResourceAuthorizationHandler is called.
         var principalId = context.Principal.UserId()!;
 
         var principalRoles = await context.AuthorizationServices.GetUserRolesAsync(principalId);

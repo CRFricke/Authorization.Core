@@ -286,7 +286,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppUser>)) == new UserResourceHandler<AppUser>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppUser>)) == new UserAuthorizationHandler<AppUser>() &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
@@ -336,7 +336,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppUser>)) == new UserResourceHandler<AppUser>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppUser>)) == new UserAuthorizationHandler<AppUser>() &&
                 sp.GetService(typeof(IHttpContextAccessor)) == new Mock<IHttpContextAccessor>().Object &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
@@ -395,7 +395,7 @@ namespace Authorization.Core.Tests
 
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppUser>)) == new UserResourceHandler<AppUser>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppUser>)) == new UserAuthorizationHandler<AppUser>() &&
                 sp.GetService(typeof(IHttpContextAccessor)) == new Mock<IHttpContextAccessor>().Object &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
@@ -452,7 +452,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppUser>)) == new UserResourceHandler<AppUser>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppUser>)) == new UserAuthorizationHandler<AppUser>() &&
                 sp.GetService(typeof(IHttpContextAccessor)) == new Mock<IHttpContextAccessor>().Object &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
@@ -490,7 +490,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppRole>)) == new RoleResourceHandler<AppRole>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppRole>)) == new RoleAuthorizationHandler<AppRole>() &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object
                 );
 
@@ -542,7 +542,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppRole>)) == new RoleResourceHandler<AppRole>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppRole>)) == new RoleAuthorizationHandler<AppRole>() &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
@@ -596,7 +596,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppRole>)) == new RoleResourceHandler<AppRole>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppRole>)) == new RoleAuthorizationHandler<AppRole>() &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );
@@ -818,7 +818,7 @@ namespace Authorization.Core.Tests
                 );
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppUser>)) == new UserResourceHandler<AppUser>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppUser>)) == new UserAuthorizationHandler<AppUser>() &&
                 sp.GetService(typeof(IRepository<AppUser, AppRole>)) == dbContext &&
                 sp.GetService(typeof(IHttpContextAccessor)) == new Mock<IHttpContextAccessor>().Object &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
@@ -950,7 +950,7 @@ namespace Authorization.Core.Tests
                 ).Returns(true);
 
             var serviceProvider = Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IResourceHandler<AppRole>)) == new RoleResourceHandler<AppRole>() &&
+                sp.GetService(typeof(IResourceAuthorizationHandler<AppRole>)) == new RoleAuthorizationHandler<AppRole>() &&
                 sp.GetService(typeof(UserRoleCache)) == userRoleCache.Object &&
                 sp.GetService(typeof(RoleClaimCache)) == roleClaimCache.Object
                 );

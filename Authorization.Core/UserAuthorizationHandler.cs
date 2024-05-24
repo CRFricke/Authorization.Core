@@ -9,17 +9,18 @@ namespace CRFricke.Authorization.Core;
 /// Performs additional authorization checks for a specified User.
 /// </summary>
 /// <typeparam name="TUser">The type of application's user objects.</typeparam>
-public class UserResourceHandler<TUser> : IResourceHandler<TUser>
+public class UserAuthorizationHandler<TUser> : IResourceAuthorizationHandler<TUser>
     where TUser : AuthUser, new()
 {
     ///<inheritdoc/>
-    public async Task<AuthorizationResult> HandleAsync(ResourceHandlerContext context)
+    public async Task<AuthorizationResult> HandleAsync(ResourceAuthorizationHandlerContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         if (context.ClaimRequirements.ClaimValues.Contains(SysClaims.User.Delete))
         {
-            // Nothing to check if the User is being deleted.
+            // Nothing to check if the User is being deleted (we've already 
+            // checked that the user has the 'User.Delete' claim).
             return AuthorizationResult.Success();
         }
 
@@ -28,7 +29,7 @@ public class UserResourceHandler<TUser> : IResourceHandler<TUser>
             return AuthorizationResult.Success();
         }
 
-        // Principal.UserId() is verified before the ResourceHandler is called.
+        // Principal.UserId() is verified before the ResourceAuthorizationHandler is called.
         var principalId = context.Principal.UserId()!;
 
         var principalRoles = await context.AuthorizationServices.GetUserRolesAsync(principalId);

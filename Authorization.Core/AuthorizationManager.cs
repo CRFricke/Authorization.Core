@@ -183,7 +183,7 @@ namespace CRFricke.Authorization.Core
 
             ArgumentNullException.ThrowIfNull(principal);
             ArgumentNullException.ThrowIfNull(claimRequirement);
-            if (resource is not IRequiresAuthorization raObject)
+            if (resource is not IRequiresAuthorization raResource)
                 throw new ArgumentException($"Argument does not implement {nameof(IRequiresAuthorization)} interface.", nameof(resource));
 
             var principalId = principal.UserId();
@@ -197,7 +197,7 @@ namespace CRFricke.Authorization.Core
             }
 
             // Is this a system User or Role?
-            if (DefinedGuids.Contains(raObject.Id))
+            if (DefinedGuids.Contains(raResource.Id))
             {
                 // Yes - fail requests for restricted claims
                 var failedClaims = claimRequirement.ClaimValues.Intersect(RestrictedClaims);
@@ -209,7 +209,7 @@ namespace CRFricke.Authorization.Core
 
                     _logger.LogInformation(
                         "{ClassName} of \"{Claim}\" for {ResourceType} '{ObjectName}' not met by '{UserName}' - restricted operation on system User or Role.",
-                        nameof(AppClaimRequirement), failedClaim, resourceType, raObject.Name, userName
+                        nameof(AppClaimRequirement), failedClaim, resourceType, raResource.Name, userName
                         );
                     return AuthorizationResult.SystemObject(failedClaims);
                 }
@@ -223,13 +223,13 @@ namespace CRFricke.Authorization.Core
 
             // See if there is a IResourceHandler implementation for the resource 
             var handler = _serviceProvider.GetRequiredService(
-                typeof(IResourceHandler<>).MakeGenericType(resource.GetType())
-                ) as IResourceHandler;
+                typeof(IResourceAuthorizationHandler<>).MakeGenericType(resource.GetType())
+                ) as IResourceAuthorizationHandler;
 
             if (handler is not null)
             {
                 return await handler.HandleAsync(
-                    new ResourceHandlerContext(this, resource, principal, claimRequirement)
+                    new ResourceAuthorizationHandlerContext(this, raResource, principal, claimRequirement)
                     );
             }
 
