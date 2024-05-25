@@ -12,6 +12,31 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 [PageImplementationType(typeof(IndexModel<,>))]
 public abstract class IndexModel : ModelBase
 {
+    private static string _basePath = null;
+    private readonly object _lockObject = new();
+
+    public string BasePath
+    {
+        get
+        {
+            if (_basePath is null)
+            {
+                lock (_lockObject)
+                {
+                    if (_basePath is null)
+                    {
+                        var path = Request.Path.Value;
+                        _basePath = (
+                            path.EndsWith(IndexHandler.PageName) ? path[..(path.Length - IndexHandler.PageName.Length)] : path
+                            ).TrimEnd('/');
+                    }
+                }
+            }
+
+            return _basePath;
+        }
+    }
+
     public IList<RoleInfo> RoleInfo { get; set; }
 
     public virtual Task OnGetAsync() => throw new NotImplementedException();

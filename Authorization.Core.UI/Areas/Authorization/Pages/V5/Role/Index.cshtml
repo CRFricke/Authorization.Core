@@ -3,10 +3,12 @@
 @{
     ViewData["Title"] = "Role Management";
 
-    var classCreate = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Create)) ? "" : "disabled";
-    var classDelete = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Delete)) ? "" : "disabled";
-    var classDetails = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Read)) ? "" : "disabled";
-    var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? "" : "disabled";
+    var basePath = Model.BasePath;
+
+    var classCreate = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Create)) ? null : "disabled";
+    var classDelete = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Delete)) ? null : "disabled";
+    var classDetails = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Read)) ? null : "disabled";
+    var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? null : "disabled";
 }
 <div class="row align-items-center">
     <div class="col-sm-4 text-center text-sm-start">
@@ -20,7 +22,11 @@
 <div class="row">
     <div class="col-lg-11 col-xxl-8 mx-sm-3 pe-sm-4">
         <p>
-            <a class="@classCreate" asp-page="Create">Create New</a>
+            <a class="ac-anchor @classCreate" href="@($"{basePath}/Create")"
+            @if (classCreate != null)
+            {
+                @:tabindex="-1" aria-disabled="true"
+            }>Create New</a>
         </p>
         <table class="table table-sm w-100 opacity-0">
             <thead>
@@ -46,11 +52,23 @@
                         </td>
                         <td>
                             <a class="bi bi-pencil-square ac-icon-button @classEdit"
-                               asp-page="./Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit" />
+                            @if (classEdit != null)
+                            {
+                                @:tabindex="-1" aria-disabled="true"
+                            }
+                               href="@($"{basePath}/Edit?id={item.Id}")" title="Edit" aria-label="Edit" />
                             <a class="bi bi-binoculars ac-icon-button @classDetails"
-                               asp-page="./Details" asp-route-id="@item.Id" title="View" aria-label="View" />
+                            @if (classDetails != null)
+                            {
+                                @:tabindex="-1" aria-disabled="true"
+                            }
+                               href="@($"{basePath}/Details?id={item.Id}")" title="View" aria-label="View" />
                             <a class="bi bi-trash ac-icon-button @classDelete"
-                               asp-page="./Delete" asp-route-id="@item.Id" title="Delete" aria-label="Delete" />
+                            @if (classDelete != null)
+                            {
+                                @:tabindex="-1" aria-disabled="true"
+                            }
+                               href="@($"{basePath}/Delete?id={item.Id}")" title="Delete" aria-label="Delete" />
                         </td>
                     </tr>
                 }

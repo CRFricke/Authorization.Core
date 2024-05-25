@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using CRFricke.Authorization.Core
+@inject IAuthorizationManager authManager
+
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
 <head>
     <meta charset="utf-8" />
@@ -29,18 +32,30 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Admin" asp-page="/Index">Home</a>
                         </li>
+                    @if (await authManager.IsAuthorizedAsync(User, AppClaims.Calendar.List))
+                    {
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Admin" asp-page="/Calendar/Index">Calendar</a>
                         </li>
+                    }
+                    @if (await authManager.IsAuthorizedAsync(User, AppClaims.Document.List))
+                    {
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Admin" asp-page="/Document/Index">Document</a>
                         </li>
+                    }
+                    @if (await authManager.IsAuthorizedAsync(User, SysClaims.Role.List))
+                    {
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Authorization" asp-page="/Role/Index">Role</a>
                         </li>
+                    }
+                    @if (await authManager.IsAuthorizedAsync(User, SysClaims.User.List))
+                    {
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Authorization" asp-page="/User/Index">User</a>
                         </li>
+                    }
                     </ul>
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav">
