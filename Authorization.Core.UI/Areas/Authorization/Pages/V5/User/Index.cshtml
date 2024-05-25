@@ -1,10 +1,10 @@
 ﻿@page
+@using CRFricke.Authorization.Core.UI.Pages.Shared.User
 @model User.IndexModel
 @{
     ViewData["Title"] = "User Management";
 
-    var path = HttpContext.Request.Path.Value;
-    var basePath = path[..path.LastIndexOf('/')];
+    var basePath = Model.BasePath;
 
     var classCreate = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Create)) ? null : "disabled";
     var classDelete = (await AuthManager.IsAuthorizedAsync(User, SysClaims.User.Delete)) ? null : "disabled";

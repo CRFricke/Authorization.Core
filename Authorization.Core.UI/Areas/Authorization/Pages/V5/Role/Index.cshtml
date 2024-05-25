@@ -3,8 +3,7 @@
 @{
     ViewData["Title"] = "Role Management";
 
-    var path = HttpContext.Request.Path.Value;
-    var basePath = path[..path.LastIndexOf('/')];
+    var basePath = Model.BasePath;
 
     var classCreate = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Create)) ? null : "disabled";
     var classDelete = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Delete)) ? null : "disabled";
