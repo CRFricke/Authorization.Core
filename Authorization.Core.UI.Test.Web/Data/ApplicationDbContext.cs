@@ -34,6 +34,7 @@ namespace Authorization.Core.UI.Test.Web.Data
             await base.SeedDatabaseAsync(serviceProvider);
 
             var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
+            var hasher = serviceProvider.GetRequiredService<IPasswordHasher<ApplicationUser>>();
             var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<ApplicationDbContext>();
 
             var role = await Roles.FindAsync(AppGuids.Role.CalendarManager);
@@ -68,10 +69,10 @@ namespace Authorization.Core.UI.Test.Web.Data
                     LockoutEnabled = false,
                     NormalizedEmail = normalizer.NormalizeEmail(email),
                     NormalizedUserName = normalizer.NormalizeName(email),
-                    PasswordHash = "AQAAAAEAACcQAAAAEFXwSRmwaiwTjRDW4zcaupENlSdbverXypglebb + Ti6f / Rn4sBikU3q / uE0jJQJAMw ==", // "Calend@rGuy!"
+                    PasswordHash = hasher.HashPassword(user!, "Calend@rGuy!"),
                     Surname = "Guy",
                     UserName = email
-                }.SetClaims(new[] { role.Name! });
+                }.SetClaims([role.Id]);
 
                 await Users.AddAsync(user);
                 logger.LogInformation(
@@ -112,10 +113,10 @@ namespace Authorization.Core.UI.Test.Web.Data
                     LockoutEnabled = false,
                     NormalizedEmail = normalizer.NormalizeEmail(email),
                     NormalizedUserName = normalizer.NormalizeName(email),
-                    PasswordHash = "AQAAAAEAACcQAAAAEJaNzNSqF3SrSxUHuT010YO6kAmf95+Xv20mzd3MzLBTNU8ySBGMBqkx82q3Be+BCg==", // "D0cumentGuy!"
+                    PasswordHash = hasher.HashPassword(user!, "D0cumentGuy!"),
                     Surname = "Guy",
                     UserName = email
-                }.SetClaims(new[] { role.Name! });
+                }.SetClaims([role.Id]);
 
                 await Users.AddAsync(user);
                 logger.LogInformation(

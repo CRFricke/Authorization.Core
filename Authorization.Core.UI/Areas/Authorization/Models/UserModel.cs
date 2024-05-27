@@ -147,7 +147,7 @@ namespace CRFricke.Authorization.Core.UI.Models
             return (
                 from role in Roles
                 where role.IsAssigned
-                select role.Name
+                select role.Id
                 ).ToArray();
         }
 
@@ -165,7 +165,7 @@ namespace CRFricke.Authorization.Core.UI.Models
 
             foreach (var role in Roles)
             {
-                role.IsAssigned = roles.Contains(role.Name);
+                role.IsAssigned = roles.Contains(role.Id);
             }
         }
 

@@ -4,7 +4,6 @@ using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
-using System.Text.RegularExpressions;
 
 namespace Authorization.Core.UI.Tests.Playwright;
 
@@ -14,6 +13,7 @@ internal class UserManagementTests : PageTest
 {
     private HttpClient _httpClient;
     private WebAppFactory _webAppFactory;
+    private Dictionary<string, ApplicationRole> _roleDictionary;
 
     #region Setup / Teardown
 
@@ -21,7 +21,10 @@ internal class UserManagementTests : PageTest
     public void OneTimeSetup()
     {
         _webAppFactory = new WebAppFactory();
-        _webAppFactory.EnsureUser(Logins.UserManager, nameof(SysUiGuids.Role.UserManager));
+        _webAppFactory.EnsureUser(Logins.UserManager, SysUiGuids.Role.UserManager);
+
+        _roleDictionary = _webAppFactory.GetRoles()
+            .ToDictionary(ar => ar.Id, ar => ar);
     }
 
     [SetUp]
@@ -63,7 +66,7 @@ internal class UserManagementTests : PageTest
         var userPhoneNumber = "(123) 456-7890";
         var userGivenName = "Test";
         var userSurname = "User";
-        var userRoleName = nameof(SysUiGuids.Role.RoleManager);
+        var userRole = _roleDictionary[SysUiGuids.Role.RoleManager];
 
         await Page.GetByLabel("Email").FillAsync(userEmail);
         await Page.GetByLabel("Password", new() { Exact = true }).FillAsync(userPassword);
@@ -73,7 +76,7 @@ internal class UserManagementTests : PageTest
         await Page.GetByLabel("Phone Number").FillAsync(userPhoneNumber);
 
         await Page.GetByRole(AriaRole.Row)
-            .Filter(new() { HasText = userRoleName })
+            .Filter(new() { HasText = userRole.Name })
             .GetByRole(AriaRole.Checkbox)
             .CheckAsync();
 
@@ -92,7 +95,7 @@ internal class UserManagementTests : PageTest
             Assert.That(user.PhoneNumber, Is.EqualTo(userPhoneNumber));
             Assert.That(user.GivenName, Is.EqualTo(userGivenName));
             Assert.That(user.Surname, Is.EqualTo(userSurname));
-            Assert.That(user.Claims.Any(c => c.ClaimValue == userRoleName));
+            Assert.That(user.Claims.Any(c => c.ClaimValue == userRole.Id));
         });
     }
 
@@ -107,9 +110,9 @@ internal class UserManagementTests : PageTest
             Surname = "User",
             PhoneNumber = "(123) 456-7890"
         };
-        var userRoleName = nameof(SysUiGuids.Role.UserManager);
+        var userRole = _roleDictionary[SysUiGuids.Role.UserManager];
 
-        await _webAppFactory.EnsureUserAsync(user, "SuperSecret02!", userRoleName);
+        await _webAppFactory.EnsureUserAsync(user, "SuperSecret02!", userRole.Id);
 
         await Page.LogUserInAsync(Logins.Administrator, "/Admin/User");
         var title = await Page.TitleAsync();
@@ -117,7 +120,7 @@ internal class UserManagementTests : PageTest
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = user!.Email })
-            .GetByRole(AriaRole.Link, new() { Name = "View" })
+            .GetByLabel("View")
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.That(title, Does.Contain("User Details"));
@@ -135,7 +138,7 @@ internal class UserManagementTests : PageTest
         await Expect(rows).ToHaveCountAsync(1);
 
         var isChecked = await Page.GetByRole(AriaRole.Row)
-            .Filter(new() { HasText = userRoleName })
+            .Filter(new() { HasText = userRole.Name })
             .GetByRole(AriaRole.Checkbox)
             .IsCheckedAsync();
         Assert.That(isChecked, Is.True);
@@ -152,7 +155,7 @@ internal class UserManagementTests : PageTest
             Surname = "User",
             PhoneNumber = "(123) 456-7890",
             LockoutEnd = DateTimeOffset.UtcNow.AddDays(1)
-        }.SetClaims(nameof(SysUiGuids.Role.RoleManager));
+        }.SetClaims(SysUiGuids.Role.RoleManager);
 
         await _webAppFactory.EnsureUserAsync(user, "SuperSecret03!");
 
@@ -162,7 +165,7 @@ internal class UserManagementTests : PageTest
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = user!.Email })
-            .GetByRole(AriaRole.Link, new() { Name = "Edit" })
+            .GetByLabel("Edit")
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.That(title, Does.Contain("Edit User"));
@@ -218,14 +221,14 @@ internal class UserManagementTests : PageTest
         });
 
         Assert.That(dbUser.Claims, Has.Count.EqualTo(1));
-        Assert.That(dbUser.Claims.Any(c => c.ClaimValue == nameof(SysUiGuids.Role.UserManager)), Is.True);
+        Assert.That(dbUser.Claims.Any(c => c.ClaimValue == SysUiGuids.Role.UserManager), Is.True);
     }
 
     [Test]
     [Description("Can delete existing user")]
     public async Task Can_delete_existing_user()
     {
-        var userRoleName = nameof(SysUiGuids.Role.RoleManager);
+        var userRole = _roleDictionary[SysUiGuids.Role.RoleManager];
         var user = new ApplicationUser
         {
             Email = "Test04User@company.com",
@@ -233,7 +236,7 @@ internal class UserManagementTests : PageTest
             Surname = "User",
             PhoneNumber = "(123) 456-7890",
             LockoutEnd = DateTime.UtcNow.AddDays(1)
-        }.SetClaims(userRoleName);
+        }.SetClaims(userRole.Id);
 
         await _webAppFactory.EnsureUserAsync(user, "SuperSecret04!");
 
@@ -243,7 +246,7 @@ internal class UserManagementTests : PageTest
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = user!.Email })
-            .GetByRole(AriaRole.Link, new() { Name = "Delete" })
+            .GetByLabel("Delete")
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.That(title, Does.Contain("Delete User"));
@@ -261,7 +264,7 @@ internal class UserManagementTests : PageTest
         await Expect(rows).ToHaveCountAsync(1);
 
         var isChecked = await Page.GetByRole(AriaRole.Row)
-            .Filter(new() { HasText = userRoleName })
+            .Filter(new() { HasText = userRole.Name })
             .GetByRole(AriaRole.Checkbox)
             .IsCheckedAsync();
         Assert.That(isChecked, Is.True);
@@ -289,7 +292,7 @@ internal class UserManagementTests : PageTest
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = user!.Email })
-            .GetByRole(AriaRole.Link, new() { Name = "Delete" })
+            .GetByLabel("Delete")
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.That(title, Does.Contain("Delete User"));
@@ -316,7 +319,7 @@ internal class UserManagementTests : PageTest
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = user!.Email })
-            .GetByRole(AriaRole.Link, new() { Name = "Delete" })
+            .GetByLabel("Delete")
             .ClickAsync();
         title = await Page.TitleAsync();
         Assert.That(title, Does.Contain("Delete User"));
@@ -400,5 +403,100 @@ internal class UserManagementTests : PageTest
             Assert.That(errors.Any(m => m.Contains("one digit")), Is.True);
             Assert.That(errors.Any(m => m.Contains("one upper")), Is.True);
         });
+    }
+
+
+    [Test]
+    [Description("Index page Create link disabled when Create claim missing")]
+    public async Task Index_page_Create_link_disabled_when_Create_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test09Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.User.DefinedClaims.Except([SysClaims.User.Create]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test09User@company.com", "TestO9pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/User");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("User Management"));
+
+        var locator = Page.GetByRole(AriaRole.Link, new() { Name = "Create New" });
+        await Expect(locator).ToBeDisabledAsync();
+    }
+
+    [Test]
+    [Description("Index page Edit button disabled when Update claim missing")]
+    public async Task Index_page_Edit_button_disabled_when_Update_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test10Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.User.DefinedClaims.Except([SysClaims.User.Update]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test10User@company.com", "Test10pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/User");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("User Management"));
+
+        var locator = Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = login.Email })
+            .GetByLabel("Edit");
+        await Expect(locator).ToBeDisabledAsync();
+    }
+
+    [Test]
+    [Description("View button disabled on Index page when Read claim missing")]
+    public async Task Index_page_View_button_disabled_when_Read_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test11Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.User.DefinedClaims.Except([SysClaims.User.Read]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test11User@company.com", "Test11pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/User");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("User Management"));
+
+        var locator = Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = login.Email })
+            .GetByLabel("View");
+        await Expect(locator).ToBeDisabledAsync();
+    }
+
+    [Test]
+    [Description("View button disabled on Index page when Delete claim missing")]
+    public async Task Index_page_Delete_button_disabled_when_Delete_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test12Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.User.DefinedClaims.Except([SysClaims.User.Delete]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test12User@company.com", "Test12pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/User");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("User Management"));
+
+        var locator = Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = login.Email })
+            .GetByLabel("Delete");
+        await Expect(locator).ToBeDisabledAsync();
     }
 }

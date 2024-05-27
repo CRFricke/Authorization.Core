@@ -54,6 +54,16 @@ public class UserManagementTests : TestsBase
         return userMock.Object;
     }
 
+    private static List<ApplicationRole> GetDefinedRoles()
+    {
+        return
+        [
+            new() { Id = SysGuids.Role.Administrator, Name = nameof(SysGuids.Role.Administrator) },
+            new() { Id = SysUiGuids.Role.RoleManager, Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) }
+        ];
+    }
+
     [Fact(DisplayName = "UserManagement page returns list of Users")]
     public async Task UserManagement_Test1Async()
     {
@@ -109,14 +119,7 @@ public class UserManagementTests : TestsBase
     public async Task UserManagement_Test3Async()
     {
         ApplicationUser user = null;
-        var expectedClaims = new string[] { nameof(SysUiGuids.Role.RoleManager) };
-
-        var roles = new List<ApplicationRole>
-        {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
-        };
+        var expectedClaims = new string[] { SysUiGuids.Role.RoleManager };
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
@@ -137,7 +140,7 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(GetDefinedRoles().AsQueryable().BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { user = au; })
             .Returns((EntityEntry<ApplicationUser>)null);
@@ -514,18 +517,11 @@ public class UserManagementTests : TestsBase
     [Fact(DisplayName = "Edit User [Post] updates User properties")]
     public async Task UserManagement_Test12Async()
     {
-        var roles = new List<ApplicationRole>
-        {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
-        };
-
-        var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
+        var expectedClaims = new string[] { SysUiGuids.Role.RoleManager, SysUiGuids.Role.UserManager };
 
         var user = new ApplicationUser("OldUser@company.com");
         user.Claims.Add(
-            new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = roles[0].Name }
+            new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = SysGuids.Role.Administrator }
             );
         var users = new List<ApplicationUser> { user };
 
@@ -555,7 +551,7 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
+            db.Roles == GetDefinedRoles().AsQueryable().BuildMockDbSet().Object &&
             db.Users == users.AsQueryable().BuildMockDbSet().Object &&
             db.SaveChangesAsync(default) == Task.FromResult(0)
             );
@@ -796,22 +792,17 @@ public class UserManagementTests : TestsBase
     [Fact(DisplayName = "Delete User [Get] initializes RoleInfo collection")]
     public async Task UserManagement_Test20Async()
     {
-        var roles = new List<ApplicationRole>
-        {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
-        };
+        var roles = GetDefinedRoles();
 
-        var expectedClaims = new[] { roles[2].Name };
+        var expectedClaims = new[] { SysUiGuids.Role.RoleManager };
 
         //
         // MockQueryable does not support .Include(au => au.Claims) so we add the claims manually.
         //
         var users = new List<ApplicationUser>
         {
-            new ApplicationUser("TestUser1@company.com").SetClaims<ApplicationUser>(new [] { nameof(SysGuids.Role.Administrator) }),
-            new ApplicationUser("TestUser2@company.com").SetClaims<ApplicationUser>(expectedClaims)
+            new ApplicationUser("TestUser1@company.com").SetClaims(SysGuids.Role.Administrator),
+            new ApplicationUser("TestUser2@company.com").SetClaims(expectedClaims)
         };
 
         var authManager = Mock.Of<IAuthorizationManager>(am =>
@@ -832,7 +823,7 @@ public class UserManagementTests : TestsBase
 
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
         Assert.Equal(expectedClaims.Length, claims.Count());
-        Assert.Equal(expectedClaims, claims.Select(c => c.Name));
+        Assert.Equal(expectedClaims, claims.Select(c => c.Id));
     }
 
     [Fact(DisplayName = "Delete User [Post] returns NotFound for null ID")]

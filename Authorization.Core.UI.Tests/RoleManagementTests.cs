@@ -759,7 +759,7 @@ public class RoleManagementTests : TestsBase
         var user = new ApplicationUser { Email = "MrTester@company.com", UserName = "MrTester@company.com", GivenName = "Chuck", Surname = "Fricke" };
         var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
 
-        var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
+        var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Id };
         var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
 
         var authManager = Mock.Of<IAuthorizationManager>(am =>

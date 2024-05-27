@@ -95,14 +95,14 @@ public class RoleModel
         where TRole : AuthUiRole
         where TUser : AuthUiUser
     {
-        _ = Name ?? throw new InvalidOperationException(
+        _ = Id ?? throw new InvalidOperationException(
             $"{nameof(InitFromRole)} has not been called."
             );
 
         RoleUsers = await (
             from uc in repository.UserClaims
             join au in repository.Users on uc.UserId equals au.Id
-            where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == Name
+            where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == Id
             select new RoleUser { Name = au.DisplayName, Email = au.Email }
             ).ToListAsync();
 
