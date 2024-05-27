@@ -21,7 +21,7 @@ public partial class RoleManagementTests : PageTest
     public void OneTimeSetup()
     {
         _webAppFactory = new WebAppFactory();
-        _webAppFactory.EnsureUser(Logins.RoleManager, nameof(SysUiGuids.Role.RoleManager));
+        _webAppFactory.EnsureUser(Logins.RoleManager, SysUiGuids.Role.RoleManager);
     }
 
     [SetUp]
@@ -61,7 +61,7 @@ public partial class RoleManagementTests : PageTest
         var role = new ApplicationRole
         {
             Name = "Test01Role", Description = "Test Role"
-        }.SetClaims("Calendar.List", "Document.List", "Role.List", "User.List");
+        }.SetClaims(AppClaims.Calendar.List, AppClaims.Document.List, SysClaims.Role.List, SysClaims.User.List);
 
         await Page.GetByLabel("Name").FillAsync(role.Name!);
         await Page.GetByLabel("Description").FillAsync(role.Description);
@@ -210,7 +210,7 @@ public partial class RoleManagementTests : PageTest
         await _webAppFactory.EnsureRoleAsync(role);
 
         var login = new Login("Test04User@company.com", "Test04pa$$");
-        await _webAppFactory.EnsureUserAsync(login, role.Name);
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
 
         await Page.LogUserInAsync(Logins.RoleManager, "/Admin/Role");
         var title = await Page.TitleAsync();
@@ -296,5 +296,99 @@ public partial class RoleManagementTests : PageTest
         await Expect(
             Page.GetByRole(AriaRole.Heading, new() { Name = $"Error: Role '{role.Name}' was not found in the database." })
             ).ToHaveCountAsync(1);
+    }
+
+    [Test]
+    [Description("Index page Create link disabled when Create claim missing")]
+    public async Task Index_page_Create_link_disabled_when_Create_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "CalendarReader",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Create]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test07User@company.com", "TestO7pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("Role Management"));
+
+        var locator = Page.GetByRole(AriaRole.Link, new() { Name = "Create New" });
+        await Expect(locator).ToBeDisabledAsync();
+    }
+
+    [Test]
+    [Description("Index page Edit button disabled when Update claim missing")]
+    public async Task Index_page_Edit_button_disabled_when_Update_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test08Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Update]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test08User@company.com", "TestO8pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("Role Management"));
+
+        var locator = Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByLabel("Edit");
+        await Expect(locator).ToBeDisabledAsync();
+    }
+
+    [Test]
+    [Description("View button disabled on Index page when Read claim missing")]
+    public async Task Index_page_View_button_disabled_when_Read_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test09Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Read]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test09User@company.com", "TestO9pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("Role Management"));
+
+        var locator = Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByLabel("View");
+        await Expect(locator).ToBeDisabledAsync();
+    }
+
+    [Test]
+    [Description("View button disabled on Index page when Delete claim missing")]
+    public async Task Index_page_Delete_button_disabled_when_Delete_claim_missing()
+    {
+        var role = new ApplicationRole
+        {
+            Name = "Test10Role",
+            Description = "Test Role"
+        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Delete]));
+        await _webAppFactory.EnsureRoleAsync(role);
+
+        var login = new Login("Test10User@company.com", "Test10pa$$");
+        await _webAppFactory.EnsureUserAsync(login, role.Id);
+
+        await Page.LogUserInAsync(login, "/Admin/Role");
+        var title = await Page.TitleAsync();
+        Assert.That(title, Does.Contain("Role Management"));
+
+        var locator = Page.GetByRole(AriaRole.Row)
+            .Filter(new() { HasText = role!.Name })
+            .GetByLabel("Delete");
+        await Expect(locator).ToBeDisabledAsync();
     }
 }

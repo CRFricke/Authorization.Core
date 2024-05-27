@@ -166,7 +166,7 @@ namespace Authorization.Core.Tests
         {
             var user = new AppUser("TestUser@StEmilian.com");
             var role = new AppRole() { Id = SysGuids.Role.Administrator, Name = nameof(SysGuids.Role.Administrator) };
-            var userClaim = new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
+            var userClaim = new IdentityUserClaim<string> { Id = 1, UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Id };
             var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Create);
 
             var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>

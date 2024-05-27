@@ -61,12 +61,13 @@
             <h5 class="text-muted text-sm-center mb-3">Select the user's role assignments:</h5>
             <hr />
             <div class="mx-auto">
-                <table class="table table-sm w-100" data-order='[[1,"asc"]]'>
+                <table class="table table-sm w-100" data-order='[[2,"asc"]]'>
                     <thead>
                         <tr>
                             <th class="col-auto" id="thSelect" data-orderable="false">
                                 <label asp-for="UserModel.Roles.ElementAt(0).IsAssigned"></label>
                             </th>
+                            <th><label asp-for="UserModel.Roles.ElementAt(0).Id"></label></th>
                             <th><label asp-for="UserModel.Roles.ElementAt(0).Name"></label></th>
                             <th><label asp-for="UserModel.Roles.ElementAt(0).Description"></label></th>
                         </tr>
@@ -79,6 +80,9 @@
                                 <tr>
                                     <td class="align-middle">
                                         <input class="form-check ms-3" type="checkbox" @checkedVal />
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(x => role.Id)
                                     </td>
                                     <td>
                                         @Html.DisplayFor(x => role.Name)
@@ -105,7 +109,15 @@
 @section Scripts {
 
     <script defer>
-        var dt = $('table').DataTable();
+        var dt = $('table').DataTable({
+            columnDefs: [
+                {
+                    target: 1,
+                    visible: false,
+                    searchable: false
+                }
+            ]
+        });
 
         $("#btnCreate").click(function (event) {
             var roles = [];

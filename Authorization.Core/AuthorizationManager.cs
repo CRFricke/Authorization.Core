@@ -388,7 +388,7 @@ namespace CRFricke.Authorization.Core
 
                 hashSet = (await (
                     from uc in dbContext.Set<IdentityUserClaim<string>>()
-                    join ar in dbContext.Set<TRole>() on uc.ClaimValue equals ar.Name
+                    join ar in dbContext.Set<TRole>() on uc.ClaimValue equals ar.Id
                     where uc.UserId == userId && uc.ClaimType == ClaimTypes.Role
                     select ar.Id
                     ).ToArrayAsync()).ToHashSet();

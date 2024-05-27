@@ -25,10 +25,10 @@ public abstract class IndexModel : ModelBase
                 {
                     if (_basePath is null)
                     {
-                        var path = Request.Path.Value;
+                        var path = Request.Path.Value.AsSpan();
                         _basePath = (
                             path.EndsWith(IndexHandler.PageName) ? path[..(path.Length - IndexHandler.PageName.Length)] : path
-                            ).TrimEnd('/');
+                            ).TrimEnd('/').ToString();
                     }
                 }
             }

@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core.Data
@@ -96,9 +98,12 @@ namespace CRFricke.Authorization.Core.Data
         /// <inheritdoc/>
         public virtual async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
         {
+            var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthDbContext>();
+
+            await FixupUserClaimValuesAsync(logger);
+
             var hasher = serviceProvider.GetRequiredService<IPasswordHasher<TUser>>();
             var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
-            var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthDbContext>();
 
             var role = await Roles.FindAsync(SysGuids.Role.Administrator);
             if (role == null)
@@ -133,7 +138,7 @@ namespace CRFricke.Authorization.Core.Data
                     PasswordHash = hasher.HashPassword(user!, "Administrat0r!"),
                     UserName = email
                 };
-                ((AuthUser)user).SetClaims(role.Name!);
+                ((AuthUser)user).SetClaims(role.Id);
 
                 await Users.AddAsync(user);
                 logger.LogInformation(
@@ -149,6 +154,55 @@ namespace CRFricke.Authorization.Core.Data
             catch (Exception ex)
             {
                 logger.LogError(ex, "SaveChangesAsync() method failed.");
+            }
+        }
+
+        /// <summary>
+        /// Called to fix up UserClaim values after the change to reference Role ID rather than Name.
+        /// </summary>
+        /// <param name="logger">A logger for logging results.</param>
+        /// <returns>A task that can be awaited on.</returns>
+        /// <remarks>
+        /// Prior to version 8.0.1, we stored the name of the Role in UserClaim.ClaimValue.
+        /// If the name of the Role was updated afterwards, the UserClaim was orphaned.
+        /// We now store the ID of the Role to prevent this.
+        /// </remarks>
+        private async Task FixupUserClaimValuesAsync(ILogger<AuthDbContext> logger)
+        {
+            var userClaims = 
+                from uc in UserClaims
+                join ar in Roles on uc.ClaimValue equals ar.Name
+                where uc.ClaimType == ClaimTypes.Role
+                select uc;
+
+            var userClaimCount = await userClaims.CountAsync();
+
+            if (userClaimCount == 0)
+            {
+                return;
+            }
+
+            var roleDictionary = await Roles
+                .Where(r => r.Name != null)
+                .ToDictionaryAsync(k => k.Name!, e => e.Id);
+
+            foreach (var claim in userClaims)
+            {
+                claim.ClaimValue = roleDictionary[claim.ClaimValue!];
+            }
+
+            try
+            {
+                await SaveChangesAsync();
+
+                logger.LogInformation(
+                    "Fixup successful for {UpdateCount} {UpdateEntity}.", 
+                    userClaimCount, nameof(UserClaims)
+                    );
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "FixupUserClaimValuesAsync() method failed.");
             }
         }
     }

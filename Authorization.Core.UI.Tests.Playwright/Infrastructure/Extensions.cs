@@ -345,6 +345,19 @@ internal static class Extensions
     }
 
     /// <summary>
+    /// Returns the ApplicationRoles contained in the database.
+    /// </summary>
+    /// <param name="webAppFactory">
+    /// The <see cref="WebAppFactory"/> whose services are to be used to access the database.
+    /// </param>
+    /// <returns>A <see cref="DbSet{TEntity}"/> of the <see cref="ApplicationRole">ApplicationRoles</see> contained in the database.</returns>
+    internal static DbSet<ApplicationRole> GetRoles(this WebAppFactory webAppFactory)
+    {
+        var dbContext = webAppFactory.Services.GetRequiredService<ApplicationDbContext>();
+        return dbContext.Roles;
+    }
+
+    /// <summary>
     /// Retrieves the specified <see cref="ApplicationUser"/> from the database.  
     /// Returns <see langword="null"/> if there is no user with the specified email.
     /// </summary>
