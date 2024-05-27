@@ -13,14 +13,9 @@
 }
 
 .ac-icon-button {
-    display: inline-block;
     font-size: 1.2rem;
     margin-left: .5rem;
     text-decoration: none;
-}
-
-.ac-icon-button::before {
-    vertical-align: baseline;
 }
 
 .ac-icon-button.disabled, .ac-icon-button:disabled {
