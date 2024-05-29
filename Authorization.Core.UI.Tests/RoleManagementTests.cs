@@ -53,8 +53,8 @@ public class RoleManagementTests : TestsBase
     {
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = "Administrator", Description = "Anyone with this role can do anything!" },
-            new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
+            new() { Name = "Administrator", Description = "Anyone with this role can do anything!" },
+            new() { Name = "TestRole", Description = "Used for testing." }
         };
         var dbSet = roles.AsQueryable().BuildMockDbSet();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
@@ -330,7 +330,7 @@ public class RoleManagementTests : TestsBase
 
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
+            new() { Name = "TestRole", Description = "Used for testing." }
         };
 
         roles[0].Claims.Add(
@@ -692,7 +692,7 @@ public class RoleManagementTests : TestsBase
 
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = "TestRole", Description = "Used for testing." }
+            new() { Name = "TestRole", Description = "Used for testing." }
         };
 
         roles[0].Claims.Add(
