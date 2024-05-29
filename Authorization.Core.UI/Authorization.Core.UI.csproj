@@ -17,6 +17,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>aspnetcore, identity, membership, authorization, UI</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
