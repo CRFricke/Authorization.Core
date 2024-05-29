@@ -80,7 +80,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         [Theory(DisplayName = "Can access Management page via friendly area name ")]
         [MemberData(nameof(Test01Data))]
-        public async void PageAccessTest01(string endpoint, bool needsId)
+        public async Task PageAccessTest01(string endpoint, bool needsId)
         {
             var client = CreateClientWithAuthenticationScheme();
 
@@ -98,7 +98,7 @@ namespace Authorization.Core.UI.Tests.Integration
         }
 
         [Fact(DisplayName = "Can access customer page actually located in friendly name area")]
-        public async void PageAccessTest02()
+        public async Task PageAccessTest02()
         {
             var client = CreateClientWithAuthenticationScheme(
                 nameof(Test.Web.AppGuids.Role.CalendarManager)
@@ -111,7 +111,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         [Theory(DisplayName = "Can access Management pages in default area ")]
         [MemberData(nameof(Test03Data))]
-        public async void PageAccessTest03Async(string endpoint, bool needsId)
+        public async Task PageAccessTest03Async(string endpoint, bool needsId)
         {
             var client = CreateClientWithAuthenticationScheme();
 
@@ -130,7 +130,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         [Theory(DisplayName = "Redirects to AccessDenied page without proper claim ")]
         [MemberData(nameof(Test04Data))]
-        public async void PageAccessTest04Async(string endpoint)
+        public async Task PageAccessTest04Async(string endpoint)
         {
             var client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -144,7 +144,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         [Theory(DisplayName = "Can access management page with proper claim ")]
         [MemberData(nameof(Test05Data))]
-        public async void PageAccessTest05Async(string endpoint, string claim, bool needsId)
+        public async Task PageAccessTest05Async(string endpoint, string claim, bool needsId)
         {
             using var scope = Factory.Services.CreateScope();
             var authManager = scope.ServiceProvider.GetRequiredService<IAuthorizationManager>();
@@ -174,7 +174,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         [Theory(DisplayName = "Returns NotFound for null Id ")]
         [MemberData(nameof(Test06Data))]
-        public async void PageAccessTest06Async(string endpoint)
+        public async Task PageAccessTest06Async(string endpoint)
         {
             var client = CreateClientWithAuthenticationScheme(
                 nameof(SysGuids.Role.Administrator)
@@ -187,7 +187,7 @@ namespace Authorization.Core.UI.Tests.Integration
 
         [Theory(DisplayName = "Returns NotFound for non-existing Id ")]
         [MemberData(nameof(Test06Data))]
-        public async void PageAccessTest07Async(string endpoint)
+        public async Task PageAccessTest07Async(string endpoint)
         {
             var client = CreateClientWithAuthenticationScheme(
                 nameof(SysGuids.Role.Administrator)

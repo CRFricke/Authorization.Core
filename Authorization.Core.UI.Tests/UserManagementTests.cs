@@ -69,8 +69,8 @@ public class UserManagementTests : TestsBase
     {
         var users = new List<ApplicationUser>
         {
-            new ApplicationUser("Admin@company.com"),
-            new ApplicationUser("TestUser@company.com") { GivenName = "Test", Surname = "User"   }
+            new("Admin@company.com"),
+            new("TestUser@company.com") { GivenName = "Test", Surname = "User"   }
         };
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
             db.Users == users.AsQueryable().BuildMockDbSet().Object
@@ -85,13 +85,13 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create User [Get] initializes the RoleInfo collection")]
-    public async void UserManagement_Test2()
+    public async Task UserManagement_Test2()
     {
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = "Administrator" },
-            new ApplicationRole { Name = "RoleManager" },
-            new ApplicationRole { Name = "UserManager" }
+            new() { Name = "Administrator" },
+            new() { Name = "RoleManager" },
+            new() { Name = "UserManager" }
         };
 
         var authManager = Mock.Of<IAuthorizationManager>(am =>
@@ -346,9 +346,9 @@ public class UserManagementTests : TestsBase
     {
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
+            new() { Name = nameof(SysGuids.Role.Administrator) },
+            new() { Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
         var expectedClaims = new[] { roles[2].Name };
@@ -437,7 +437,7 @@ public class UserManagementTests : TestsBase
             new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationRole_Id'.")
             );
 
-        var users = new List<ApplicationUser> { new ApplicationUser("TestUser@company.com") };
+        var users = new List<ApplicationUser> { new("TestUser@company.com") };
         var roles = new List<ApplicationRole> { };
 
         var principalId = Guid.NewGuid().ToString();
@@ -489,7 +489,7 @@ public class UserManagementTests : TestsBase
     [Fact(DisplayName = "Edit User [Post] sends no notification for no changes")]
     public async Task UserManagement_Test11Async()
     {
-        var users = new List<ApplicationUser> { new ApplicationUser("TestUser@company.com") };
+        var users = new List<ApplicationUser> { new("TestUser@company.com") };
         var roles = new List<ApplicationRole>();
 
         var authManager = Mock.Of<IAuthorizationManager>();
@@ -708,9 +708,9 @@ public class UserManagementTests : TestsBase
     {
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
+            new() { Name = nameof(SysGuids.Role.Administrator) },
+            new() { Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
         var expectedClaims = new[] { roles[2].Name };
@@ -843,7 +843,7 @@ public class UserManagementTests : TestsBase
     public async Task UserManagement_Test22Async()
     {
         var user = new ApplicationUser("TestUser@company.com");
-        var users = new List<ApplicationUser>(new[] { user });
+        var users = new List<ApplicationUser>([user]);
 
         var authManager = Mock.Of<IAuthorizationManager>();
 
@@ -1027,7 +1027,7 @@ public class UserManagementTests : TestsBase
         var expectedMessage = "System accounts may not be deleted";
 
         var user = new ApplicationUser("TestUser@company.com");
-        var users = new List<ApplicationUser>(new[] { user });
+        var users = new List<ApplicationUser>([user]);
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
@@ -1084,9 +1084,9 @@ public class UserManagementTests : TestsBase
 
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
+            new() { Name = nameof(SysGuids.Role.Administrator) },
+            new() { Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
         var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
@@ -1148,9 +1148,9 @@ public class UserManagementTests : TestsBase
     {
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
+            new() { Name = nameof(SysGuids.Role.Administrator) },
+            new() { Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
         var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
@@ -1331,9 +1331,9 @@ public class UserManagementTests : TestsBase
 
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
+            new() { Name = nameof(SysGuids.Role.Administrator) },
+            new() { Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
         var principalUser = new ApplicationUser("AdminUser@company.com");
@@ -1397,9 +1397,9 @@ public class UserManagementTests : TestsBase
 
         var roles = new List<ApplicationRole>
         {
-            new ApplicationRole { Name = nameof(SysGuids.Role.Administrator) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.RoleManager) },
-            new ApplicationRole { Name = nameof(SysUiGuids.Role.UserManager) }
+            new() { Name = nameof(SysGuids.Role.Administrator) },
+            new() { Name = nameof(SysUiGuids.Role.RoleManager) },
+            new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
         var principal = new ApplicationUser("AdminUser@company.com");
