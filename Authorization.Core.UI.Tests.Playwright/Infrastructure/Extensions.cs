@@ -63,8 +63,8 @@ internal static class Extensions
                 }
                 catch (Exception ex)
                 {
-                    TestContext.WriteLine("Error copying HTTP request headers in Playwright.BrowserContext Route handler.");
-                    TestContext.WriteLine(ex.ToString());
+                    TestContext.Out.WriteLine("Error copying HTTP request headers in Playwright.BrowserContext Route handler.");
+                    TestContext.Out.WriteLine(ex.ToString());
                 }
             }
 
