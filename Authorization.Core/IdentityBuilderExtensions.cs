@@ -23,6 +23,7 @@ namespace CRFricke.Authorization.Core
         /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
         [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2062:DynamicallyAccessedMembers", Justification = "AddScoped() 'implementationType' parameter is DBContext and always has available public constructor.")]
         [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:DynamicallyAccessedMembers", Justification = "AuthorizationManager<,> & IRepository<,> definitions have required DynamicallyAccessedMembers attributes.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2076:DynamicallyAccessedMembers", Justification = "AuthorizationManager<,> & IRepository<,> definitions have required DynamicallyAccessedMembers attributes.")]
         public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder, DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
         {
             Type contextType;

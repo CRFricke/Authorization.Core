@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Setup PowerShell
-      uses: CRFricke/Setup-PowerShell@v1.0.9
+      uses: CRFricke/Setup-PowerShell@v1.0.10
 
     - name: Checkout
       uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
       shell: pwsh
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: 'v8'
+          TAG_PREFIX: 'v9'
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
@@ -33,7 +33,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
