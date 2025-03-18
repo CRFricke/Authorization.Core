@@ -127,8 +127,8 @@
       <Output TaskParameter="Assets" ItemName="BS5Assets" />
     </DefineStaticWebAssets>
 
-    <GenerateStaticWebAsssetsPropsFile StaticWebAssets="@(BS4Assets)" PackagePathPrefix="staticwebassets/BS4" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" />
-    <GenerateStaticWebAsssetsPropsFile StaticWebAssets="@(BS5Assets)" PackagePathPrefix="staticwebassets/BS5" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" />
+    <GenerateStaticWebAssetsPropsFile StaticWebAssets="@(BS4Assets)" PackagePathPrefix="staticwebassets/BS4" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" />
+    <GenerateStaticWebAssetsPropsFile StaticWebAssets="@(BS5Assets)" PackagePathPrefix="staticwebassets/BS5" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" />
 
     <ComputeStaticWebAssetsTargetPaths Assets="@(BS4Assets)" PathPrefix="staticwebassets/BS4" AdjustPathsForPack="true">
       <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
