@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: Setup PowerShell
-      uses: CRFricke/Setup-PowerShell@v1.0.9
+      uses: CRFricke/Setup-PowerShell@v1.0.10
 
     - name: Checkout
       uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
 
     - name: Create NuGet packages
-      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION -p:TargetFrameworks=net8.0
 
     - name: Upload NuGet packages to GitHub
       run: dotnet nuget push "**/*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
