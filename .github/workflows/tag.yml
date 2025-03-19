@@ -32,9 +32,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: |
-          8.0.x
-          9.0.x
+        dotnet-version: 8.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -54,7 +52,7 @@ jobs:
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
 
     - name: Create NuGet packages
-      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION -p:TargetFrameworks=net8.0
+      run: dotnet pack Authorization.Core.NoTests.slnf --configuration $BUILD_CONFIG --no-build /p:Version=$BUILD_VERSION
 
     - name: Upload NuGet packages to GitHub
       run: dotnet nuget push "**/*.nupkg" --source https://nuget.pkg.github.com/CRFricke/index.json --api-key ${{ secrets.GITHUB_TOKEN }}

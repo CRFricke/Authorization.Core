@@ -62,8 +62,10 @@
   
   <!-- The remainder of this project file generates the build files required to pack the static web assets for the NuGet package. -->
   <!-- Based on Microsoft.AspNetCore.Identity.UI project file located at: --> 
-  <!--   https://github.com/dotnet/aspnetcore/blob/main/src/Identity/UI/src/Microsoft.AspNetCore.Identity.UI.csproj --> 
-  <PropertyGroup>
+  <!--   https://github.com/dotnet/aspnetcore/blob/main/src/Identity/UI/src/Microsoft.AspNetCore.Identity.UI.csproj -->
+
+	<PropertyGroup>
+	<EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
     <ProvideApplicationPartFactoryAttributeTypeName>Microsoft.AspNetCore.Mvc.ApplicationParts.NullApplicationPartFactory, Microsoft.AspNetCore.Mvc.Core</ProvideApplicationPartFactoryAttributeTypeName>
     <DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
     <StaticWebAssetsDisableProjectBuildPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildPropsFileGeneration>
@@ -73,13 +75,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
-    <Content Remove="libman.json" />
-    <Content Update="**\*.cshtml" Pack="false" />
+    <None Include="@(Content)" />
+    <Content Remove="@(Content)" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
     <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
+
+  <Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
+    <ItemGroup>
+      <_RazorGenerate Include="Areas\Authorization\Pages\**\*.cshtml" />
+
+      <RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Authorization\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
 
   <Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
     <PropertyGroup>
@@ -96,7 +105,14 @@
       </ReferenceAssetCandidates>
     </ItemGroup>
     
-    <DefineStaticWebAssets Condition="'@(ReferenceAssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(ReferenceAssetCandidates)" SourceId="$(PackageId)" SourceType="Project" AssetKind="All" BasePath="$(StaticWebAssetBasePath)">
+    <DefineStaticWebAssets 
+	  Condition="'@(ReferenceAssetCandidates->Count())' != '0'" 
+	  CandidateAssets="@(ReferenceAssetCandidates)" 
+	  SourceId="$(PackageId)" 
+	  SourceType="Project" 
+	  AssetKind="All" 
+	  BasePath="$(StaticWebAssetBasePath)"
+	  >
       <Output TaskParameter="Assets" ItemName="ReferenceAsset" />
     </DefineStaticWebAssets>
     <ItemGroup>
@@ -107,6 +123,9 @@
   </Target>
 
   <Target Name="_GenerateAuthUIPackItems" BeforeTargets="GenerateStaticWebAssetsPackFiles">
+
+	<Message Importance="High" Text="StaticWebAssetsSdkBuildTasksAssembly: $(StaticWebAssetsSdkBuildTasksAssembly)" />
+
     <ItemGroup>
       <BS4AssetCandidates Include="assets\BS4\**" />
       <BS4AssetCandidates>
@@ -119,16 +138,40 @@
       </BS5AssetCandidates>
     </ItemGroup>
     
-    <DefineStaticWebAssets Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS4AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS4" BasePath="$(StaticWebAssetBasePath)">
+    <DefineStaticWebAssets 
+	  Condition="'@(BS4AssetCandidates->Count())' != '0'" 
+	  CandidateAssets="@(BS4AssetCandidates)" 
+	  SourceId="$(PackageId)" 
+	  SourceType="Discovered" 
+	  AssetKind="All" 
+	  ContentRoot="assets/BS4" 
+	  BasePath="$(StaticWebAssetBasePath)"
+	  >
       <Output TaskParameter="Assets" ItemName="BS4Assets" />
     </DefineStaticWebAssets>
     
-    <DefineStaticWebAssets Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS5AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS5" BasePath="$(StaticWebAssetBasePath)">
+    <DefineStaticWebAssets 
+	  Condition="'@(BS5AssetCandidates->Count())' != '0'" 
+	  CandidateAssets="@(BS5AssetCandidates)" 
+	  SourceId="$(PackageId)" 
+	  SourceType="Discovered" 
+	  AssetKind="All" 
+	  ContentRoot="assets/BS5" 
+	  BasePath="$(StaticWebAssetBasePath)"
+	  >
       <Output TaskParameter="Assets" ItemName="BS5Assets" />
     </DefineStaticWebAssets>
 
-    <GenerateStaticWebAssetsPropsFile StaticWebAssets="@(BS4Assets)" PackagePathPrefix="staticwebassets/BS4" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" />
-    <GenerateStaticWebAssetsPropsFile StaticWebAssets="@(BS5Assets)" PackagePathPrefix="staticwebassets/BS5" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" />
+    <GenerateStaticWebAsssetsPropsFile 
+	  StaticWebAssets="@(BS4Assets)" 
+	  PackagePathPrefix="staticwebassets/BS4" 
+	  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" 
+	  />
+    <GenerateStaticWebAsssetsPropsFile 
+	  StaticWebAssets="@(BS5Assets)" 
+	  PackagePathPrefix="staticwebassets/BS5" 
+	  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" 
+	  />
 
     <ComputeStaticWebAssetsTargetPaths Assets="@(BS4Assets)" PathPrefix="staticwebassets/BS4" AdjustPathsForPack="true">
       <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
