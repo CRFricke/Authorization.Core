@@ -66,6 +66,7 @@
 
   <PropertyGroup>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+	<EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
     <DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
     <DisableStaticWebAssetEndpointsBuildPropsFileGeneration>true</DisableStaticWebAssetEndpointsBuildPropsFileGeneration>
     <ProvideApplicationPartFactoryAttributeTypeName>Microsoft.AspNetCore.Mvc.ApplicationParts.NullApplicationPartFactory, Microsoft.AspNetCore.Mvc.Core</ProvideApplicationPartFactoryAttributeTypeName>
@@ -76,13 +77,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
-    <Content Remove="libman.json" />
-    <Content Update="**\*.cshtml" Pack="false" />
+    <None Include="@(Content)" />
+    <Content Remove="@(Content)" />
     <None Include="build\*" Pack="true" PackagePath="build\" />
     <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
     <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
+
+  <Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
+    <ItemGroup>
+      <_RazorGenerate Include="Areas\Authorization\Pages\**\*.cshtml" />
+
+      <RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Authorization\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
 
   <Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
     <PropertyGroup>
@@ -118,12 +126,16 @@
   </Target>
 
   <Target Name="_GenerateAuthUIPackItems" BeforeTargets="GenerateStaticWebAssetsPackFiles">
+
+	<Message Importance="High" Text="StaticWebAssetsSdkBuildTasksAssembly: $(StaticWebAssetsSdkBuildTasksAssembly)" />
+
     <ItemGroup>
       <BS4AssetCandidates Include="assets\BS4\**" />
       <BS4AssetCandidates>
         <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
       </BS4AssetCandidates>
-      <BS5AssetCandidates Include="assets\BS5\**" />
+
+	  <BS5AssetCandidates Include="assets\BS5\**" />
       <BS5AssetCandidates>
         <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
       </BS5AssetCandidates>
@@ -201,7 +213,8 @@
 	  >
       <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
     </ComputeStaticWebAssetsTargetPaths>
-    <ComputeStaticWebAssetsTargetPaths 
+
+	<ComputeStaticWebAssetsTargetPaths 
 	  Assets="@(BS5Assets)" 
 	  PathPrefix="staticwebassets/BS5" 
 	  AdjustPathsForPack="true"
@@ -216,6 +229,7 @@
       <StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS4.endpoints.targets">
         <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS4.endpoints.targets</PackagePath>
       </StaticWebAssetPackageFile>
+
       <StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS5.targets">
         <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS5.targets</PackagePath>
       </StaticWebAssetPackageFile>
