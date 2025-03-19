@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		icon.png = icon.png
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -18,11 +19,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Test.Web", "Authorization.Core.UI.Test.Web\Authorization.Core.UI.Test.Web.csproj", "{0D0281E1-8115-4B74-9DEC-739D85AD1720}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests", "Authorization.Core.UI.Tests\Authorization.Core.UI.Tests.csproj", "{8B662D41-F811-44C0-8A05-8DE849B1249F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".assets", ".assets", "{FA413BEC-27EE-4E32-AF25-54DB50BE0859}"
-	ProjectSection(SolutionItems) = preProject
-		assets\icon.png = assets\icon.png
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Core.UI.Tests.Integration", "Authorization.Core.UI.Tests.Integration\Authorization.Core.UI.Tests.Integration.csproj", "{7E849D0F-3F73-43CD-9F5E-40BD1C398887}"
 EndProject
@@ -65,9 +61,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{FA413BEC-27EE-4E32-AF25-54DB50BE0859} = {F6AEEA8D-84AB-48C4-8F2B-CD140ECCFB1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EEEE8EE-B2B2-43B4-9814-87DE79EED7D8}

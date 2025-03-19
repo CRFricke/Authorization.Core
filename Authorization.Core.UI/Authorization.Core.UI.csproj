@@ -43,7 +43,7 @@
     <None Update="Areas\Authorization\Pages\V5\Role\*.cshtml.css" CssScope="b-role-mgmt" />
     <None Update="Areas\Authorization\Pages\V5\User\*.cshtml.css" CssScope="b-user-mgmt" />
     <None Include="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
-    <None Include="..\assets\icon.png" Pack="True" PackagePath="\" />
+    <None Include="..\icon.png" Pack="True" PackagePath="\" />
     <None Include="..\README.md" Pack="True" PackagePath="\" />
     <None Include="libman.json" />
   </ItemGroup>

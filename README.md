@@ -1,4 +1,4 @@
-![Authorization.Core](assets/icon.png)
+![Authorization.Core](icon.png)
 
 [![.NET](https://github.com/CRFricke/Authorization.Core/actions/workflows/dotnet.yml/badge.svg)](https://github.com/CRFricke/Authorization.Core/actions/workflows/dotnet.yml) 
 [![Tag](https://github.com/CRFricke/Authorization.Core/actions/workflows/tag.yml/badge.svg)](https://github.com/CRFricke/Authorization.Core/actions/workflows/tag.yml)
