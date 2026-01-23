@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "Authorization.Core.sln",
+    "path": "Authorization.Core.slnx",
     "projects": [
       "Authorization.Core\\Authorization.Core.csproj",
       "Authorization.Core.UI\\Authorization.Core.UI.csproj"

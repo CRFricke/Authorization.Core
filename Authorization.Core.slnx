@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="global.json" />
+  </Folder>
+  <Project Path="Authorization.Core.Tests/Authorization.Core.Tests.csproj" />
+  <Project Path="Authorization.Core.UI.Test.Web/Authorization.Core.UI.Test.Web.csproj" />
+  <Project Path="Authorization.Core.UI.Tests.Integration/Authorization.Core.UI.Tests.Integration.csproj" />
+  <Project Path="Authorization.Core.UI.Tests.Playwright/Authorization.Core.UI.Tests.Playwright.csproj" />
+  <Project Path="Authorization.Core.UI.Tests/Authorization.Core.UI.Tests.csproj" />
+  <Project Path="Authorization.Core.UI/Authorization.Core.UI.csproj" />
+  <Project Path="Authorization.Core/Authorization.Core.csproj" />
+</Solution>
