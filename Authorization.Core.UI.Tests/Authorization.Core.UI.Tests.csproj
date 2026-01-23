@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CRFricke.Test.Support" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.14" />
+    <PackageReference Include="CRFricke.Test.Support" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.12" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="8.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="MockQueryable.Moq" Version="7.0.3" />

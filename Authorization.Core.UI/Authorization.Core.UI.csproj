@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.12" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -162,12 +162,12 @@
       <Output TaskParameter="Assets" ItemName="BS5Assets" />
     </DefineStaticWebAssets>
 
-    <GenerateStaticWebAsssetsPropsFile 
+	<GenerateStaticWebAssetsPropsFile 
 	  StaticWebAssets="@(BS4Assets)" 
 	  PackagePathPrefix="staticwebassets/BS4" 
 	  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" 
 	  />
-    <GenerateStaticWebAsssetsPropsFile 
+	<GenerateStaticWebAssetsPropsFile
 	  StaticWebAssets="@(BS5Assets)" 
 	  PackagePathPrefix="staticwebassets/BS5" 
 	  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" 
