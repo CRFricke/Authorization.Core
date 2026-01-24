@@ -1,193 +1,241 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <IsTrimmable>false</IsTrimmable>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Authors>Chuck Fricke</Authors>
-    <Company>Fricke Consulting</Company>
-    <Copyright>Copyright © Chuck Fricke $([System.DateTime]::Now.ToString(yyyy))</Copyright>
-    <Description>Extends ASP.NET Core Identity to include a UI for management of Users and Roles.</Description>
-    <RazorAssemblyDescription>Compiled Razor views assembly for the CRFricke.Authorization.Core.UI package.</RazorAssemblyDescription>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>aspnetcore, identity, membership, authorization, UI</PackageTags>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  </PropertyGroup>
-
-  <!-- For 'push' workflow, we embed the PDB in the DLL and push the nupkg to github.com -->
-  <PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'push'">
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-
-  <!-- For 'release' workflow, we create a separate symbol package and push both to nuget.org -->
-  <PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'release'">
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
-
-  <!-- To get a "deterministic build" for our NuGet package: -->
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Update="Areas\Authorization\Pages\V5\Role\*.cshtml.css" CssScope="b-role-mgmt" />
-    <None Update="Areas\Authorization\Pages\V5\User\*.cshtml.css" CssScope="b-user-mgmt" />
-    <None Include="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
-    <None Include="..\icon.png" Pack="True" PackagePath="\" />
-    <None Include="..\README.md" Pack="True" PackagePath="\" />
-    <None Include="libman.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.14" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
-  </ItemGroup>
-  
-  <!-- The remainder of this project file generates the build files required to pack the static web assets for the NuGet package. -->
-  <!-- Based on Microsoft.AspNetCore.Identity.UI project file located at: --> 
-  <!--   https://github.com/dotnet/aspnetcore/blob/main/src/Identity/UI/src/Microsoft.AspNetCore.Identity.UI.csproj -->
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<IsTrimmable>false</IsTrimmable>
+	</PropertyGroup>
 
 	<PropertyGroup>
-	<EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
-    <ProvideApplicationPartFactoryAttributeTypeName>Microsoft.AspNetCore.Mvc.ApplicationParts.NullApplicationPartFactory, Microsoft.AspNetCore.Mvc.Core</ProvideApplicationPartFactoryAttributeTypeName>
-    <DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
-    <StaticWebAssetsDisableProjectBuildPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildPropsFileGeneration>
-    <StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>
-    <StaticWebAssetsDisableProjectBuildTransitivePropsFileGeneration>true</StaticWebAssetsDisableProjectBuildTransitivePropsFileGeneration>
-    <StaticWebAssetsGetBuildAssetsTargets>GetAuthUIAssets</StaticWebAssetsGetBuildAssetsTargets>
-  </PropertyGroup>
+		<Authors>Chuck Fricke</Authors>
+		<Company>Fricke Consulting</Company>
+		<Copyright>Copyright © Chuck Fricke $([System.DateTime]::Now.ToString(yyyy))</Copyright>
+		<Description>Extends ASP.NET Core Identity to include a UI for management of Users and Roles.</Description>
+		<RazorAssemblyDescription>Compiled Razor views assembly for the CRFricke.Authorization.Core.UI package.</RazorAssemblyDescription>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>aspnetcore, identity, membership, authorization, UI</PackageTags>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="@(Content)" />
-    <Content Remove="@(Content)" />
-    <None Include="build\*" Pack="true" PackagePath="build\" />
-    <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
-    <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
-  </ItemGroup>
+	<!-- For 'push' workflow, we embed the PDB in the DLL and push the nupkg to github.com -->
+	<PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'push'">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
 
-  <Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
-    <ItemGroup>
-      <_RazorGenerate Include="Areas\Authorization\Pages\**\*.cshtml" />
+	<!-- For 'release' workflow, we create a separate symbol package and push both to nuget.org -->
+	<PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'release'">
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
 
-      <RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Authorization\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
-    </ItemGroup>
-  </Target>
+	<!-- To get a "deterministic build" for our NuGet package: -->
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
 
-  <Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
-    <PropertyGroup>
-      <_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'">assets/BS5</_ReferenceAssetContentRoot>
-      <_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'">assets/BS4</_ReferenceAssetContentRoot>
-    </PropertyGroup>
-    
-    <ItemGroup>
-      <ReferenceAssetCandidates Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'" Include="assets\BS5\**" />
-      <ReferenceAssetCandidates Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'" Include="assets\BS4\**" />
-      <ReferenceAssetCandidates>
-        <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
-        <ContentRoot>$([System.IO.Path]::GetFullPath($(_ReferenceAssetContentRoot)))</ContentRoot>
-      </ReferenceAssetCandidates>
-    </ItemGroup>
-    
-    <DefineStaticWebAssets 
-	  Condition="'@(ReferenceAssetCandidates->Count())' != '0'" 
-	  CandidateAssets="@(ReferenceAssetCandidates)" 
-	  SourceId="$(PackageId)" 
-	  SourceType="Project" 
-	  AssetKind="All" 
-	  BasePath="$(StaticWebAssetBasePath)"
-	  >
-      <Output TaskParameter="Assets" ItemName="ReferenceAsset" />
-    </DefineStaticWebAssets>
-    <ItemGroup>
-      <ReferenceAsset>
-        <ResultType>StaticWebAsset</ResultType>
-      </ReferenceAsset>
-    </ItemGroup>
-  </Target>
+	<ItemGroup>
+		<None Update="Areas\Authorization\Pages\V5\Role\*.cshtml.css" CssScope="b-role-mgmt" />
+		<None Update="Areas\Authorization\Pages\V5\User\*.cshtml.css" CssScope="b-user-mgmt" />
+		<None Include="assets\BS5\lib\bootstrap\font\bootstrap-icons.json" />
+		<None Include="..\icon.png" Pack="True" PackagePath="\" />
+		<None Include="..\README.md" Pack="True" PackagePath="\" />
+		<None Include="libman.json" />
+	</ItemGroup>
 
-  <Target Name="_GenerateAuthUIPackItems" BeforeTargets="GenerateStaticWebAssetsPackFiles">
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.12" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-	<Message Importance="High" Text="StaticWebAssetsSdkBuildTasksAssembly: $(StaticWebAssetsSdkBuildTasksAssembly)" />
+	<ItemGroup>
+		<ProjectReference Include="..\Authorization.Core\Authorization.Core.csproj" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <BS4AssetCandidates Include="assets\BS4\**" />
-      <BS4AssetCandidates>
-        <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
-      </BS4AssetCandidates>
-      
-      <BS5AssetCandidates Include="assets\BS5\**" />
-      <BS5AssetCandidates>
-        <RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
-      </BS5AssetCandidates>
-    </ItemGroup>
-    
-    <DefineStaticWebAssets 
-	  Condition="'@(BS4AssetCandidates->Count())' != '0'" 
-	  CandidateAssets="@(BS4AssetCandidates)" 
-	  SourceId="$(PackageId)" 
-	  SourceType="Discovered" 
-	  AssetKind="All" 
-	  ContentRoot="assets/BS4" 
-	  BasePath="$(StaticWebAssetBasePath)"
-	  >
-      <Output TaskParameter="Assets" ItemName="BS4Assets" />
-    </DefineStaticWebAssets>
-    
-    <DefineStaticWebAssets 
-	  Condition="'@(BS5AssetCandidates->Count())' != '0'" 
-	  CandidateAssets="@(BS5AssetCandidates)" 
-	  SourceId="$(PackageId)" 
-	  SourceType="Discovered" 
-	  AssetKind="All" 
-	  ContentRoot="assets/BS5" 
-	  BasePath="$(StaticWebAssetBasePath)"
-	  >
-      <Output TaskParameter="Assets" ItemName="BS5Assets" />
-    </DefineStaticWebAssets>
+	<!-- The remainder of this project file generates the build files required to pack the static web assets for the NuGet package. -->
+	<!-- Based on Microsoft.AspNetCore.Identity.UI project file located at: -->
+	<!--   https://github.com/dotnet/aspnetcore/blob/main/src/Identity/UI/src/Microsoft.AspNetCore.Identity.UI.csproj -->
 
-    <GenerateStaticWebAsssetsPropsFile 
-	  StaticWebAssets="@(BS4Assets)" 
-	  PackagePathPrefix="staticwebassets/BS4" 
-	  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" 
-	  />
-    <GenerateStaticWebAsssetsPropsFile 
-	  StaticWebAssets="@(BS5Assets)" 
-	  PackagePathPrefix="staticwebassets/BS5" 
-	  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" 
-	  />
+	<PropertyGroup>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+		<DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
+		<DisableStaticWebAssetEndpointsBuildPropsFileGeneration>true</DisableStaticWebAssetEndpointsBuildPropsFileGeneration>
+		<ProvideApplicationPartFactoryAttributeTypeName>Microsoft.AspNetCore.Mvc.ApplicationParts.NullApplicationPartFactory, Microsoft.AspNetCore.Mvc.Core</ProvideApplicationPartFactoryAttributeTypeName>
+		<StaticWebAssetsDisableProjectBuildPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildPropsFileGeneration>
+		<StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildMultiTargetingPropsFileGeneration>
+		<StaticWebAssetsDisableProjectBuildTransitivePropsFileGeneration>true</StaticWebAssetsDisableProjectBuildTransitivePropsFileGeneration>
+		<StaticWebAssetsGetBuildAssetsTargets>GetAuthUIAssets</StaticWebAssetsGetBuildAssetsTargets>
+	</PropertyGroup>
 
-    <ComputeStaticWebAssetsTargetPaths Assets="@(BS4Assets)" PathPrefix="staticwebassets/BS4" AdjustPathsForPack="true">
-      <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
-    </ComputeStaticWebAssetsTargetPaths>
-    <ComputeStaticWebAssetsTargetPaths Assets="@(BS5Assets)" PathPrefix="staticwebassets/BS5" AdjustPathsForPack="true">
-      <Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
-    </ComputeStaticWebAssetsTargetPaths>
+	<ItemGroup>
+		<None Include="@(Content)" />
+		<Content Remove="@(Content)" />
+		<None Include="build\*" Pack="true" PackagePath="build\" />
+		<None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
+		<None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS4.targets">
-        <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS4.targets</PackagePath>
-      </StaticWebAssetPackageFile>
-      <StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS5.targets">
-        <PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS5.targets</PackagePath>
-      </StaticWebAssetPackageFile>
-    </ItemGroup>
-  </Target>
+	<Target Name="SetupRazorInputs" BeforeTargets="ResolveRazorGenerateInputs">
+		<ItemGroup>
+			<_RazorGenerate Include="Areas\Authorization\Pages\**\*.cshtml" />
+
+			<RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Authorization\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
+		</ItemGroup>
+	</Target>
+
+	<Target Name="GetAuthUIAssets" Returns="@(ReferenceAsset)">
+		<PropertyGroup>
+			<_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'">assets/BS5</_ReferenceAssetContentRoot>
+			<_ReferenceAssetContentRoot Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'">assets/BS4</_ReferenceAssetContentRoot>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<ReferenceAssetCandidates Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap5'" Include="assets\BS5\**" />
+			<ReferenceAssetCandidates Condition="'$(IdentityDefaultUIFramework)' == 'Bootstrap4'" Include="assets\BS4\**" />
+			<ReferenceAssetCandidates>
+				<RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+				<ContentRoot>$([System.IO.Path]::GetFullPath($(_ReferenceAssetContentRoot)))</ContentRoot>
+			</ReferenceAssetCandidates>
+		</ItemGroup>
+
+		<DefineStaticWebAssets
+		  Condition="'@(ReferenceAssetCandidates->Count())' != '0'"
+		  CandidateAssets="@(ReferenceAssetCandidates)"
+		  SourceId="$(PackageId)"
+		  SourceType="Project"
+		  AssetKind="All"
+		  BasePath="$(StaticWebAssetBasePath)"
+		>
+			<Output TaskParameter="Assets" ItemName="ReferenceAsset" />
+		</DefineStaticWebAssets>
+
+		<ItemGroup>
+			<ReferenceAsset>
+				<ResultType>StaticWebAsset</ResultType>
+			</ReferenceAsset>
+		</ItemGroup>
+	</Target>
+
+	<Target Name="_GenerateAuthUIPackItems" BeforeTargets="GenerateStaticWebAssetsPackFiles">
+
+		<!--<Message Importance="High" Text="StaticWebAssetsSdkBuildTasksAssembly: $(StaticWebAssetsSdkBuildTasksAssembly)" />-->
+
+		<ItemGroup>
+			<BS4AssetCandidates Include="assets\BS4\**" />
+			<BS4AssetCandidates>
+				<RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+			</BS4AssetCandidates>
+
+			<BS5AssetCandidates Include="assets\BS5\**" />
+			<BS5AssetCandidates>
+				<RelativePath>%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+			</BS5AssetCandidates>
+		</ItemGroup>
+
+		<DefineStaticWebAssets
+		  Condition="'@(BS4AssetCandidates->Count())' != '0'"
+		  CandidateAssets="@(BS4AssetCandidates)"
+		  SourceId="$(PackageId)"
+		  SourceType="Discovered"
+		  AssetKind="All"
+		  ContentRoot="assets/BS4"
+		  BasePath="$(StaticWebAssetBasePath)"
+		>
+			<Output TaskParameter="Assets" ItemName="BS4Assets" />
+		</DefineStaticWebAssets>
+
+		<DefineStaticWebAssets
+		  Condition="'@(BS5AssetCandidates->Count())' != '0'"
+		  CandidateAssets="@(BS5AssetCandidates)"
+		  SourceId="$(PackageId)"
+		  SourceType="Discovered"
+		  AssetKind="All"
+		  ContentRoot="assets/BS5"
+		  BasePath="$(StaticWebAssetBasePath)"
+		>
+			<Output TaskParameter="Assets" ItemName="BS5Assets" />
+		</DefineStaticWebAssets>
+
+		<DefineStaticWebAssetEndpoints
+		  Condition="'@(BS4Assets)' != ''"
+		  CandidateAssets="@(BS4Assets)"
+		  ExistingEndpoints="@()"
+		  ContentTypeMappings="@(StaticWebAssetContentTypeMapping)"
+        >
+			<Output TaskParameter="Endpoints" ItemName="BS4AssetEndpoints" />
+		</DefineStaticWebAssetEndpoints>
+
+		<DefineStaticWebAssetEndpoints
+		  Condition="'@(BS5Assets)' != ''"
+		  CandidateAssets="@(BS5Assets)"
+		  ExistingEndpoints="@()"
+		  ContentTypeMappings="@(StaticWebAssetContentTypeMapping)"
+        >
+			<Output TaskParameter="Endpoints" ItemName="BS5AssetEndpoints" />
+		</DefineStaticWebAssetEndpoints>
+
+		<GenerateStaticWebAssetsPropsFile
+		  StaticWebAssets="@(BS4Assets)"
+		  PackagePathPrefix="staticwebassets/BS4"
+		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets"
+	    />
+		<GenerateStaticWebAssetsPropsFile
+		  StaticWebAssets="@(BS5Assets)"
+		  PackagePathPrefix="staticwebassets/BS5"
+		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets"
+	    />
+
+		<GenerateStaticWebAssetEndpointsPropsFile
+		  StaticWebAssets="@(BS4Assets)"
+		  StaticWebAssetEndpoints="@(BS4AssetEndpoints)"
+		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.endpoints.targets"
+	    />
+
+		<GenerateStaticWebAssetEndpointsPropsFile
+		  StaticWebAssets="@(BS5Assets)"
+		  StaticWebAssetEndpoints="@(BS5AssetEndpoints)"
+		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.endpoints.targets"
+	    />
+
+		<ComputeStaticWebAssetsTargetPaths
+		  Assets="@(BS4Assets)"
+		  PathPrefix="staticwebassets/BS4"
+		  AdjustPathsForPack="true"
+	    >
+			<Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
+		</ComputeStaticWebAssetsTargetPaths>
+
+		<ComputeStaticWebAssetsTargetPaths
+		  Assets="@(BS5Assets)"
+		  PathPrefix="staticwebassets/BS5"
+		  AdjustPathsForPack="true"
+	    >
+			<Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
+		</ComputeStaticWebAssetsTargetPaths>
+
+		<ItemGroup>
+			<StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS4.targets">
+				<PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS4.targets</PackagePath>
+			</StaticWebAssetPackageFile>
+			<StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS4.endpoints.targets">
+				<PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS4.endpoints.targets</PackagePath>
+			</StaticWebAssetPackageFile>
+
+			<StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS5.targets">
+				<PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS5.targets</PackagePath>
+			</StaticWebAssetPackageFile>
+			<StaticWebAssetPackageFile Include="$(IntermediateOutputPath)AuthUI.BS5.endpoints.targets">
+				<PackagePath>build\Microsoft.AspNetCore.StaticWebAssets.BS5.endpoints.targets</PackagePath>
+			</StaticWebAssetPackageFile>
+		</ItemGroup>
+	</Target>
 
 </Project>
