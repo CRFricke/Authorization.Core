@@ -17,13 +17,13 @@ jobs:
       uses: CRFricke/Setup-PowerShell@v1.0.10
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Get Build Version
       shell: pwsh
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: 'v9'
+          TAG_PREFIX: 'v10'
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
@@ -32,7 +32,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -46,7 +46,7 @@ jobs:
 
     - name: Install Playwright
       shell: pwsh
-      run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net9.0/playwright.ps1 install
+      run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net10.0/playwright.ps1 install
 
     - name: Test
       run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
