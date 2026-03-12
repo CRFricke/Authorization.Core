@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>CRFricke.$(MSBuildProjectName)</AssemblyName>
 		<RootNamespace>CRFricke.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<IsTrimmable>false</IsTrimmable>
@@ -48,7 +48,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.12" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.5" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
