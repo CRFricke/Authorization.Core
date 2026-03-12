@@ -1,0 +1,1376 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-03-12T18:28:37.3665058Z",
+  "analysisEndTime": "2026-03-12T18:28:40.6473434Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 7,
+      "issues": 5,
+      "incidents": 44,
+      "effort": 44
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 7,
+        "Optional": 3,
+        "Potential": 34,
+        "Information": 0
+      },
+      "category": {
+        "NuGet": 13,
+        "Project": 7,
+        "Api": 24
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "Authorization.Core\\Authorization.Core.csproj",
+      "startingProject": true,
+      "issues": 3,
+      "storyPoints": 4,
+      "properties": {
+        "appName": "Authorization.Core",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 30,
+        "numberOfCodeFiles": 30,
+        "linesTotal": 2096,
+        "linesOfCode": 2096,
+        "totalApiScanned": 2045,
+        "minLinesOfCodeToChange": 2,
+        "maxLinesOfCodeToChange": 2
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "ceb42c15-43bf-4f24-bfaa-a0554fb0bb62",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core\\Authorization.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5",
+              "protected": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core\\Authorization.Core.csproj",
+            "snippet": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5",
+            "label": "Microsoft.AspNetCore.Identity.EntityFrameworkCore 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "424ceed4-14b1-450f-8438-ff7f52e6da2b",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core\\Authorization.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core\\Authorization.Core.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "257f1b87-e4e4-42a0-b85f-16b520bad794",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "Authorization.Core\\Authorization.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "userRoleCache.Set(\r\n                    userId, hashSet,\r\n                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(3))\r\n                    );",
+              "protected": "M:System.TimeSpan.FromMinutes(System.Int64)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core\\AuthorizationManager.cs",
+            "snippet": "userRoleCache.Set(\r\n                    userId, hashSet,\r\n                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(3))\r\n                    );",
+            "protectedSnippet": "M:System.TimeSpan.FromMinutes(System.Int64)",
+            "label": "M:System.TimeSpan.FromMinutes(System.Int64)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 395,
+            "column": 16
+          }
+        },
+        {
+          "incidentId": "889cbda6-2ac9-4289-9cdc-236978986c0e",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "Authorization.Core\\Authorization.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "roleClaimCache.Set(\r\n                    roleId, hashSet,\r\n                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(3))\r\n                    );",
+              "protected": "M:System.TimeSpan.FromMinutes(System.Int64)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core\\AuthorizationManager.cs",
+            "snippet": "roleClaimCache.Set(\r\n                    roleId, hashSet,\r\n                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(3))\r\n                    );",
+            "protectedSnippet": "M:System.TimeSpan.FromMinutes(System.Int64)",
+            "label": "M:System.TimeSpan.FromMinutes(System.Int64)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 340,
+            "column": 16
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Authorization.Core.Tests\\Authorization.Core.Tests.csproj",
+      "startingProject": true,
+      "issues": 2,
+      "storyPoints": 2,
+      "properties": {
+        "appName": "Authorization.Core.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 7,
+        "numberOfCodeFiles": 5,
+        "linesTotal": 2894,
+        "linesOfCode": 1105,
+        "totalApiScanned": 2701,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "eda15602-7dc3-4b76-96c5-4b3008962d49",
+          "ruleId": "NuGet.0005",
+          "projectPath": "Authorization.Core.Tests\\Authorization.Core.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+              "protected": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.Tests\\Authorization.Core.Tests.csproj",
+            "snippet": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "protectedSnippet": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "label": "xunit 2.9.3",
+            "properties": {
+              "PackageId": "xunit",
+              "PackageVersion": "2.9.3",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "9662f620-ef67-460f-82a9-f68211c6b0a3",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core.Tests\\Authorization.Core.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.Tests\\Authorization.Core.Tests.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+      "startingProject": true,
+      "issues": 3,
+      "storyPoints": 4,
+      "properties": {
+        "appName": "Authorization.Core.UI",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 45,
+        "numberOfCodeFiles": 45,
+        "linesTotal": 3716,
+        "linesOfCode": 3716,
+        "totalApiScanned": 31016,
+        "minLinesOfCodeToChange": 2,
+        "maxLinesOfCodeToChange": 2
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "30259f90-e37e-4f5e-90ca-fb2452c50210",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5",
+              "protected": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+            "snippet": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5",
+            "label": "Microsoft.AspNetCore.Identity.UI 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.UI",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "206aa28a-0f53-441e-85bb-fa09885320cd",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "72d1c0d7-f303-45a1-b0fa-029f937cb9d7",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.UI, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.UI, 8.0.6",
+          "projectPath": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var metadata = assembly?.GetCustomAttributes\u003CUIFrameworkAttribute\u003E()\r\n                .SingleOrDefault()?.UIFramework;",
+              "protected": "P:Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute.UIFramework"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI\\IdentityBuilderExtensions.cs",
+            "snippet": "var metadata = assembly?.GetCustomAttributes\u003CUIFrameworkAttribute\u003E()\r\n                .SingleOrDefault()?.UIFramework;",
+            "protectedSnippet": "P:Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute.UIFramework",
+            "label": "P:Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute.UIFramework",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.UI",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 145,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "ff0512a4-954b-4087-be5a-61645a596293",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.UI, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.UI, 8.0.6",
+          "projectPath": "Authorization.Core.UI\\Authorization.Core.UI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var metadata = assembly?.GetCustomAttributes\u003CUIFrameworkAttribute\u003E()\r\n                .SingleOrDefault()?.UIFramework;",
+              "protected": "T:Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI\\IdentityBuilderExtensions.cs",
+            "snippet": "var metadata = assembly?.GetCustomAttributes\u003CUIFrameworkAttribute\u003E()\r\n                .SingleOrDefault()?.UIFramework;",
+            "protectedSnippet": "T:Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute",
+            "label": "T:Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.UI",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 145,
+            "column": 12
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+      "startingProject": true,
+      "issues": 4,
+      "storyPoints": 16,
+      "properties": {
+        "appName": "Authorization.Core.UI.Test.Web",
+        "projectKind": "AspNetCore",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 69,
+        "numberOfCodeFiles": 35,
+        "linesTotal": 56199,
+        "linesOfCode": 1993,
+        "totalApiScanned": 6060,
+        "minLinesOfCodeToChange": 10,
+        "maxLinesOfCodeToChange": 10
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "5fff8a92-ff9c-4a3f-8219-c3dddbec9999",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore 10.0.5",
+              "protected": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+            "snippet": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore 10.0.5",
+            "label": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "8067885d-2aee-4b8d-a03b-69405a6630be",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5",
+              "protected": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+            "snippet": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.5",
+            "label": "Microsoft.AspNetCore.Identity.EntityFrameworkCore 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "9830f9f2-fbd0-461e-917d-b0438ebc39a1",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5",
+              "protected": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+            "snippet": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Identity.UI, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.UI, and replace with new package Microsoft.AspNetCore.Identity.UI 10.0.5",
+            "label": "Microsoft.AspNetCore.Identity.UI 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.UI",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "8b082006-7a3f-487b-bcfd-dfc5f882336e",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Sqlite, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Sqlite, and replace with new package Microsoft.EntityFrameworkCore.Sqlite 10.0.5",
+              "protected": "Microsoft.EntityFrameworkCore.Sqlite, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Sqlite, and replace with new package Microsoft.EntityFrameworkCore.Sqlite 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Sqlite, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Sqlite, and replace with new package Microsoft.EntityFrameworkCore.Sqlite 10.0.5",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Sqlite, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Sqlite, and replace with new package Microsoft.EntityFrameworkCore.Sqlite 10.0.5",
+            "label": "Microsoft.EntityFrameworkCore.Sqlite 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Sqlite",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "ed544407-09b2-4bbe-b42a-c6c1b3c8a8d7",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Tools, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Tools, and replace with new package Microsoft.EntityFrameworkCore.Tools 10.0.5",
+              "protected": "Microsoft.EntityFrameworkCore.Tools, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Tools, and replace with new package Microsoft.EntityFrameworkCore.Tools 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Tools, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Tools, and replace with new package Microsoft.EntityFrameworkCore.Tools 10.0.5",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Tools, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Tools, and replace with new package Microsoft.EntityFrameworkCore.Tools 10.0.5",
+            "label": "Microsoft.EntityFrameworkCore.Tools 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Tools",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "88c168e4-4cf1-47b2-a713-fe089c6f8d80",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "345a41ef-50b2-4d5e-b4b7-b71a91e70285",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: Exception diagnostics are suppressed when IExceptionHandler.TryHandleAsync returns true ",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "app.UseExceptionHandler(\u0022/Error\u0022);",
+              "protected": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "app.UseExceptionHandler(\u0022/Error\u0022);",
+            "protectedSnippet": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)",
+            "label": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/aspnet-core/10/exception-handler-diagnostics-suppressed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 41,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "9d148451-d9cd-4090-b023-75660cb5d8c1",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "app.UseMigrationsEndPoint();",
+              "protected": "T:Microsoft.AspNetCore.Builder.MigrationsEndPointExtensions"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "app.UseMigrationsEndPoint();",
+            "protectedSnippet": "T:Microsoft.AspNetCore.Builder.MigrationsEndPointExtensions",
+            "label": "T:Microsoft.AspNetCore.Builder.MigrationsEndPointExtensions",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 37,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "db51e708-3fb9-4085-819a-52d39b7f0e45",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "app.UseMigrationsEndPoint();",
+              "protected": "M:Microsoft.AspNetCore.Builder.MigrationsEndPointExtensions.UseMigrationsEndPoint(Microsoft.AspNetCore.Builder.IApplicationBuilder)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "app.UseMigrationsEndPoint();",
+            "protectedSnippet": "M:Microsoft.AspNetCore.Builder.MigrationsEndPointExtensions.UseMigrationsEndPoint(Microsoft.AspNetCore.Builder.IApplicationBuilder)",
+            "label": "M:Microsoft.AspNetCore.Builder.MigrationsEndPointExtensions.UseMigrationsEndPoint(Microsoft.AspNetCore.Builder.IApplicationBuilder)",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 37,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "45f98ca4-1a86-4fa8-a77b-b71b6296c003",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);",
+              "protected": "M:System.TimeSpan.FromMinutes(System.Int64)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);",
+            "protectedSnippet": "M:System.TimeSpan.FromMinutes(System.Int64)",
+            "label": "M:System.TimeSpan.FromMinutes(System.Int64)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 22,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "9b90aefb-a48a-441a-9339-11f660d7b31a",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.UI, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.UI, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+              "protected": "T:Microsoft.Extensions.DependencyInjection.IdentityServiceCollectionUIExtensions"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+            "protectedSnippet": "T:Microsoft.Extensions.DependencyInjection.IdentityServiceCollectionUIExtensions",
+            "label": "T:Microsoft.Extensions.DependencyInjection.IdentityServiceCollectionUIExtensions",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.UI",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 13,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "837f8064-6010-42b7-bb25-ae202dccf463",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.UI, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.UI, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.IdentityServiceCollectionUIExtensions.AddDefaultIdentity\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.Identity.IdentityOptions})"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.IdentityServiceCollectionUIExtensions.AddDefaultIdentity\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.Identity.IdentityOptions})",
+            "label": "M:Microsoft.Extensions.DependencyInjection.IdentityServiceCollectionUIExtensions.AddDefaultIdentity\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.Identity.IdentityOptions})",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.UI",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 13,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "46e1e77a-35db-4194-8554-794da78fdcbf",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+              "protected": "T:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+            "protectedSnippet": "T:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions",
+            "label": "T:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 13,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "439e046d-492b-45cb-b532-369be893e20b",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions.AddEntityFrameworkStores\u0060\u00601(Microsoft.AspNetCore.Identity.IdentityBuilder)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "builder.Services\r\n    .AddDefaultIdentity\u003CApplicationUser\u003E(options =\u003E\r\n    {\r\n        options.Password.RequireNonAlphanumeric = true;\r\n        options.Password.RequireUppercase = true;\r\n        options.Password.RequireLowercase = true;\r\n        options.Password.RequiredLength = 6;\r\n        options.SignIn.RequireConfirmedAccount = true;\r\n        options.Lockout.AllowedForNewUsers = true;\r\n        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);\r\n        options.Lockout.MaxFailedAccessAttempts = 3;\r\n    })\r\n    .AddRoles\u003CApplicationRole\u003E()\r\n    .AddEntityFrameworkStores\u003CApplicationDbContext\u003E()\r\n    .AddAccessRightBasedAuthorization()\r\n    .AddAuthorizationCoreUI(options =\u003E options.FriendlyAreaName = \u0022Admin\u0022);",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions.AddEntityFrameworkStores\u0060\u00601(Microsoft.AspNetCore.Identity.IdentityBuilder)",
+            "label": "M:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions.AddEntityFrameworkStores\u0060\u00601(Microsoft.AspNetCore.Identity.IdentityBuilder)",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 13,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "3be5abff-3099-4bf9-abca-0990c6f70f87",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services\r\n    .AddDbContext\u003CApplicationDbContext\u003E(options =\u003E options.UseSqlite(connectionString))\r\n    .AddDatabaseDeveloperPageExceptionFilter();",
+              "protected": "T:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "builder.Services\r\n    .AddDbContext\u003CApplicationDbContext\u003E(options =\u003E options.UseSqlite(connectionString))\r\n    .AddDatabaseDeveloperPageExceptionFilter();",
+            "protectedSnippet": "T:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions",
+            "label": "T:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 9,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "93985289-d067-4154-bdd9-e72c986f7fc7",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore, 8.0.6",
+          "projectPath": "Authorization.Core.UI.Test.Web\\Authorization.Core.UI.Test.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services\r\n    .AddDbContext\u003CApplicationDbContext\u003E(options =\u003E options.UseSqlite(connectionString))\r\n    .AddDatabaseDeveloperPageExceptionFilter();",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Test.Web\\Program.cs",
+            "snippet": "builder.Services\r\n    .AddDbContext\u003CApplicationDbContext\u003E(options =\u003E options.UseSqlite(connectionString))\r\n    .AddDatabaseDeveloperPageExceptionFilter();",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)",
+            "label": "M:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6"
+            },
+            "line": 9,
+            "column": 0
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+      "startingProject": true,
+      "issues": 3,
+      "storyPoints": 3,
+      "properties": {
+        "appName": "Authorization.Core.UI.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 8,
+        "numberOfCodeFiles": 6,
+        "linesTotal": 4796,
+        "linesOfCode": 3007,
+        "totalApiScanned": 8868,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "352e08e4-88c7-4551-a1dd-2c155a1b847f",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Identity.Core, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.Extensions.Identity.Core, and replace with new package Microsoft.Extensions.Identity.Core 10.0.5",
+              "protected": "Microsoft.Extensions.Identity.Core, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.Extensions.Identity.Core, and replace with new package Microsoft.Extensions.Identity.Core 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+            "snippet": "Microsoft.Extensions.Identity.Core, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.Extensions.Identity.Core, and replace with new package Microsoft.Extensions.Identity.Core 10.0.5",
+            "protectedSnippet": "Microsoft.Extensions.Identity.Core, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.Extensions.Identity.Core, and replace with new package Microsoft.Extensions.Identity.Core 10.0.5",
+            "label": "Microsoft.Extensions.Identity.Core 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Identity.Core",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "84f20c37-4d54-4373-b9e6-ef2f814aca43",
+          "ruleId": "NuGet.0005",
+          "projectPath": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+              "protected": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+            "snippet": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "protectedSnippet": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "label": "xunit 2.9.3",
+            "properties": {
+              "PackageId": "xunit",
+              "PackageVersion": "2.9.3",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "768fbc40-5776-4ebc-80c4-02e4fb0816a9",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests\\Authorization.Core.UI.Tests.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+      "startingProject": true,
+      "issues": 4,
+      "storyPoints": 9,
+      "properties": {
+        "appName": "Authorization.Core.UI.Tests.Integration",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 5,
+        "numberOfCodeFiles": 3,
+        "linesTotal": 2114,
+        "linesOfCode": 325,
+        "totalApiScanned": 474,
+        "minLinesOfCodeToChange": 6,
+        "maxLinesOfCodeToChange": 6
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "8654c7c6-2690-41fe-8fb8-da7c2ff3d58b",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5",
+              "protected": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+            "snippet": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5",
+            "label": "Microsoft.AspNetCore.Mvc.Testing 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Mvc.Testing",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "b37111b9-4fbb-4757-8a02-59cfa2eb5c2e",
+          "ruleId": "NuGet.0005",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+              "protected": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+            "snippet": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "protectedSnippet": "xunit, 2.9.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "label": "xunit 2.9.3",
+            "properties": {
+              "PackageId": "xunit",
+              "PackageVersion": "2.9.3",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "4cc516b1-975b-43bb-b80a-ad84d9074e9d",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "49dee7be-c804-4166-8dd2-4d3b33faa3d6",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var client = Factory.CreateClient(new WebApplicationFactoryClientOptions\r\n            {\r\n                AllowAutoRedirect = false, BaseAddress = new(HostUri)\r\n            });",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\PageAccessTests.cs",
+            "snippet": "var client = Factory.CreateClient(new WebApplicationFactoryClientOptions\r\n            {\r\n                AllowAutoRedirect = false, BaseAddress = new(HostUri)\r\n            });",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "1e315922-1279-4b3b-8706-796c4e46ba70",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var client = Factory.CreateClient(new WebApplicationFactoryClientOptions\r\n            {\r\n                AllowAutoRedirect = false, BaseAddress = new(HostUri)\r\n            });",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\PageAccessTests.cs",
+            "snippet": "var client = Factory.CreateClient(new WebApplicationFactoryClientOptions\r\n            {\r\n                AllowAutoRedirect = false, BaseAddress = new(HostUri)\r\n            });",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "60c965c0-2082-47cb-b227-ddff086a32dc",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var client = Factory.CreateClient(new WebApplicationFactoryClientOptions\r\n            {\r\n                AllowAutoRedirect = false, BaseAddress = new(HostUri)\r\n            });",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\PageAccessTests.cs",
+            "snippet": "var client = Factory.CreateClient(new WebApplicationFactoryClientOptions\r\n            {\r\n                AllowAutoRedirect = false, BaseAddress = new(HostUri)\r\n            });",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "fa8e56a6-f8bb-4d6a-a75d-d5215d2d753a",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var client = Factory.WithWebHostBuilder(builder =\u003E {\r\n                builder.ConfigureTestServices(services =\u003E\r\n                {\r\n                    services.AddAuthentication(defaultScheme: \u0022TestScheme\u0022)\r\n                        .AddScheme\u003CAuthenticationSchemeOptions, TestAuthHandler\u003E(\r\n                            \u0022TestScheme\u0022, options =\u003E { options.ClaimsIssuer = claimsIssuer; });\r\n                });\r\n            }).CreateClient(new()\r\n            {\r\n                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)\r\n            });",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\PageAccessTests.cs",
+            "snippet": "var client = Factory.WithWebHostBuilder(builder =\u003E {\r\n                builder.ConfigureTestServices(services =\u003E\r\n                {\r\n                    services.AddAuthentication(defaultScheme: \u0022TestScheme\u0022)\r\n                        .AddScheme\u003CAuthenticationSchemeOptions, TestAuthHandler\u003E(\r\n                            \u0022TestScheme\u0022, options =\u003E { options.ClaimsIssuer = claimsIssuer; });\r\n                });\r\n            }).CreateClient(new()\r\n            {\r\n                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)\r\n            });",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 61,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "e9ee06ff-b222-4c1b-87cd-eb6d7fcb1762",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var client = Factory.WithWebHostBuilder(builder =\u003E {\r\n                builder.ConfigureTestServices(services =\u003E\r\n                {\r\n                    services.AddAuthentication(defaultScheme: \u0022TestScheme\u0022)\r\n                        .AddScheme\u003CAuthenticationSchemeOptions, TestAuthHandler\u003E(\r\n                            \u0022TestScheme\u0022, options =\u003E { options.ClaimsIssuer = claimsIssuer; });\r\n                });\r\n            }).CreateClient(new()\r\n            {\r\n                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)\r\n            });",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\PageAccessTests.cs",
+            "snippet": "var client = Factory.WithWebHostBuilder(builder =\u003E {\r\n                builder.ConfigureTestServices(services =\u003E\r\n                {\r\n                    services.AddAuthentication(defaultScheme: \u0022TestScheme\u0022)\r\n                        .AddScheme\u003CAuthenticationSchemeOptions, TestAuthHandler\u003E(\r\n                            \u0022TestScheme\u0022, options =\u003E { options.ClaimsIssuer = claimsIssuer; });\r\n                });\r\n            }).CreateClient(new()\r\n            {\r\n                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)\r\n            });",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 61,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "24f97e37-2e25-4463-80af-83c434a9597f",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Authorization.Core.UI.Tests.Integration\\Authorization.Core.UI.Tests.Integration.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var client = Factory.WithWebHostBuilder(builder =\u003E {\r\n                builder.ConfigureTestServices(services =\u003E\r\n                {\r\n                    services.AddAuthentication(defaultScheme: \u0022TestScheme\u0022)\r\n                        .AddScheme\u003CAuthenticationSchemeOptions, TestAuthHandler\u003E(\r\n                            \u0022TestScheme\u0022, options =\u003E { options.ClaimsIssuer = claimsIssuer; });\r\n                });\r\n            }).CreateClient(new()\r\n            {\r\n                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)\r\n            });",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Integration\\PageAccessTests.cs",
+            "snippet": "var client = Factory.WithWebHostBuilder(builder =\u003E {\r\n                builder.ConfigureTestServices(services =\u003E\r\n                {\r\n                    services.AddAuthentication(defaultScheme: \u0022TestScheme\u0022)\r\n                        .AddScheme\u003CAuthenticationSchemeOptions, TestAuthHandler\u003E(\r\n                            \u0022TestScheme\u0022, options =\u003E { options.ClaimsIssuer = claimsIssuer; });\r\n                });\r\n            }).CreateClient(new()\r\n            {\r\n                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)\r\n            });",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 61,
+            "column": 12
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+      "startingProject": true,
+      "issues": 3,
+      "storyPoints": 6,
+      "properties": {
+        "appName": "Authorization.Core.UI.Tests.Playwright",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 7,
+        "numberOfCodeFiles": 5,
+        "linesTotal": 3163,
+        "linesOfCode": 1374,
+        "totalApiScanned": 3491,
+        "minLinesOfCodeToChange": 4,
+        "maxLinesOfCodeToChange": 4
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "a8d41d73-be42-4f9f-ba15-579da1f28ba1",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5",
+              "protected": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+            "snippet": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5",
+            "protectedSnippet": "Microsoft.AspNetCore.Mvc.Testing, 9.0.12\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Mvc.Testing, and replace with new package Microsoft.AspNetCore.Mvc.Testing 10.0.5",
+            "label": "Microsoft.AspNetCore.Mvc.Testing 9.0.12",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Mvc.Testing",
+              "PackageVersion": "9.0.12",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "7d159667-e200-42e2-9493-7a2f29a1485c",
+          "ruleId": "Project.0002",
+          "projectPath": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "479f0155-1e0a-4e0f-8ad3-5f0947107233",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var responseHeaders = response.Content.Headers\r\n                .Select(h =\u003E KeyValuePair.Create(h.Key, h.Value.First()));",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Playwright\\Infrastructure\\Extensions.cs",
+            "snippet": "var responseHeaders = response.Content.Headers\r\n                .Select(h =\u003E KeyValuePair.Create(h.Key, h.Value.First()));",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 72,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "79ccc2cd-2db2-44e2-9219-77c4602e154b",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var responseBody = await response.Content.ReadAsByteArrayAsync();",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Playwright\\Infrastructure\\Extensions.cs",
+            "snippet": "var responseBody = await response.Content.ReadAsByteArrayAsync();",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 71,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "dfae6752-19a4-4788-b640-b34a8f231528",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "requestMessage.Content!.Headers.Add(header.Key, header.Value);",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Playwright\\Infrastructure\\Extensions.cs",
+            "snippet": "requestMessage.Content!.Headers.Add(header.Key, header.Value);",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 56,
+            "column": 24
+          }
+        },
+        {
+          "incidentId": "e17f78c5-3568-470e-afd2-e3de1d0f3e27",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "Authorization.Core.UI.Tests.Playwright\\Authorization.Core.UI.Tests.Playwright.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var requestMessage = new HttpRequestMessage(new(request.Method), request.Url)\r\n            {\r\n                Content = content\r\n            };",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "Authorization.Core.UI.Tests.Playwright\\Infrastructure\\Extensions.cs",
+            "snippet": "var requestMessage = new HttpRequestMessage(new(request.Method), request.Url)\r\n            {\r\n                Content = content\r\n            };",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 45,
+            "column": 12
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "NuGet.0002": {
+      "id": "NuGet.0002",
+      "isFeature": false,
+      "description": "NuGet package upgrade is recommended for selected target framework.\n\nStandard .NET packages are recommended to have versions matching version of .NET that project targets.\n\nSome other packages also are known to work better for selected target frameworks.",
+      "label": "NuGet package upgrade is recommended",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262530",
+          "isCustom": false
+        }
+      ]
+    },
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Project\u0027s target framework(s) needs to be changed to the new target framework that you selected for this upgrade.\n\nDuring upgrade target framework will be adjusted to corresponding platform when applicable. In some cases project would result in multiple target frameworks after the upgrade if it was using features that now have their own platforms in modern .NET frameworks (windows, iOS, Android etc).",
+      "label": "Project\u0027s target framework(s) needs to be changed",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Overview of porting from .NET Framework to .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": ".NET project SDKs",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0002": {
+      "id": "Api.0002",
+      "isFeature": false,
+      "description": "API is source incompatible for selected .NET version: requires code changes to compile successfully when targeting a new version, such as removing obsolete APIs or changing method signatures.",
+      "label": "Source incompatible for selected .NET version",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Breaking changes in .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0005": {
+      "id": "NuGet.0005",
+      "isFeature": false,
+      "description": "NuGet package is deprecated.\n\nGo to its documentation and if there is a guidance for replacement of functionality provided by this package.",
+      "label": "NuGet package is deprecated",
+      "severity": "Optional",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262531",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0003": {
+      "id": "Api.0003",
+      "isFeature": false,
+      "description": "API has a behavioral change in selected .NET version: code and binaries may behave differently at runtime without needing recompilation, but the new behavior might be undesirable and require updates.",
+      "label": "Behavioral change in selected .NET version",
+      "severity": "Potential",
+      "effort": 1
+    }
+  }
+}
