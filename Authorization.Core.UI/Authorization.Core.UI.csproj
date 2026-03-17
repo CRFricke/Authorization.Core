@@ -49,7 +49,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.5" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -106,14 +106,7 @@
 			</ReferenceAssetCandidates>
 		</ItemGroup>
 
-		<DefineStaticWebAssets
-		  Condition="'@(ReferenceAssetCandidates->Count())' != '0'"
-		  CandidateAssets="@(ReferenceAssetCandidates)"
-		  SourceId="$(PackageId)"
-		  SourceType="Project"
-		  AssetKind="All"
-		  BasePath="$(StaticWebAssetBasePath)"
-		>
+		<DefineStaticWebAssets Condition="'@(ReferenceAssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(ReferenceAssetCandidates)" SourceId="$(PackageId)" SourceType="Project" AssetKind="All" BasePath="$(StaticWebAssetBasePath)">
 			<Output TaskParameter="Assets" ItemName="ReferenceAsset" />
 		</DefineStaticWebAssets>
 
@@ -140,84 +133,34 @@
 			</BS5AssetCandidates>
 		</ItemGroup>
 
-		<DefineStaticWebAssets
-		  Condition="'@(BS4AssetCandidates->Count())' != '0'"
-		  CandidateAssets="@(BS4AssetCandidates)"
-		  SourceId="$(PackageId)"
-		  SourceType="Discovered"
-		  AssetKind="All"
-		  ContentRoot="assets/BS4"
-		  BasePath="$(StaticWebAssetBasePath)"
-		>
+		<DefineStaticWebAssets Condition="'@(BS4AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS4AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS4" BasePath="$(StaticWebAssetBasePath)">
 			<Output TaskParameter="Assets" ItemName="BS4Assets" />
 		</DefineStaticWebAssets>
 
-		<DefineStaticWebAssets
-		  Condition="'@(BS5AssetCandidates->Count())' != '0'"
-		  CandidateAssets="@(BS5AssetCandidates)"
-		  SourceId="$(PackageId)"
-		  SourceType="Discovered"
-		  AssetKind="All"
-		  ContentRoot="assets/BS5"
-		  BasePath="$(StaticWebAssetBasePath)"
-		>
+		<DefineStaticWebAssets Condition="'@(BS5AssetCandidates-&gt;Count())' != '0'" CandidateAssets="@(BS5AssetCandidates)" SourceId="$(PackageId)" SourceType="Discovered" AssetKind="All" ContentRoot="assets/BS5" BasePath="$(StaticWebAssetBasePath)">
 			<Output TaskParameter="Assets" ItemName="BS5Assets" />
 		</DefineStaticWebAssets>
 
-		<DefineStaticWebAssetEndpoints
-		  Condition="'@(BS4Assets)' != ''"
-		  CandidateAssets="@(BS4Assets)"
-		  ExistingEndpoints="@()"
-		  ContentTypeMappings="@(StaticWebAssetContentTypeMapping)"
-        >
+		<DefineStaticWebAssetEndpoints Condition="'@(BS4Assets)' != ''" CandidateAssets="@(BS4Assets)" ExistingEndpoints="@()" ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
 			<Output TaskParameter="Endpoints" ItemName="BS4AssetEndpoints" />
 		</DefineStaticWebAssetEndpoints>
 
-		<DefineStaticWebAssetEndpoints
-		  Condition="'@(BS5Assets)' != ''"
-		  CandidateAssets="@(BS5Assets)"
-		  ExistingEndpoints="@()"
-		  ContentTypeMappings="@(StaticWebAssetContentTypeMapping)"
-        >
+		<DefineStaticWebAssetEndpoints Condition="'@(BS5Assets)' != ''" CandidateAssets="@(BS5Assets)" ExistingEndpoints="@()" ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
 			<Output TaskParameter="Endpoints" ItemName="BS5AssetEndpoints" />
 		</DefineStaticWebAssetEndpoints>
 
-		<GenerateStaticWebAssetsPropsFile
-		  StaticWebAssets="@(BS4Assets)"
-		  PackagePathPrefix="staticwebassets/BS4"
-		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets"
-	    />
-		<GenerateStaticWebAssetsPropsFile
-		  StaticWebAssets="@(BS5Assets)"
-		  PackagePathPrefix="staticwebassets/BS5"
-		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets"
-	    />
+		<GenerateStaticWebAssetsPropsFile StaticWebAssets="@(BS4Assets)" PackagePathPrefix="staticwebassets/BS4" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.targets" />
+		<GenerateStaticWebAssetsPropsFile StaticWebAssets="@(BS5Assets)" PackagePathPrefix="staticwebassets/BS5" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.targets" />
 
-		<GenerateStaticWebAssetEndpointsPropsFile
-		  StaticWebAssets="@(BS4Assets)"
-		  StaticWebAssetEndpoints="@(BS4AssetEndpoints)"
-		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.endpoints.targets"
-	    />
+		<GenerateStaticWebAssetEndpointsPropsFile StaticWebAssets="@(BS4Assets)" StaticWebAssetEndpoints="@(BS4AssetEndpoints)" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS4.endpoints.targets" />
 
-		<GenerateStaticWebAssetEndpointsPropsFile
-		  StaticWebAssets="@(BS5Assets)"
-		  StaticWebAssetEndpoints="@(BS5AssetEndpoints)"
-		  TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.endpoints.targets"
-	    />
+		<GenerateStaticWebAssetEndpointsPropsFile StaticWebAssets="@(BS5Assets)" StaticWebAssetEndpoints="@(BS5AssetEndpoints)" TargetPropsFilePath="$(IntermediateOutputPath)AuthUI.BS5.endpoints.targets" />
 
-		<ComputeStaticWebAssetsTargetPaths
-		  Assets="@(BS4Assets)"
-		  PathPrefix="staticwebassets/BS4"
-		  AdjustPathsForPack="true"
-	    >
+		<ComputeStaticWebAssetsTargetPaths Assets="@(BS4Assets)" PathPrefix="staticwebassets/BS4" AdjustPathsForPack="true">
 			<Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
 		</ComputeStaticWebAssetsTargetPaths>
 
-		<ComputeStaticWebAssetsTargetPaths
-		  Assets="@(BS5Assets)"
-		  PathPrefix="staticwebassets/BS5"
-		  AdjustPathsForPack="true"
-	    >
+		<ComputeStaticWebAssetsTargetPaths Assets="@(BS5Assets)" PathPrefix="staticwebassets/BS5" AdjustPathsForPack="true">
 			<Output TaskParameter="AssetsWithTargetPath" ItemName="_PackStaticWebAssetWithTargetPath" />
 		</ComputeStaticWebAssetsTargetPaths>
 

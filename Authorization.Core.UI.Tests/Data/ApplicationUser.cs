@@ -17,6 +17,6 @@ namespace Authorization.Core.UI.Tests.Data
         public ApplicationUser(string userName) : base(userName)
         { }
 
-        string IRequiresAuthorization.Name => !string.IsNullOrEmpty(DisplayName) ? DisplayName : Email;
+        string IRequiresAuthorization.Name => !string.IsNullOrEmpty(DisplayName) ? DisplayName : Email ?? string.Empty;
     }
 }

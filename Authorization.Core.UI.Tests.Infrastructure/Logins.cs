@@ -1,8 +1,8 @@
-﻿namespace Authorization.Core.UI.Tests.Playwright.Infrastructure;
+﻿namespace Authorization.Core.UI.Tests.Infrastructure;
 
 public record Login(string Email, string Password);
 
-internal static class Logins
+public static class Logins
 {
     public static Login Administrator => new("admin@company.com", "Administrat0r!");
 
