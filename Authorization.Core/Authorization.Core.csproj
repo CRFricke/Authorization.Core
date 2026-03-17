@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\icon.png" Pack="True" PackagePath="\"/>
-    <None Include="..\README.md" Pack="True" PackagePath="\"/>
+    <None Include="..\icon.png" Pack="True" PackagePath="\" />
+    <None Include="..\README.md" Pack="True" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,7 +51,7 @@
   <ItemGroup>
     <PackageReference Include="CRFricke.EF.Core.Utilities" Version="10.0.0-beta1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

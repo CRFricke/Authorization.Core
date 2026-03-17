@@ -29,14 +29,14 @@ namespace Authorization.Core.UI.Tests;
 public class UserManagementTests : TestsBase
 {
     private static UserManager<ApplicationUser> CreateUserManagerMock(
-        IUserStore<ApplicationUser> userStore = null,
-        IOptions<IdentityOptions> optionsAccessor = null,
-        IPasswordHasher<ApplicationUser> passwordHasher = null,
-        IEnumerable<IUserValidator<ApplicationUser>> userValidators = null,
-        IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators = null,
-        ILookupNormalizer keyNormalizer = null,
-        IdentityErrorDescriber errors = null,
-        IServiceProvider services = null
+        IUserStore<ApplicationUser> userStore = null!,
+        IOptions<IdentityOptions> optionsAccessor = null!,
+        IPasswordHasher<ApplicationUser> passwordHasher = null!,
+        IEnumerable<IUserValidator<ApplicationUser>> userValidators = null!,
+        IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators = null!,
+        ILookupNormalizer keyNormalizer = null!,
+        IdentityErrorDescriber errors = null!,
+        IServiceProvider services = null!
         )
     {
         var userMock = new Mock<UserManager<ApplicationUser>>(
@@ -73,7 +73,7 @@ public class UserManagementTests : TestsBase
             new("TestUser@company.com") { GivenName = "Test", Surname = "User"   }
         };
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var model = new IndexModel<ApplicationUser, ApplicationRole>(repository);
@@ -102,7 +102,7 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<CreateHandler>();
@@ -118,14 +118,14 @@ public class UserManagementTests : TestsBase
     [Fact(DisplayName = "Create User [Post] sets assigned role claims")]
     public async Task UserManagement_Test3Async()
     {
-        ApplicationUser user = null;
+        ApplicationUser user = null!;
         var expectedClaims = new string[] { SysUiGuids.Role.RoleManager };
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -140,10 +140,10 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles).Returns(GetDefinedRoles().AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(GetDefinedRoles().BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { user = au; })
-            .Returns((EntityEntry<ApplicationUser>)null);
+            .Returns((EntityEntry<ApplicationUser>)null!);
 
         var logger = new FakeLogger<CreateHandler>();
 
@@ -164,7 +164,7 @@ public class UserManagementTests : TestsBase
     [Fact(DisplayName = "Create User [Post] handles DB exception")]
     public async Task UserManagement_Test4Async()
     {
-        ApplicationUser user = null;
+        ApplicationUser user = null!;
         var dbUpdateException =
             new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
             new DataException("The INSERT statement conflicted with the PRIMARY KEY constraint 'PK_ApplicationUser_Id'.")
@@ -176,7 +176,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -191,7 +191,7 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(roles.BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { user = au; })
             .Throws(dbUpdateException);
@@ -213,7 +213,7 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains("User", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
@@ -221,7 +221,7 @@ public class UserManagementTests : TestsBase
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
@@ -229,7 +229,7 @@ public class UserManagementTests : TestsBase
     [Fact(DisplayName = "Create User [Post] sends notification on success")]
     public async Task UserManagement_Test5Async()
     {
-        ApplicationUser user = null;
+        ApplicationUser user = null!;
 
         var roles = new List<ApplicationRole>();
 
@@ -237,7 +237,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -252,10 +252,10 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(roles.BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { user = au; })
-            .Returns((EntityEntry<ApplicationUser>)null);
+            .Returns((EntityEntry<ApplicationUser>)null!);
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
@@ -272,13 +272,13 @@ public class UserManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email, notifications[0].Message);
+        Assert.Contains(user.Email!, notifications[0].Message);
     }
 
     [Fact(DisplayName = "Create User [Post] logs success")]
     public async Task UserManagement_Test6Async()
     {
-        ApplicationUser user = null;
+        ApplicationUser user = null!;
 
         var roles = new List<ApplicationRole>();
 
@@ -286,7 +286,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -301,10 +301,10 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(roles.BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Add(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { user = au; })
-            .Returns((EntityEntry<ApplicationUser>)null);
+            .Returns((EntityEntry<ApplicationUser>)null!);
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
 
@@ -325,7 +325,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains($"created {nameof(ApplicationUser)}", logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Edit User [Get] returns NotFound for null ID")]
@@ -375,8 +375,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -409,8 +409,8 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -444,7 +444,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -454,8 +454,8 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles).Returns(roles.AsQueryable().BuildMockDbSet().Object);
-        repository.Setup(db => db.Users).Returns(users.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(roles.BuildMockDbSet().Object);
+        repository.Setup(db => db.Users).Returns(users.BuildMockDbSet().Object);
         repository.Setup(db => db.SaveChangesAsync(default)).Throws(dbUpdateException);
 
         var logger = new FakeLogger<EditHandler>();
@@ -473,7 +473,7 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains("User", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
@@ -482,7 +482,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
         Assert.Contains(users[0].Id, logger.LatestRecord.Message);
-        Assert.Contains(users[0].Email, logger.LatestRecord.Message);
+        Assert.Contains(users[0].Email!, logger.LatestRecord.Message);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
@@ -495,8 +495,8 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object &&
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object &&
             db.SaveChangesAsync(default) == Task.FromResult(0)
             );
 
@@ -527,9 +527,9 @@ public class UserManagementTests : TestsBase
 
         var expectedValue = new Dictionary<string, string>
         {
-            { nameof(user.ConcurrencyStamp), user.ConcurrencyStamp },
+            { nameof(user.ConcurrencyStamp), user.ConcurrencyStamp! },
             { nameof(user.Id), user.Id },
-            { nameof(user.SecurityStamp), user.SecurityStamp }
+            { nameof(user.SecurityStamp), user.SecurityStamp! }
         };
 
         var userModel = new UserModel
@@ -551,8 +551,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == GetDefinedRoles().AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object &&
+            db.Roles == GetDefinedRoles().BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object &&
             db.SaveChangesAsync(default) == Task.FromResult(0)
             );
 
@@ -598,7 +598,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -608,8 +608,8 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object &&
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object &&
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
@@ -626,7 +626,7 @@ public class UserManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email, notifications[0].Message);
+        Assert.Contains(user.Email!, notifications[0].Message);
     }
 
     [Fact(DisplayName = "Edit User [Post] logs successful update")]
@@ -641,7 +641,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -651,8 +651,8 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object &&
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object &&
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
@@ -673,7 +673,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Display User returns NotFound for null ID")]
@@ -694,7 +694,7 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == new List<ApplicationUser>().AsQueryable().BuildMockDbSet().Object 
+            db.Users == Array.Empty<ApplicationUser>().BuildMockDbSet().Object 
             );
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
@@ -736,8 +736,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
@@ -778,7 +778,7 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == new List<ApplicationUser>().AsQueryable().BuildMockDbSet().Object
+            db.Users == Array.Empty<ApplicationUser>().BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<DeleteHandler>();
@@ -810,8 +810,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<DeleteHandler>();
@@ -848,7 +848,7 @@ public class UserManagementTests : TestsBase
         var authManager = Mock.Of<IAuthorizationManager>();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<DeleteHandler>();
@@ -864,7 +864,7 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email, notifications[0].Message);
+        Assert.Contains(user.Email!, notifications[0].Message);
     }
 
     [Fact(DisplayName = "Delete User [Post] handles DB exception")]
@@ -881,7 +881,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -893,9 +893,9 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Users).Returns(new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Users).Returns(new List<ApplicationUser> { user }.BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Remove(It.IsAny<ApplicationUser>())).Throws(dbUpdateException);
-        repository.Setup(db => db.Roles).Returns(new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Roles).Returns(Array.Empty<ApplicationRole>().BuildMockDbSet().Object);
 
         var logger = new FakeLogger<DeleteHandler>();
 
@@ -912,7 +912,7 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains("User", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
@@ -921,7 +921,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
@@ -934,7 +934,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -946,8 +946,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet().Object &&
-            db.Users.Remove(It.IsAny<ApplicationUser>()) == (EntityEntry<ApplicationUser>)null &&
+            db.Users == new List<ApplicationUser> { user }.BuildMockDbSet().Object &&
+            db.Users.Remove(It.IsAny<ApplicationUser>()) == (EntityEntry<ApplicationUser>)null! &&
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
@@ -965,13 +965,13 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email, notifications[0].Message);
+        Assert.Contains(user.Email!, notifications[0].Message);
     }
 
     [Fact(DisplayName = "Delete User [Post] logs successful delete")]
     public async Task UserManagement_Test25Async()
     {
-        ApplicationUser deletedUser = null;
+        ApplicationUser deletedUser = null!;
 
         var user = new ApplicationUser("TestUser@company.com");
 
@@ -979,7 +979,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -991,10 +991,10 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Users).Returns(new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet().Object);
+        repository.Setup(db => db.Users).Returns(new List<ApplicationUser> { user }.BuildMockDbSet().Object);
         repository.Setup(db => db.Users.Remove(It.IsAny<ApplicationUser>()))
             .Callback((ApplicationUser au) => { deletedUser = au; })
-            .Returns((EntityEntry<ApplicationUser>)null);
+            .Returns((EntityEntry<ApplicationUser>)null!);
         repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
 
         var logger = new FakeLogger<DeleteHandler>();
@@ -1018,7 +1018,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Delete User [Post] prevents delete of System User")]
@@ -1033,7 +1033,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1045,8 +1045,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet().Object &&
-            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Users == new List<ApplicationUser> { user }.BuildMockDbSet().Object &&
+            db.Roles == new List<ApplicationRole>().BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<DeleteHandler>();
@@ -1064,7 +1064,7 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -1073,7 +1073,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains("delete system", logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Edit User [Post] prevents update of System User")]
@@ -1089,7 +1089,7 @@ public class UserManagementTests : TestsBase
             new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
-        var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
+        var expectedClaims = new string[] { roles[1].Name!, roles[2].Name! };
 
         var user = new ApplicationUser("TestUser@company.com");
         user.Claims.Add(
@@ -1101,7 +1101,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1113,8 +1113,8 @@ public class UserManagementTests : TestsBase
             );
 
         var dbContext = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1132,7 +1132,7 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -1140,7 +1140,7 @@ public class UserManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Edit User [Post] refreshes User cache on success")]
@@ -1153,7 +1153,7 @@ public class UserManagementTests : TestsBase
             new() { Name = nameof(SysUiGuids.Role.UserManager) }
         };
 
-        var expectedClaims = new string[] { roles[1].Name, roles[2].Name };
+        var expectedClaims = new string[] { roles[1].Name!, roles[2].Name! };
 
         var user = new ApplicationUser("TestUser@company.com");
         user.Claims.Add(
@@ -1165,7 +1165,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1177,8 +1177,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object &&
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object &&
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
 
@@ -1191,7 +1191,7 @@ public class UserManagementTests : TestsBase
             TempData = new TestTempDataDictionary()
         };
 
-        string cacheKey = null;
+        string cacheKey = null!;
         Mock.Get(authManager).Setup(am => am.RefreshUser(user.Id)).Callback((string id) => { cacheKey = id; });
 
         await model.OnPostAsync(string.Join(',', expectedClaims));
@@ -1208,7 +1208,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1220,7 +1220,7 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Users == new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet().Object &&
+            db.Users == new List<ApplicationUser> { user }.BuildMockDbSet().Object &&
             db.Users.Remove(user) == null &&
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
@@ -1234,7 +1234,7 @@ public class UserManagementTests : TestsBase
             TempData = new TestTempDataDictionary()
         };
 
-        string cacheKey = null;
+        string cacheKey = null!;
         Mock.Get(authManager).Setup(am => am.RefreshUser(user.Id)).Callback((string id) => { cacheKey = id; });
 
         await model.OnPostAsync(user.Id);
@@ -1255,8 +1255,8 @@ public class UserManagementTests : TestsBase
             );
 
         var dbContext = Mock.Of<ApplicationDbContext>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1279,7 +1279,7 @@ public class UserManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1293,7 +1293,7 @@ public class UserManagementTests : TestsBase
         var userManager = CreateUserManagerMock();
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == Enumerable.Empty<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Roles == Array.Empty<ApplicationRole>().BuildMockDbSet().Object
             );
 
         var passwordHasher = Mock.Of<IPasswordHasher<ApplicationUser>>();
@@ -1313,7 +1313,7 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -1339,7 +1339,7 @@ public class UserManagementTests : TestsBase
         var principalUser = new ApplicationUser("AdminUser@company.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalUser.Id) } &&
-            cp.Identity.Name == principalUser.UserName
+            cp.Identity!.Name == principalUser.UserName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1357,8 +1357,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1376,14 +1376,14 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalUser.UserName, logger.LatestRecord.Message);
+        Assert.Contains(principalUser.UserName!, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Email, logger.LatestRecord.Message);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message);
         Assert.Contains(user.Id, logger.LatestRecord.Message);
         Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
         Assert.Null(logger.LatestRecord.Exception);
@@ -1405,7 +1405,7 @@ public class UserManagementTests : TestsBase
         var principal = new ApplicationUser("AdminUser@company.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principal.Id) } &&
-            cp.Identity.Name == principal.UserName
+            cp.Identity!.Name == principal.UserName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1423,8 +1423,8 @@ public class UserManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object &&
-            db.Users == users.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object &&
+            db.Users == users.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1442,12 +1442,12 @@ public class UserManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principal.UserName, logger.LatestRecord.Message);
+        Assert.Contains(principal.UserName!, logger.LatestRecord.Message);
         Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
         Assert.Null(logger.LatestRecord.Exception);
     }

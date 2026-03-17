@@ -15,9 +15,7 @@ namespace CRFricke.Authorization.Core.Attributes
         /// <summary>
         /// Creates a new instance of the RequiresClaimsAttribute class.
         /// </summary>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private RequiresClaimsAttribute()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         { }
 
         /// <summary>
@@ -35,7 +33,7 @@ namespace CRFricke.Authorization.Core.Attributes
         /// <summary>
         /// Gets the required claim values.
         /// </summary>
-        public string[] ClaimValues { get; private set; }
+        public string[] ClaimValues { get; private set; } = [];
 
 
         /// <summary>

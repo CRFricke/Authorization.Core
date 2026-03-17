@@ -15,13 +15,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Authorization.Core.UI.Tests;
 
@@ -56,7 +51,7 @@ public class RoleManagementTests : TestsBase
             new() { Name = "Administrator", Description = "Anyone with this role can do anything!" },
             new() { Name = "TestRole", Description = "Used for testing." }
         };
-        var dbSet = roles.AsQueryable().BuildMockDbSet();
+        var dbSet = roles.BuildMockDbSet();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
             db.Roles == dbSet.Object
             );
@@ -72,14 +67,14 @@ public class RoleManagementTests : TestsBase
     [Fact(DisplayName = "Create Role [Post] sets assigned claims")]
     public async Task RoleManagement_Test3Async()
     {
-        ApplicationRole role = null;
+        ApplicationRole role = null!;
         var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -94,7 +89,7 @@ public class RoleManagementTests : TestsBase
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
         repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
             .Callback((ApplicationRole ar) => { role = ar; })
-            .Returns((EntityEntry<ApplicationRole>)null);
+            .Returns((EntityEntry<ApplicationRole>)null!);
 
         var logger = new FakeLogger<CreateHandler>();
 
@@ -115,7 +110,7 @@ public class RoleManagementTests : TestsBase
     [Fact(DisplayName = "Create Role [Post] sets ApplicationRole properties")]
     public async Task RoleManagement_Test4Async()
     {
-        ApplicationRole role = null;
+        ApplicationRole role = null!;
         var name = "TestRole";
         var description = "Can do tester stuff.";
 
@@ -123,7 +118,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -138,7 +133,7 @@ public class RoleManagementTests : TestsBase
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>> ();
         repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
             .Callback((ApplicationRole ar) => { role = ar; })
-            .Returns((EntityEntry<ApplicationRole>)null);
+            .Returns((EntityEntry<ApplicationRole>)null!);
 
         var logger = new FakeLogger<CreateHandler>();
 
@@ -170,7 +165,7 @@ public class RoleManagementTests : TestsBase
 
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -199,7 +194,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains("Role", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
@@ -213,13 +208,13 @@ public class RoleManagementTests : TestsBase
     [Fact(DisplayName = "Create Role [Post] logs success")]
     public async Task RoleManagement_Test6Async()   
     {
-        ApplicationRole role = null;
+        ApplicationRole role = null!;
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -234,7 +229,7 @@ public class RoleManagementTests : TestsBase
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
         repository.Setup(db => db.Roles.Add(It.IsAny<ApplicationRole>()))
             .Callback((ApplicationRole ar) => { role = ar; })
-            .Returns((EntityEntry<ApplicationRole>)null);
+            .Returns((EntityEntry<ApplicationRole>)null!);
 
         var logger = new FakeLogger<CreateHandler>();
 
@@ -253,7 +248,7 @@ public class RoleManagementTests : TestsBase
         Assert.Contains(principalName, logger.LatestRecord.Message);
         Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
         Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(role.Name!, logger.LatestRecord.Message);
     }
 
     [Fact(DisplayName = "Create Role [Post] sends notification on success")]
@@ -263,7 +258,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -313,7 +308,7 @@ public class RoleManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Roles == new List<ApplicationRole>().BuildMockDbSet().Object
             );
         var logger = new FakeLogger<EditHandler>();
 
@@ -345,7 +340,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -371,7 +366,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Roles == new List<ApplicationRole>().BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -399,13 +394,13 @@ public class RoleManagementTests : TestsBase
             );
 
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -435,7 +430,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains("Role", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
@@ -452,7 +447,7 @@ public class RoleManagementTests : TestsBase
     public async Task RoleManagement_Test13Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var authManager = Mock.Of<IAuthorizationManager>(am =>
             am.DefinedClaims == GetDefinedClaims()
@@ -484,13 +479,13 @@ public class RoleManagementTests : TestsBase
         var expectedDescription = "TestManagers do things related to testing.";
 
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -532,13 +527,13 @@ public class RoleManagementTests : TestsBase
         role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = SysClaims.User.Create });
         role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = ClaimTypes.AuthorizationDecision, ClaimValue = expectedClaims[0] });
 
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -576,13 +571,13 @@ public class RoleManagementTests : TestsBase
     public async Task RoleManagement_Test16Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -618,13 +613,13 @@ public class RoleManagementTests : TestsBase
     public async Task RoleManagement_Test17Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -676,7 +671,7 @@ public class RoleManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Roles == new List<ApplicationRole>().BuildMockDbSet().Object
             );
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
@@ -706,7 +701,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == roles.AsQueryable().BuildMockDbSet().Object
+            db.Roles == roles.BuildMockDbSet().Object
             );
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
@@ -740,7 +735,7 @@ public class RoleManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Roles == new List<ApplicationRole>().BuildMockDbSet().Object
             );
         var logger = new FakeLogger<DeleteHandler>();
 
@@ -754,13 +749,13 @@ public class RoleManagementTests : TestsBase
     public async Task RoleManagement_Test23Async()
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
-        var roles = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var roles = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var user = new ApplicationUser { Email = "MrTester@company.com", UserName = "MrTester@company.com", GivenName = "Chuck", Surname = "Fricke" };
-        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+        var users = new List<ApplicationUser> { user }.BuildMockDbSet();
 
         var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Id };
-        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.BuildMockDbSet();
 
         var authManager = Mock.Of<IAuthorizationManager>(am =>
             am.DefinedGuids == GetDefinedGuids() &&
@@ -803,7 +798,7 @@ public class RoleManagementTests : TestsBase
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new List<ApplicationRole>().AsQueryable().BuildMockDbSet().Object
+            db.Roles == new List<ApplicationRole>().BuildMockDbSet().Object
             );
         var logger = new FakeLogger<DeleteHandler>();
 
@@ -833,7 +828,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -847,9 +842,9 @@ public class RoleManagementTests : TestsBase
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
-            db.UserClaims == Enumerable.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object &&
-            db.Users == Enumerable.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object
+            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role))! &&
+            db.UserClaims == Array.Empty<IdentityUserClaim<string>>().BuildMockDbSet().Object &&
+            db.Users == Array.Empty<ApplicationUser>().BuildMockDbSet().Object
             );
 #pragma warning restore CA2012 // Use ValueTasks correctly
 
@@ -868,7 +863,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -890,16 +885,16 @@ public class RoleManagementTests : TestsBase
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
         var user = new ApplicationUser("MrTester@company.com");
-        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+        var users = new List<ApplicationUser> { user }.BuildMockDbSet();
 
         var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -912,7 +907,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role))!);
         repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Throws(dbUpdateException);
         repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
         repository.Setup(db => db.Users).Returns(users.Object);
@@ -932,7 +927,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains("Role", errors[0].ErrorMessage);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
@@ -950,14 +945,14 @@ public class RoleManagementTests : TestsBase
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-        var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
-        var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
+        var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().BuildMockDbSet().Object;
+        var dbsUsers = Array.Empty<ApplicationUser>().BuildMockDbSet().Object;
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -968,12 +963,12 @@ public class RoleManagementTests : TestsBase
         authManager
             .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
             .Returns(Task.FromResult(AuthorizationResult.Success()));
-        authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
+        authManager.SetupGet(am => am.DefinedClaims).Returns([]);
         authManager.Setup(am => am.RefreshRole(role.Id));
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
+            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role))! &&
             db.UserClaims == dbsUserClaims &&
             db.Users == dbsUsers &&
             db.Roles.Remove(It.IsAny<ApplicationRole>()) == null &&
@@ -1001,18 +996,18 @@ public class RoleManagementTests : TestsBase
     [Fact(DisplayName = "Delete Role [Post] logs success")]
     public async Task RoleManagement_Test29Async()
     {
-        ApplicationRole deletedRole = null;
+        ApplicationRole deletedRole = null!;
 
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
-        var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().AsQueryable().BuildMockDbSet().Object;
-        var dbsUsers = Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object;
+        var dbsUserClaims = Array.Empty<IdentityUserClaim<string>>().BuildMockDbSet().Object;
+        var dbsUsers = Array.Empty<ApplicationUser>().BuildMockDbSet().Object;
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1023,16 +1018,16 @@ public class RoleManagementTests : TestsBase
         authManager
             .Setup(am => am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()))
             .Returns(Task.FromResult(AuthorizationResult.Success()));
-        authManager.SetupGet(am => am.DefinedClaims).Returns(new List<string>());
+        authManager.SetupGet(am => am.DefinedClaims).Returns([]);
         authManager.Setup(am => am.RefreshRole(role.Id));
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role))!);
         repository.Setup(db => db.UserClaims).Returns(dbsUserClaims);
         repository.Setup(db => db.Users).Returns(dbsUsers);
         repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>()))
             .Callback((ApplicationRole ar) => { deletedRole = ar; })
-            .Returns((EntityEntry<ApplicationRole>)null);
+            .Returns((EntityEntry<ApplicationRole>)null!);
         repository.Setup(db => db.SaveChangesAsync(default)).Returns(Task.FromResult(1));
 
         var logger = new FakeLogger<DeleteHandler>();
@@ -1072,7 +1067,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1085,7 +1080,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet().Object
+            db.Roles == new List<ApplicationRole> { role }.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1103,7 +1098,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -1119,13 +1114,13 @@ public class RoleManagementTests : TestsBase
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
         role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
-        var dbSet = new List<ApplicationRole> { role }.AsQueryable().BuildMockDbSet();
+        var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1165,7 +1160,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1179,9 +1174,9 @@ public class RoleManagementTests : TestsBase
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role)) &&
-            db.UserClaims == new IdentityUserClaim<string>[0].AsQueryable().BuildMockDbSet().Object &&
-            db.Users == new ApplicationUser[0].AsQueryable().BuildMockDbSet().Object &&
+            db.Roles.FindAsync(role.Id) == new ValueTask<ApplicationRole>(Task.FromResult(role))! &&
+            db.UserClaims == new IdentityUserClaim<string>[0].BuildMockDbSet().Object &&
+            db.Users == new ApplicationUser[0].BuildMockDbSet().Object &&
             db.Roles.Remove(role) == null &&
             db.SaveChangesAsync(default) == Task.FromResult(1)
             );
@@ -1212,7 +1207,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
+            db.Roles == new[] { role }.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1233,7 +1228,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1261,7 +1256,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -1284,7 +1279,7 @@ public class RoleManagementTests : TestsBase
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1297,7 +1292,7 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
-            db.Roles == new[] { role }.AsQueryable().BuildMockDbSet().Object
+            db.Roles == new[] { role }.BuildMockDbSet().Object
             );
 
         var logger = new FakeLogger<EditHandler>();
@@ -1315,7 +1310,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
-        var errors = model.ModelState[string.Empty].Errors;
+        var errors = model.ModelState[string.Empty]!.Errors;
         Assert.Contains(expectedMessage, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
@@ -1334,18 +1329,18 @@ public class RoleManagementTests : TestsBase
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
         var user = new ApplicationUser("MrTester@company.com");
-        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+        var users = new List<ApplicationUser> { user }.BuildMockDbSet();
 
         var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.BuildMockDbSet();
 
-        IdentityUserClaim<string>[] removedClaims = null;
+        IdentityUserClaim<string>[] removedClaims = null!;
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1358,8 +1353,8 @@ public class RoleManagementTests : TestsBase
             );
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
-        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null);
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role))!);
+        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null!);
         repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
         repository.Setup(db => db.Users).Returns(users.Object);
         repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))
@@ -1387,16 +1382,16 @@ public class RoleManagementTests : TestsBase
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
         var user = new ApplicationUser("MrTester@company.com");
-        var users = new List<ApplicationUser> { user }.AsQueryable().BuildMockDbSet();
+        var users = new List<ApplicationUser> { user }.BuildMockDbSet();
 
         var userClaim = new IdentityUserClaim<string> { UserId = user.Id, ClaimType = ClaimTypes.Role, ClaimValue = role.Name };
-        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.AsQueryable().BuildMockDbSet();
+        var userClaims = new List<IdentityUserClaim<string>> { userClaim }.BuildMockDbSet();
 
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
             cp.Claims == new[] { new Claim(ClaimTypes.NameIdentifier, principalId) } &&
-            cp.Identity.Name == principalName
+            cp.Identity!.Name == principalName
             );
 
         var httpContext = Mock.Of<HttpContext>(hc =>
@@ -1408,11 +1403,11 @@ public class RoleManagementTests : TestsBase
             am.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<ApplicationRole>(), It.IsAny<AppClaimRequirement>()) == Task.FromResult(AuthorizationResult.Success())
             );
 
-        IdentityUserClaim<string>[] removedClaims = null;
+        IdentityUserClaim<string>[] removedClaims = null!;
 
         var repository = new Mock<IRepository<ApplicationUser, ApplicationRole>>();
-        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role)));
-        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null);
+        repository.Setup(db => db.Roles.FindAsync(role.Id)).Returns(new ValueTask<ApplicationRole>(Task.FromResult(role))!);
+        repository.Setup(db => db.Roles.Remove(It.IsAny<ApplicationRole>())).Returns((EntityEntry<ApplicationRole>)null!);
         repository.Setup(db => db.UserClaims).Returns(userClaims.Object);
         repository.Setup(db => db.Users).Returns(users.Object);
         repository.Setup(db => db.UserClaims.RemoveRange(It.IsAny<IdentityUserClaim<string>[]>()))

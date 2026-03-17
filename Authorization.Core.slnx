@@ -2,10 +2,17 @@
   <Folder Name="/Solution Items/">
     <File Path="global.json" />
   </Folder>
+  <Folder Name="/Solution Items/.github/" />
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/dotnet.yml" />
+    <File Path=".github/workflows/release.yml" />
+    <File Path=".github/workflows/tag.yml" />
+  </Folder>
   <Project Path="Authorization.Core.Tests/Authorization.Core.Tests.csproj" />
   <Project Path="Authorization.Core.UI.Test.Web/Authorization.Core.UI.Test.Web.csproj" />
+  <Project Path="Authorization.Core.UI.Tests.Infrastructure/Authorization.Core.UI.Tests.Infrastructure.csproj" Id="6ea0f66c-f7ce-45cf-987b-4d95fde2816b" />
   <Project Path="Authorization.Core.UI.Tests.Integration/Authorization.Core.UI.Tests.Integration.csproj" />
-  <Project Path="Authorization.Core.UI.Tests.Playwright/Authorization.Core.UI.Tests.Playwright.csproj" />
+  <Project Path="Authorization.Core.UI.Tests.Playwright/Authorization.Core.UI.Tests.Playwright.csproj" Id="2b3b2fee-2723-42c6-b1ea-bd952e2d47c9" />
   <Project Path="Authorization.Core.UI.Tests/Authorization.Core.UI.Tests.csproj" />
   <Project Path="Authorization.Core.UI/Authorization.Core.UI.csproj" />
   <Project Path="Authorization.Core/Authorization.Core.csproj" />

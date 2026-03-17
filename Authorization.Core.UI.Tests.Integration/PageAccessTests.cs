@@ -1,5 +1,6 @@
-﻿using Authorization.Core.UI.Test.Web.Data;
-using Authorization.Core.UI.Tests.Integration.Infrastructure;
+﻿using Authorization.Core.UI.Test.Web;
+using Authorization.Core.UI.Test.Web.Data;
+using Authorization.Core.UI.Tests.Infrastructure;
 using CRFricke.Authorization.Core;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -49,33 +50,12 @@ namespace Authorization.Core.UI.Tests.Integration
     {
         public PageAccessTests(WebAppFactory factory)
         {
-            Factory = factory;
+            WebAppFactory = factory;
         }
 
-        public WebAppFactory Factory { get; }
+        public WebAppFactory WebAppFactory { get; }
 
-        private string HostUri { get; } = "https://localhost/";
-
-
-        private HttpClient CreateClientWithAuthenticationScheme(string claimsIssuer = "Administrator", bool allowRedirect = true)
-        {
-            var client = Factory.WithWebHostBuilder(builder => {
-                builder.ConfigureTestServices(services =>
-                {
-                    services.AddAuthentication(defaultScheme: "TestScheme")
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                            "TestScheme", options => { options.ClaimsIssuer = claimsIssuer; });
-                });
-            }).CreateClient(new()
-            {
-                AllowAutoRedirect = allowRedirect, BaseAddress = new(HostUri)
-            });
-
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(scheme: "TestScheme");
-
-            return client;
-        }
+        private string HostUrl { get; } = "https://localhost/";
 
 
         [Theory(DisplayName = "Can access Management page via friendly area name ")]
@@ -87,12 +67,12 @@ namespace Authorization.Core.UI.Tests.Integration
             if (needsId)
             {
                 var id = (endpoint.Contains("Role"))
-                    ? Test.Web.AppGuids.Role.CalendarManager
-                    : Test.Web.AppGuids.User.CalendarGuy;
+                    ? AppGuids.Role.CalendarManager
+                    : AppGuids.User.CalendarGuy;
                 endpoint += $"?id={id}";
             }
 
-            var response = await client.GetAsync(endpoint);
+            var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -101,10 +81,10 @@ namespace Authorization.Core.UI.Tests.Integration
         public async Task PageAccessTest02()
         {
             var client = CreateClientWithAuthenticationScheme(
-                nameof(Test.Web.AppGuids.Role.CalendarManager)
+                nameof(AppGuids.Role.CalendarManager)
                 );
 
-            var response = await client.GetAsync("/Admin/Calendar");
+            var response = await client.GetAsync("/Admin/Calendar", TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -118,12 +98,12 @@ namespace Authorization.Core.UI.Tests.Integration
             if (needsId)
             {
                 var id = (endpoint.Contains("Role"))
-                    ? Test.Web.AppGuids.Role.CalendarManager
-                    : Test.Web.AppGuids.User.CalendarGuy;
+                    ? AppGuids.Role.CalendarManager
+                    : AppGuids.User.CalendarGuy;
                 endpoint += $"?id={id}";
             }
 
-            var response = await client.GetAsync(endpoint);
+            var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -132,12 +112,12 @@ namespace Authorization.Core.UI.Tests.Integration
         [MemberData(nameof(Test04Data))]
         public async Task PageAccessTest04Async(string endpoint)
         {
-            var client = Factory.CreateClient(new WebApplicationFactoryClientOptions
+            var client = WebAppFactory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false, BaseAddress = new(HostUri)
+                AllowAutoRedirect = false, BaseAddress = new(HostUrl)
             });
 
-            var response = await client.GetAsync(endpoint);
+            var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         }
@@ -146,28 +126,28 @@ namespace Authorization.Core.UI.Tests.Integration
         [MemberData(nameof(Test05Data))]
         public async Task PageAccessTest05Async(string endpoint, string claim, bool needsId)
         {
-            using var scope = Factory.Services.CreateScope();
+            using var scope = WebAppFactory.Services.CreateScope();
             var authManager = scope.ServiceProvider.GetRequiredService<IAuthorizationManager>();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            var role = dbContext.Roles.Find(Test.Web.AppGuids.Role.DocumentManager)!.SetClaims(claim);
+            var role = dbContext.Roles.Find(AppGuids.Role.DocumentManager)!.SetClaims(claim);
             dbContext.Roles.Update(role);
             dbContext.SaveChanges();
             authManager.RefreshRole(role.Id);
 
             var client = CreateClientWithAuthenticationScheme(
-                nameof(Test.Web.AppGuids.Role.DocumentManager)
+                nameof(AppGuids.Role.DocumentManager)
                 );
 
             if (needsId)
             {
                 var id = (endpoint.Contains("Role"))
-                    ? Test.Web.AppGuids.Role.CalendarManager
-                    : Test.Web.AppGuids.User.CalendarGuy;
+                    ? AppGuids.Role.CalendarManager
+                    : AppGuids.User.CalendarGuy;
                 endpoint += $"?id={id}";
             }
 
-            var response = await client.GetAsync(endpoint);
+            var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -180,7 +160,7 @@ namespace Authorization.Core.UI.Tests.Integration
                 nameof(SysGuids.Role.Administrator)
                 );
 
-            var response = await client.GetAsync(endpoint);
+            var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -193,9 +173,32 @@ namespace Authorization.Core.UI.Tests.Integration
                 nameof(SysGuids.Role.Administrator)
                 );
 
-            var response = await client.GetAsync($"{endpoint}?Id={Guid.Empty}");
+            var response = await client.GetAsync($"{endpoint}?Id={Guid.Empty}", TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+
+
+        private HttpClient CreateClientWithAuthenticationScheme(string claimsIssuer = "Administrator", bool allowRedirect = true)
+        {
+            var client = WebAppFactory.WithWebHostBuilder(builder => {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddAuthentication(defaultScheme: "TestScheme")
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                            "TestScheme", options => { options.ClaimsIssuer = claimsIssuer; });
+                });
+            }).CreateClient(new()
+            {
+                AllowAutoRedirect = allowRedirect,
+                BaseAddress = new(HostUrl)
+            });
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(scheme: "TestScheme");
+
+            return client;
         }
 
 
