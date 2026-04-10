@@ -5,15 +5,24 @@ on:
     branches: [ '**' ]
     paths-ignore: ['**/*.md']
 
-jobs:
-  build:
+  pull_request:
+    branches: [ master ]
 
-    env:
-      BUILD_CONFIG: 'Release'
+env:
+  BUILD_CONFIG: 'Release'
+
+jobs:
+
+  build:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      pull-requests: write
+      contents: read
+
     steps:
+
     - name: Setup PowerShell
       uses: CRFricke/Setup-PowerShell@v1.0.10
 
@@ -50,4 +59,47 @@ jobs:
       run: ./Authorization.Core.UI.Tests.Integration/bin/Release/net10.0/playwright.ps1 install
 
     - name: Test
-      run: dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal
+      run: |
+        dotnet test --configuration $BUILD_CONFIG --no-build --verbosity normal \
+          --coverlet --coverlet-output-format cobertura \
+          --coverlet-include '[CRFricke.Authorization.Core]*' \
+          --coverlet-include '[CRFricke.Authorization.Core.UI]*' 
+
+    - name: Merge Coverage Data
+      run: |
+        dotnet tool install -g dotnet-reportgenerator-globaltool
+        reportgenerator -reports:**/TestResults/coverage.cobertura.xml -targetdir:CodeCoverage \
+          -reporttypes:'Cobertura' 
+
+    - name: Generate Code Coverage Summary
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: 'CodeCoverage/Cobertura.xml'
+        badge: false
+        fail_below_min: true
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: true
+        indicators: true
+        output: both
+        thresholds: '50 75'
+
+    - name: Run security scan
+      shell: pwsh
+      run: |
+        $filePath = "SecurityScan.log"
+        $searchText = "has the following vulnerable packages"
+        dotnet list package --no-restore --vulnerable --include-transitive > $filePath
+        $matches = Select-String -Path $filePath -Pattern $searchText
+        if ($matches) {
+           cat $filePath
+           Write-ActionWarning "Vulnerable packages detected."
+        }
+
+    - name: Add Coverage PR Comment
+      if: github.event_name == 'pull_request'
+      uses: marocchino/sticky-pull-request-comment@v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        recreate: true
+        path: code-coverage-results.md
