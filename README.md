@@ -1,8 +1,7 @@
 ![Authorization.Core](https://raw.githubusercontent.com/CRFricke/Authorization.Core/master/icon.png)
 
-[![.NET](https://github.com/CRFricke/Authorization.Core/actions/workflows/dotnet.yml/badge.svg)](https://github.com/CRFricke/Authorization.Core/actions/workflows/dotnet.yml) 
-[![Tag](https://github.com/CRFricke/Authorization.Core/actions/workflows/tag.yml/badge.svg)](https://github.com/CRFricke/Authorization.Core/actions/workflows/tag.yml)
-[![Release](https://github.com/CRFricke/Authorization.Core/actions/workflows/release.yml/badge.svg)](https://github.com/CRFricke/Authorization.Core/actions/workflows/release.yml)
+[![CI/CD](https://github.com/CRFricke/Authorization.Core/actions/workflows/dotnet.yml/badge.svg)](https://github.com/CRFricke/Authorization.Core/actions/workflows/dotnet.yml) 
+![.NET](https://img.shields.io/badge/.NET-10.0-purple)
 # Authorization.Core
 
 The Authorization.Core package provides an efficient implementation of a rights-based authorization 
