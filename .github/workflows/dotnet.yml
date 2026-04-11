@@ -10,16 +10,18 @@ on:
 
 env:
   BUILD_CONFIG: 'Release'
+  ARTIFACTS_FOLDER: ${{ github.workspace }}/Artifacts
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  TAG_PREFIX: 'v10'
+
 
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
-
-    permissions:
-      pull-requests: write
-      contents: read
 
     steps:
 
@@ -33,7 +35,7 @@ jobs:
       shell: pwsh
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: 'v10'
+          TAG_PREFIX: ${{ env.TAG_PREFIX }}
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
@@ -42,7 +44,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: ${{ env.DOTNET_VERSION }}
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:
@@ -96,10 +98,35 @@ jobs:
            Write-ActionWarning "Vulnerable packages detected."
         }
 
-    - name: Add Coverage PR Comment
+    - name: Upload Artifacts
       if: github.event_name == 'pull_request'
-      uses: marocchino/sticky-pull-request-comment@v3
+      uses: actions/upload-artifact@v7
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        recreate: true
+        name: code-coverage-results
         path: code-coverage-results.md
+        retention-days: 1
+
+  update-pr:
+
+    if: github.event_name == 'pull_request'
+    needs: [build]
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: code-coverage-results
+          path: ${{ env.ARTIFACTS_FOLDER }}
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          path: ${{ env.ARTIFACTS_FOLDER }}/code-coverage-results.md
+          recreate: true
