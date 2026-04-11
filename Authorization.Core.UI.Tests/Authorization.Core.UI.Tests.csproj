@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.MTP" Version="8.0.1" />
-    <PackageReference Include="CRFricke.Test.Support" Version="10.0.0-beta1.0" />
+    <PackageReference Include="CRFricke.Test.Support" Version="10.0.0-beta2.1" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.4.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.5" />
 	<PackageReference Include="Microsoft.Testing.Platform" Version="2.2.1" />
