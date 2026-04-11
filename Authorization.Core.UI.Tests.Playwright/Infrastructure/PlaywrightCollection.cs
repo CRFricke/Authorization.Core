@@ -1,4 +1,4 @@
-﻿using Authorization.Core.UI.Tests.Infrastructure;
+﻿using CRFricke.Test.Support.Infrastructure;
 
 namespace Authorization.Core.UI.Tests.Playwright.Infrastructure;
 

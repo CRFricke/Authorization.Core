@@ -3,6 +3,7 @@ using Authorization.Core.UI.Test.Web.Data;
 using Authorization.Core.UI.Tests.Infrastructure;
 using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
+using CRFricke.Test.Support.Infrastructure;
 using Microsoft.Playwright;
 
 namespace Authorization.Core.UI.Tests.Playwright;
