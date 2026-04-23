@@ -70,7 +70,7 @@ jobs:
     - name: Merge Coverage Data
       run: |
         dotnet tool install -g dotnet-reportgenerator-globaltool
-        reportgenerator -reports:**/TestResults/coverage.cobertura.xml -targetdir:CodeCoverage \
+        reportgenerator -reports:**/TestResults/coverage.cobertura.*.xml -targetdir:CodeCoverage \
           -reporttypes:'Cobertura' 
 
     - name: Generate Code Coverage Summary
