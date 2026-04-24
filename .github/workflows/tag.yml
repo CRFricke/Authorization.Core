@@ -4,11 +4,15 @@ on:
   push:
     tags: ['v*']
 
+env:
+  BUILD_CONFIG: 'Release'
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  TAG_PREFIX: 'v10'
+
 jobs:
   build:
-
-    env:
-      BUILD_CONFIG: 'Release'
 
     runs-on: ubuntu-latest
 
@@ -23,7 +27,7 @@ jobs:
       shell: pwsh
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: 'v10'
+          TAG_PREFIX: ${{ env.TAG_PREFIX }}
       run: |
         Get-VersionVariables
         Set-ActionVariable "BUILD_VERSION" "$Tag_Version"
@@ -32,7 +36,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 10.0.x
+        dotnet-version: ${{ env.DOTNET_VERSION }}
         source-url: https://nuget.pkg.github.com/CRFricke/index.json
         owner: CRFricke
       env:

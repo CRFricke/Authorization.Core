@@ -3,7 +3,7 @@ name: .NET
 on:
   push:
     branches: [ '**' ]
-    paths-ignore: ['**/*.md']
+    paths-ignore: ['**/*.md', '**/tag.yml', '**/release.yml']
 
   pull_request:
     branches: [ master ]
