@@ -1,0 +1,42 @@
+<Project>
+
+  <!-- Common properties for all projects -->
+  <PropertyGroup>
+	<!--<AnalysisMode>All</AnalysisMode>-->
+	<ImplicitUsings>enable</ImplicitUsings>
+	<LangVersion>latest</LangVersion>
+	<Nullable>enable</Nullable>
+	<TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Package metadata -->
+  <PropertyGroup>
+	<Authors>Chuck Fricke</Authors>
+	<Company>Fricke Consulting</Company>
+	<Copyright>Copyright © Chuck Fricke $([System.DateTime]::Now.ToString(yyyy))</Copyright>
+	<PackageIcon>icon.png</PackageIcon>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageProjectUrl>https://github.com/CRFricke/Authorization.Core</PackageProjectUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <!-- GitHub Actions CI/CD configurations -->
+  <!-- For 'push' workflow, we embed the symbol package in the DLL and push the nupkg to github.com -->
+  <PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'push'">
+	<DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <!-- For 'release' workflow, we create a separate symbol package and push both to nuget.org -->
+  <PropertyGroup Condition="'$(GITHUB_EVENT_NAME)' == 'release'">
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- To get a "deterministic build" for our NuGet package -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+	<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+</Project>
