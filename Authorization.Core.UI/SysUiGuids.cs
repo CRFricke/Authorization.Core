@@ -1,37 +1,36 @@
-﻿using System.Collections.Generic;
+﻿#pragma warning disable CA1034 // Nested types should not be visible
 
-namespace CRFricke.Authorization.Core.UI
+namespace CRFricke.Authorization.Core.UI;
+
+/// <summary>
+/// Defines the Guids used by the Authorization system UI.
+/// </summary>
+public class SysUiGuids
 {
     /// <summary>
-    /// Defines the Guids used by the Authorization system UI.
+    /// The Guids of the system Roles.
     /// </summary>
-    public class SysUiGuids
+    public class Role : IDefinesGuids
     {
         /// <summary>
-        /// The Guids of the system Roles.
+        /// The Guid assigned to the RoleManager Role.
         /// </summary>
-        public class Role : IDefinesGuids
-        {
-            /// <summary>
-            /// The Guid assigned to the RoleManager Role.
-            /// </summary>
-            public const string RoleManager = "5e79c59c-b0c1-4857-8f3a-d99dbd1e099f";
+        public const string RoleManager = "5e79c59c-b0c1-4857-8f3a-d99dbd1e099f";
 
-            /// <summary>
-            /// The Guid assigned to the UserManager Role.
-            /// </summary>
-            public const string UserManager = "d29ad18a-eaae-407c-8398-92a99182148a";
+        /// <summary>
+        /// The Guid assigned to the UserManager Role.
+        /// </summary>
+        public const string UserManager = "d29ad18a-eaae-407c-8398-92a99182148a";
 
-            /// <summary>
-            /// Returns a list of all GUIDs defined for Role entities.
-            /// </summary>
-            public static readonly List<string> DefinedGuids = new()
-            {
-                RoleManager, UserManager
-            };
+        /// <summary>
+        /// Returns a list of all GUIDs defined for Role entities.
+        /// </summary>
+        public static readonly List<string> DefinedGuids =
+        [
+            RoleManager, UserManager
+        ];
 
-            ///<inheritdoc/>
-            List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
-        }
+        ///<inheritdoc/>
+        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 }

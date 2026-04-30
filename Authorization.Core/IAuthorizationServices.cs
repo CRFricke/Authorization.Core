@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace CRFricke.Authorization.Core;
+﻿namespace CRFricke.Authorization.Core;
 
 /// <summary>
 /// Defines the service methods exposed by the <see cref="AuthorizationManager"/> class.

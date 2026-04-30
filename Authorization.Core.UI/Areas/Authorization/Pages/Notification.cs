@@ -1,34 +1,35 @@
-﻿namespace CRFricke.Authorization.Core.UI.Pages
+﻿#pragma warning disable IDE0130 // Namespace does not match folder structure
+
+namespace CRFricke.Authorization.Core.UI.Pages;
+
+/// <summary>
+/// The severity associated with a <see cref="Notification"/>.
+/// </summary>
+public enum Severity
 {
     /// <summary>
-    /// The severity associated with a <see cref="Notification"/>.
+    /// It is a normal message.
     /// </summary>
-    public enum Severity
-    {
-        /// <summary>
-        /// It is a normal message.
-        /// </summary>
-        Normal,
-
-        /// <summary>
-        /// It is a high severity message.
-        /// </summary>
-        High
-    }
+    Normal,
 
     /// <summary>
-    /// A notification message to be displayed on another Razor page.
+    /// It is a high severity message.
     /// </summary>
-    public class Notification
-    {
-        /// <summary>
-        /// The <see cref="Severity"/> of the message.
-        /// </summary>
-        public Severity Severity { get; set; }
+    High
+}
 
-        /// <summary>
-        /// The message to be displayed on the other Razor page.
-        /// </summary>
-        public string Message { get; set; }
-    }
+/// <summary>
+/// A notification message to be displayed on another Razor page.
+/// </summary>
+public class Notification
+{
+    /// <summary>
+    /// The <see cref="Severity"/> of the message.
+    /// </summary>
+    public Severity Severity { get; set; }
+
+    /// <summary>
+    /// The message to be displayed on the other Razor page.
+    /// </summary>
+    public string Message { get; set; } = null!;
 }

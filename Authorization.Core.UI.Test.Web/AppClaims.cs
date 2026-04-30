@@ -1,5 +1,7 @@
 ﻿using CRFricke.Authorization.Core;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace Authorization.Core.UI.Test.Web;
 
 /// <summary>
@@ -40,10 +42,10 @@ public class AppClaims
         /// <summary>
         /// Returns a list of all Claims defined for Calendar entities.
         /// </summary>
-        public static readonly List<string> DefinedClaims = new()
-        {
+        public static readonly List<string> DefinedClaims =
+        [
             Create, Delete, Read, Update, List
-        };
+        ];
 
         ///<inheritdoc/>
         List<string> IDefinesClaims.DefinedClaims => DefinedClaims;
@@ -77,10 +79,10 @@ public class AppClaims
         /// <summary>
         /// Returns a list of all Claims defined for Document entities.
         /// </summary>
-        public static readonly List<string> DefinedClaims = new()
-        {
+        public static readonly List<string> DefinedClaims =
+        [
             Upload, Delete, Read, List
-        };
+        ];
 
         ///<inheritdoc/>
         List<string> IDefinesClaims.DefinedClaims => DefinedClaims;

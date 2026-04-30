@@ -1,7 +1,6 @@
 ﻿using CRFricke.Authorization.Core.UI.Data;
 
-namespace Authorization.Core.UI.Test.Web.Data
-{
-    public class ApplicationUser : AuthUiUser
-    { }
-}
+namespace Authorization.Core.UI.Test.Web.Data;
+
+public class ApplicationUser : AuthUiUser
+{ }

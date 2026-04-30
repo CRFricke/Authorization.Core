@@ -1,7 +1,8 @@
 ﻿using CRFricke.Authorization.Core;
-using System.Collections.Generic;
 
 namespace Authorization.Core.Tests;
+
+#pragma warning disable CA1034 // Nested types should not be visible
 
 public class TestGuids
 {
@@ -23,10 +24,10 @@ public class TestGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for Role entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids = new()
-        {
+        public static readonly List<string> DefinedGuids =
+        [
             RoleManager, UserManager
-        };
+        ];
 
         ///<inheritdoc/>
         List<string> IDefinesGuids.DefinedGuids => DefinedGuids;

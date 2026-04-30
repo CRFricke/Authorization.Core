@@ -1,11 +1,9 @@
 ﻿using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -46,17 +44,17 @@ internal class IndexHandler<
 
 public class UserInfo
 {
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
     [DataType(DataType.EmailAddress)]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
     [Display(Name = "Name")]
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
 
     [Display(Name = "Phone Number")]
     [DataType(DataType.PhoneNumber)]
-    public string PhoneNumber { get; set; }
+    public string? PhoneNumber { get; set; }
 
     [Display(Name = "Lockout Ends On")]
     [DisplayFormat(DataFormatString = "{0:o}")]
@@ -73,8 +71,10 @@ public class UserInfo
 
     internal UserInfo InitFromUser<TUser>(TUser user) where TUser : AuthUiUser
     {
+        ArgumentNullException.ThrowIfNull(user);
+
         Id = user.Id;
-        Email = user.Email;
+        Email = user.Email!;
         DisplayName = user.DisplayName;
         PhoneNumber = user.PhoneNumber;
         LockoutEnd = user.LockoutEnd;

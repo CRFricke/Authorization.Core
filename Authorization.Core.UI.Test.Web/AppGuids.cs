@@ -1,5 +1,7 @@
 ﻿using CRFricke.Authorization.Core;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace Authorization.Core.UI.Test.Web;
 
 /// <summary>
@@ -25,10 +27,10 @@ public class AppGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for role entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids = new()
-        {
+        public static readonly List<string> DefinedGuids =
+        [
             CalendarManager, DocumentManager
-        };
+        ];
 
         ///<inheritdoc/>
         List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
@@ -52,10 +54,10 @@ public class AppGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for user entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids = new()
-        {
+        public static readonly List<string> DefinedGuids =
+        [
             CalendarGuy, DocumentGuy
-        };
+        ];
 
         ///<inheritdoc/>
         List<string> IDefinesGuids.DefinedGuids => DefinedGuids;

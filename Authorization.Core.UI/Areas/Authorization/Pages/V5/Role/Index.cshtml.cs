@@ -1,10 +1,9 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 
@@ -12,8 +11,8 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 [PageImplementationType(typeof(IndexModel<,>))]
 public abstract class IndexModel : ModelBase
 {
-    private static string _basePath = null;
-    private readonly object _lockObject = new();
+    private static string _basePath = null!;
+    private readonly Lock _lockObject = new();
 
     public string BasePath
     {
@@ -37,7 +36,7 @@ public abstract class IndexModel : ModelBase
         }
     }
 
-    public IList<RoleInfo> RoleInfo { get; set; }
+    public IList<RoleInfo> RoleInfo { get; set; } = null!;
 
     public virtual Task OnGetAsync() => throw new NotImplementedException();
 }

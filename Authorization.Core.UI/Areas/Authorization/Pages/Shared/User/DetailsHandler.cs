@@ -2,9 +2,9 @@
 using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 

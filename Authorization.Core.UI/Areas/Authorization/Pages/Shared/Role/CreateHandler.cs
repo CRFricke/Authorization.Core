@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -68,14 +68,14 @@ internal class CreateHandler<
     /// <item>Thrown if no <see cref="IRepository{TUser, TRole}"/> implementation can be found by the the <see cref="IServiceProvider"/>.</item>
     /// </list>
     /// </exception>
-    public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string hfClaimList)
+    public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string? hfClaimList)
     {
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
         roleModel.InitRoleClaims(_authManager)
             .SetAssignedClaims(
-                hfClaimList?.Split(',') ?? Array.Empty<string>()
+                hfClaimList?.Split(',') ?? []
                 );
 
         if (!modelState.IsValid)
@@ -93,7 +93,7 @@ internal class CreateHandler<
 
             _logger.LogWarning(
                 "'{PrincipalEmail}' attempted to create {RoleType} with elevated privileges.",
-                principal.Identity.Name, typeof(TRole).Name
+                principal.Identity!.Name, typeof(TRole).Name
                 );
 
             return modelBase.Page();
@@ -111,7 +111,7 @@ internal class CreateHandler<
 
             _logger.LogError(
                 ex, "'{PrincipalEmail}' could not create {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             return modelBase.Page();
@@ -124,7 +124,7 @@ internal class CreateHandler<
 
         _logger.LogInformation(
             "'{PrincipalEmail}' created {RoleType} '{RoleName}' (ID: {RoleId}).",
-            principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

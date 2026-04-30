@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -17,7 +16,7 @@ internal class AuthCorePageApplicationModelConvention<TUser, TRole> : IPageAppli
     [RequiresUnreferencedCode("Call to 'System.Type.MakeGenericType(Type[])' can not be statically analyzed.")]
     public void Apply(PageApplicationModel pam)
     {
-        var attribute = pam.ModelType.GetCustomAttribute<PageImplementationTypeAttribute>();
+        var attribute = pam.ModelType!.GetCustomAttribute<PageImplementationTypeAttribute>();
         if (attribute == null)
         {
             return;
@@ -27,7 +26,7 @@ internal class AuthCorePageApplicationModelConvention<TUser, TRole> : IPageAppli
 
         if (attribute.Type.GetGenericArguments().Length == 1)
         {
-            var typeArg = pam.ModelType.Namespace.EndsWith(".User") ? typeof(TUser) : typeof(TRole);
+            var typeArg = pam.ModelType!.Namespace!.EndsWith(".User") ? typeof(TUser) : typeof(TRole);
 
             pam.ModelType = attribute.Type.MakeGenericType(typeArg).GetTypeInfo();
             return;

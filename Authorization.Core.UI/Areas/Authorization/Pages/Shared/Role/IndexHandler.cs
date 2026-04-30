@@ -1,10 +1,8 @@
 ﻿using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -55,19 +53,21 @@ public class RoleInfo
     /// <returns>The new <see cref="RoleInfo"/> class object.</returns>
     internal static RoleInfo Create<TRole>(TRole role) where TRole : AuthUiRole
     {
+        ArgumentNullException.ThrowIfNull(role);
+
         return new RoleInfo
         {
             Id = role.Id,
             Description = role.Description,
-            Name = role.Name
+            Name = role.Name!
         };
     }
 
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     public override string ToString()
     {

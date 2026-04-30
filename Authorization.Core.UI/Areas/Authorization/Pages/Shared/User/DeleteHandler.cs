@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -118,7 +118,7 @@ internal class DeleteHandler<
 
             _logger.LogWarning(
                 "'{PrincipalEmail}' attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                 );
 
             (await userModel.InitRoleInfoAsync(_repository)).InitFromUser(user);
@@ -137,7 +137,7 @@ internal class DeleteHandler<
 
             _logger.LogError(
                 ex, "'{PrincipalEmail}' could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                 );
         }
 
@@ -157,7 +157,7 @@ internal class DeleteHandler<
 
         _logger.LogInformation(
             "'{PrincipalEmail}' deleted {UserType} '{UserEmail}' (ID '{UserId}').",
-            principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

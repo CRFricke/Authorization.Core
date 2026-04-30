@@ -1,13 +1,12 @@
 ﻿using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+#pragma warning disable CA1034 // Nested types should not be visible
 
 namespace CRFricke.Authorization.Core.UI.Models;
 
@@ -20,7 +19,7 @@ public class RoleModel
         public RoleClaim()
         { }
 
-        public string Claim { get; set; }
+        public string Claim { get; set; } = null!;
 
         public int Id { get; internal set; }
 
@@ -41,9 +40,9 @@ public class RoleModel
 
     public class RoleUser
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
     }
 
     #endregion
@@ -52,16 +51,16 @@ public class RoleModel
     { }
 
 
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     [Required]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public List<RoleClaim> RoleClaims { get; set; }
+    public List<RoleClaim>? RoleClaims { get; set; }
 
-    public List<RoleUser> RoleUsers { get; set; }
+    public List<RoleUser>? RoleUsers { get; set; }
 
     public bool ClaimsUpdated { get; private set; }
 
@@ -81,7 +80,7 @@ public class RoleModel
     public virtual RoleModel InitFromRole(AuthUiRole role)
     {
         Id = role.Id;
-        Name = role.Name;
+        Name = role.Name!;
         Description = role.Description;
 
         return SetAssignedClaims(role.Claims);
@@ -103,7 +102,7 @@ public class RoleModel
             from uc in repository.UserClaims
             join au in repository.Users on uc.UserId equals au.Id
             where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == Id
-            select new RoleUser { Name = au.DisplayName, Email = au.Email }
+            select new RoleUser { Name = au.DisplayName, Email = au.Email! }
             ).ToListAsync();
 
         return this;
@@ -135,7 +134,7 @@ public class RoleModel
     {
         VerifyClaimsLoaded();
 
-        foreach (var roleClaim in RoleClaims)
+        foreach (var roleClaim in RoleClaims!)
         {
             roleClaim.IsAssigned = claims.Contains(roleClaim.Claim);
         }

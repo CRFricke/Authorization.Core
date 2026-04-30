@@ -3,11 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -71,13 +69,13 @@ internal class CreateHandler<
     /// <param name="hfRoleList">A list of Roles to be assigned to the new User.</param>
     /// <returns>The <see cref="IActionResult"/> to be used to display the next Razor page.</returns>
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
-    public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string hfRoleList)
+    public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string? hfRoleList)
     {
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
         (await userModel.InitRoleInfoAsync(_repository))
-            .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
+            .SetAssignedClaims(hfRoleList?.Split(',') ?? []);
 
         if (!modelState.IsValid)
         {
@@ -95,7 +93,7 @@ internal class CreateHandler<
 
             _logger.LogWarning(
                 "'{PrincipalEmail}' attempted to create {UserType} with elevated privileges.",
-                principal.Identity.Name, typeof(TUser).Name
+                principal.Identity!.Name, typeof(TUser).Name
                 );
 
             return modelBase.Page();
@@ -126,7 +124,7 @@ internal class CreateHandler<
 
             _logger.LogError(
                 ex, "'{PrincipalEmail}' could not create {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                 );
 
             return modelBase.Page();
@@ -139,7 +137,7 @@ internal class CreateHandler<
 
         _logger.LogInformation(
             "'{PrincipalEmail}' created {UserType} '{UserEmail}' (ID '{UserId}').",
-            principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);
@@ -147,7 +145,7 @@ internal class CreateHandler<
 
     private async Task<IdentityResult> ValidPasswordAsync(TUser user, string password)
     {
-        List<IdentityError> errors = null;
+        List<IdentityError> errors = null!;
         bool isValid = true;
         foreach (var passwordValidator in _userManager.PasswordValidators)
         {
@@ -159,10 +157,7 @@ internal class CreateHandler<
 
             if (identityResult.Errors.Any())
             {
-                if (errors == null)
-                {
-                    errors = [];
-                }
+                errors ??= [];
                 errors.AddRange(identityResult.Errors);
             }
 
@@ -173,9 +168,9 @@ internal class CreateHandler<
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("User password validation failed: {errors}.", string.Join(";", errors?.Select((IdentityError e) => e.Code) ?? []));
+                _logger.LogDebug("User password validation failed: {errors}.", string.Join(";", errors?.Select(e => e.Code) ?? []));
             }
-            return IdentityResult.Failed([.. errors]);
+            return IdentityResult.Failed([.. errors!]);
         }
 
         return IdentityResult.Success;

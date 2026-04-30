@@ -1,7 +1,4 @@
 ﻿using CRFricke.Authorization.Core.Data;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core;
 

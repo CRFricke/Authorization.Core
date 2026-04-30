@@ -1,47 +1,45 @@
 ﻿using CRFricke.Authorization.Core.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 
-namespace CRFricke.Authorization.Core
+namespace CRFricke.Authorization.Core;
+
+/// <summary>
+/// IAuthorizationPolicyProvider implementation that supports use of the RequiresClaims authorization attribute
+/// </summary>
+public class AppClaimRequirementProvider : IAuthorizationPolicyProvider
 {
+    private DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
+
     /// <summary>
-    /// IAuthorizationPolicyProvider implementation that supports use of the RequiresClaims authorization attribute
+    /// Creates a new instance of the AppClaimRequirementProvider using the specified AuthorizationOptions.
     /// </summary>
-    public class AppClaimRequirementProvider : IAuthorizationPolicyProvider
+    /// <param name="options">The AuthorizationOptions to be used to initialize the new AppClaimRequirementProvider instance.</param>
+    public AppClaimRequirementProvider(IOptions<AuthorizationOptions> options)
     {
-        private DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
+        FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
+    }
 
-        /// <summary>
-        /// Creates a new instance of the AppClaimRequirementProvider using the specified AuthorizationOptions.
-        /// </summary>
-        /// <param name="options">The AuthorizationOptions to be used to initialize the new AppClaimRequirementProvider instance.</param>
-        public AppClaimRequirementProvider(IOptions<AuthorizationOptions> options)
+    /// <inheritdoc />
+    public Task<AuthorizationPolicy> GetDefaultPolicyAsync()
+        => FallbackPolicyProvider.GetDefaultPolicyAsync();
+
+    /// <inheritdoc />
+    public Task<AuthorizationPolicy?> GetFallbackPolicyAsync()
+        => FallbackPolicyProvider.GetFallbackPolicyAsync();
+
+    /// <inheritdoc />
+    public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
+    {
+        if (RequiresClaimsAttribute.TryParse(policyName, out RequiresClaimsAttribute? requiresClaimsAttribute))
         {
-            FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
+            var policy = new AuthorizationPolicyBuilder();
+            policy.AddRequirements(
+                new AppClaimRequirement(requiresClaimsAttribute.ClaimValues)
+                );
+            return Task.FromResult((AuthorizationPolicy?)policy.Build());
         }
 
-        /// <inheritdoc />
-        public Task<AuthorizationPolicy> GetDefaultPolicyAsync()
-            => FallbackPolicyProvider.GetDefaultPolicyAsync();
-
-        /// <inheritdoc />
-        public Task<AuthorizationPolicy?> GetFallbackPolicyAsync()
-            => FallbackPolicyProvider.GetFallbackPolicyAsync();
-
-        /// <inheritdoc />
-        public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
-        {
-            if (RequiresClaimsAttribute.TryParse(policyName, out RequiresClaimsAttribute? requiresClaimsAttribute))
-            {
-                var policy = new AuthorizationPolicyBuilder();
-                policy.AddRequirements(
-                    new AppClaimRequirement(requiresClaimsAttribute.ClaimValues)
-                    );
-                return Task.FromResult((AuthorizationPolicy?)policy.Build());
-            }
-
-            return FallbackPolicyProvider.GetPolicyAsync(policyName);
-        }
+        return FallbackPolicyProvider.GetPolicyAsync(policyName);
     }
 }

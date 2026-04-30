@@ -16,13 +16,8 @@ using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Authorization.Core.UI.Tests;
 
@@ -110,6 +105,7 @@ public class UserManagementTests : TestsBase
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository, logger);
         _ = await model.OnGetAsync();
 
+        Assert.NotNull(model.UserModel.Roles);
         Assert.Equal(3, model.UserModel.Roles.Count);
         Assert.Equal(roles[0].Name, model.UserModel.Roles.First().Name);
         Assert.Equal(roles[2].Name, model.UserModel.Roles.Last().Name);
@@ -272,6 +268,7 @@ public class UserManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(user.Email!, notifications[0].Message);
     }
 
@@ -336,7 +333,7 @@ public class UserManagementTests : TestsBase
         var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -395,6 +392,7 @@ public class UserManagementTests : TestsBase
         Assert.Equal(user.PhoneNumberConfirmed, model.UserModel.PhoneNumberConfirmed);
         Assert.Equal(user.Surname, model.UserModel.Surname);
 
+        Assert.NotNull(model.UserModel.Roles);
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
         Assert.Equal(expectedClaims.Length, user.Claims.Count);
         Assert.Equal(expectedClaims, user.Claims.Select(c => c.ClaimValue));
@@ -426,6 +424,7 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(model.UserModel.Email, notifications[0].Message);
     }
 
@@ -617,7 +616,7 @@ public class UserManagementTests : TestsBase
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            UserModel = new UserModel { Id = user.Id, Email = user.Email },
+            UserModel = new UserModel { Id = user.Id, Email = user.Email! },
             PageContext = new PageContext { HttpContext = httpContext },
             TempData = new TestTempDataDictionary()
         };
@@ -626,6 +625,7 @@ public class UserManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(user.Email!, notifications[0].Message);
     }
 
@@ -660,7 +660,7 @@ public class UserManagementTests : TestsBase
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            UserModel = new UserModel { Id = user.Id, Email = user.Email },
+            UserModel = new UserModel { Id = user.Id, Email = user.Email! },
             PageContext = new PageContext { HttpContext = httpContext },
             TempData = new TestTempDataDictionary()
         };
@@ -683,7 +683,7 @@ public class UserManagementTests : TestsBase
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -754,6 +754,7 @@ public class UserManagementTests : TestsBase
         Assert.Equal(user.PhoneNumberConfirmed, model.UserModel.PhoneNumberConfirmed);
         Assert.Equal(user.Surname, model.UserModel.Surname);
 
+        Assert.NotNull(model.UserModel.Roles);
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
         Assert.Equal(expectedClaims.Length, user.Claims.Count);
         Assert.Equal(expectedClaims, user.Claims.Select(c => c.ClaimValue));
@@ -767,7 +768,7 @@ public class UserManagementTests : TestsBase
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -819,6 +820,7 @@ public class UserManagementTests : TestsBase
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         await model.OnGetAsync(users[1].Id);
 
+        Assert.NotNull(model.UserModel.Roles);
         Assert.Equal(roles.Count, model.UserModel.Roles.Count);
 
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
@@ -834,7 +836,7 @@ public class UserManagementTests : TestsBase
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnPostAsync(null);
+        var result = await model.OnPostAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -864,6 +866,7 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(user.Email!, notifications[0].Message);
     }
 
@@ -965,6 +968,7 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(user.Email!, notifications[0].Message);
     }
 

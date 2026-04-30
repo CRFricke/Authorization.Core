@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Models;
 using CRFricke.Authorization.Core.UI.Pages.Shared.User;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.User;
 
@@ -13,7 +13,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User;
 [PageImplementationType(typeof(DetailsModel<,>))]
 public abstract class DetailsModel : ModelBase
 {
-    public UserModel UserModel { get; set; }
+    public UserModel UserModel { get; set; } = null!;
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public virtual Task<IActionResult> OnGetAsync(string id) => throw new NotImplementedException();

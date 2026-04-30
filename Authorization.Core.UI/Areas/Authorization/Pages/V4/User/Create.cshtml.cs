@@ -5,9 +5,9 @@ using CRFricke.Authorization.Core.UI.Pages.Shared.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V4.User;
 
@@ -16,7 +16,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.User;
 public abstract class CreateModel : ModelBase
 {
     [BindProperty]
-    public UserModel UserModel { get; set; }
+    public UserModel UserModel { get; set; } = null!;
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public virtual Task<IActionResult> OnGetAsync() => throw new NotImplementedException();

@@ -37,7 +37,7 @@ public class NonParallelTests : TestsBase
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         model.OnGet();
 
-        Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims.Count);
+        Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims!.Count);
     }
 }
 
@@ -287,7 +287,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+        Assert.Contains(model.RoleModel.Name, notifications?[0].Message);
     }
 
     [Fact(DisplayName = "Edit Role [Get] returns NotFound for null ID")]
@@ -298,7 +298,7 @@ public class RoleManagementTests : TestsBase
         var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole> (authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -351,7 +351,7 @@ public class RoleManagementTests : TestsBase
         Assert.Equal(roles[0].Id, model.RoleModel.Id);
         Assert.Equal(roles[0].Description, model.RoleModel.Description);
         Assert.Equal(roles[0].Name, model.RoleModel.Name);
-        Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
+        Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims!.Count);
 
         var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
         Assert.Single(claims);
@@ -382,7 +382,7 @@ public class RoleManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+        Assert.Contains(model.RoleModel.Name, notifications?[0].Message);
     }
 
     [Fact(DisplayName = "Edit Role [Post] handles DB exception")]
@@ -606,6 +606,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(model.RoleModel.Name, notifications[0].Message);
     }
 
@@ -661,7 +662,7 @@ public class RoleManagementTests : TestsBase
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -710,6 +711,7 @@ public class RoleManagementTests : TestsBase
         Assert.Equal(roles[0].Id, model.RoleModel.Id);
         Assert.Equal(roles[0].Description, model.RoleModel.Description);
         Assert.Equal(roles[0].Name, model.RoleModel.Name);
+        Assert.NotNull(model.RoleModel.RoleClaims);
         Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
 
         var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
@@ -725,7 +727,7 @@ public class RoleManagementTests : TestsBase
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -775,6 +777,7 @@ public class RoleManagementTests : TestsBase
 
         Assert.IsType<PageResult>(result);
         Assert.Equal(role.Id, model.RoleModel.Id);
+        Assert.NotNull(model.RoleModel.RoleUsers);
         Assert.Single(model.RoleModel.RoleUsers);
         Assert.Equal(user.DisplayName, model.RoleModel.RoleUsers.First().Name);
         Assert.Equal(user.Email, model.RoleModel.RoleUsers.First().Email);
@@ -788,7 +791,7 @@ public class RoleManagementTests : TestsBase
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnPostAsync(null);
+        var result = await model.OnPostAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -813,6 +816,7 @@ public class RoleManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(model.RoleModel.Name, notifications[0].Message);
     }
 
@@ -990,6 +994,7 @@ public class RoleManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
+        Assert.NotNull(notifications);
         Assert.Contains(role.Name, notifications[0].Message);
     }
 

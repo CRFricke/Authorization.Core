@@ -3,11 +3,10 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -118,7 +117,7 @@ internal class DeleteHandler<
 
             _logger.LogWarning(
                 "'{PrincipalEmail}' attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
@@ -148,7 +147,7 @@ internal class DeleteHandler<
 
             _logger.LogError(
                 ex, "'{PrincipalEmail}' could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
@@ -174,7 +173,7 @@ internal class DeleteHandler<
 
         _logger.LogInformation(
             "'{PrincipalEmail}' deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
-            principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -86,7 +86,7 @@ internal class EditHandler<
     public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string hfRoleList)
     {
         (await userModel.InitRoleInfoAsync(_repository))
-            .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
+            .SetAssignedClaims(hfRoleList?.Split(',') ?? []);
 
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
@@ -120,13 +120,13 @@ internal class EditHandler<
             {
                 modelState.AddModelError(string.Empty, "Can not update User:");
 
-                if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
+                if (result.Failure!.FailureReason == AuthorizationFailure.Reason.SystemObject)
                 {
                     modelState.AddModelError(string.Empty, "You may not update the Roles assigned to a system User.");
 
                     _logger.LogWarning(
                         "'{PrincipalEmail}' attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
-                        principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                        principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                         );
                     return modelBase.Page();
                 }
@@ -136,7 +136,7 @@ internal class EditHandler<
                     modelState.AddModelError(string.Empty, "You can not give a User more privileges than you have.");
                     _logger.LogWarning(
                         "'{PrincipalEmail}' attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
-                        principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                        principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                         );
                 }
                 else
@@ -144,7 +144,7 @@ internal class EditHandler<
                     modelState.AddModelError(string.Empty, "You can not elevate your own privileges.");
                     _logger.LogWarning(
                         "'{PrincipalEmail}' attempted to elevate their own privileges.",
-                        principal.Identity.Name
+                        principal.Identity!.Name
                         );
                 }
 
@@ -163,7 +163,7 @@ internal class EditHandler<
 
             _logger.LogError(
                 ex, "'{PrincipalEmail}' could not update {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                 );
 
             return modelBase.Page();
@@ -183,7 +183,7 @@ internal class EditHandler<
 
             _logger.LogInformation(
                 "'{PrincipalEmail}' updated {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
                 );
         }
 

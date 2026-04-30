@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -91,7 +91,7 @@ internal class EditHandler<
 
         roleModel.InitRoleClaims(_authManager)
             .SetAssignedClaims(
-                hfClaimList?.Split(',') ?? Array.Empty<string>()
+                hfClaimList?.Split(',') ?? []
                 );
 
         if (!modelState.IsValid)
@@ -123,13 +123,13 @@ internal class EditHandler<
             {
                 modelState.AddModelError(string.Empty, "Can not update Role:");
 
-                if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
+                if (result.Failure!.FailureReason == AuthorizationFailure.Reason.SystemObject)
                 {
                     var message = "You may not update the Claims assigned to a system Role.";
                     modelState.AddModelError(string.Empty, message);
                     _logger.LogWarning(
                         "'{PrincipalEmail}' attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                        principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                        principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                         );
                     return modelBase.Page();
                 }
@@ -137,7 +137,7 @@ internal class EditHandler<
                 modelState.AddModelError(string.Empty, "You can not give a Role more privileges than you have.");
                 _logger.LogWarning(
                     "'{PrincipalEmail}' attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
-                    principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                    principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                     );
                 return modelBase.Page();
             }
@@ -154,7 +154,7 @@ internal class EditHandler<
 
             _logger.LogError(
                 ex, "'{PrincipalEmail}' could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                 );
 
             return modelBase.Page();
@@ -174,7 +174,7 @@ internal class EditHandler<
 
             _logger.LogInformation(
                 "'{PrincipalEmail}' updated {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
                 );
         }
 

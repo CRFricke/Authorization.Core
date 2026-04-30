@@ -171,12 +171,12 @@ public class UserManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         await locator.FillAsync(user.Email);
 
         locator = Page.GetByLabel("First Name");
-        await Assertions.Expect(locator).ToHaveValueAsync(user.GivenName);
+        await Assertions.Expect(locator).ToHaveValueAsync(user.GivenName!);
         user.GivenName = "Test";
         await locator.FillAsync(user.GivenName);
 
         locator = Page.GetByLabel("Last Name");
-        await Assertions.Expect(locator).ToHaveValueAsync(user.Surname);
+        await Assertions.Expect(locator).ToHaveValueAsync(user.Surname!);
         user.Surname = "User";
         await locator.FillAsync(user.Surname);
 
@@ -246,8 +246,8 @@ public class UserManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await Assertions.Expect(Page.GetByLabel("Id")).ToHaveValueAsync(user.Id);
         await Assertions.Expect(Page.Locator("#UserModel_Email").Nth(1)).ToHaveValueAsync(user.Email ?? string.Empty);
-        await Assertions.Expect(Page.GetByLabel("First Name")).ToHaveValueAsync(user.GivenName);
-        await Assertions.Expect(Page.GetByLabel("Last Name")).ToHaveValueAsync(user.Surname);
+        await Assertions.Expect(Page.GetByLabel("First Name")).ToHaveValueAsync(user.GivenName!);
+        await Assertions.Expect(Page.GetByLabel("Last Name")).ToHaveValueAsync(user.Surname!);
         await Assertions.Expect(Page.GetByLabel("Phone Number", new() { Exact = true })).ToHaveValueAsync(user.PhoneNumber ?? string.Empty);
         await Assertions.Expect(Page.Locator("#UserModel_LockoutEnd")).ToHaveValueAsync(user.LockoutEnd?.ToString() ?? string.Empty);
         await Assertions.Expect(Page.GetByLabel("Failed Logins")).ToHaveValueAsync(user.AccessFailedCount.ToString() ?? string.Empty);

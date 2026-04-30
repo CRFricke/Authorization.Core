@@ -58,7 +58,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         }.SetClaims(AppClaims.Calendar.List, AppClaims.Document.List, SysClaims.Role.List, SysClaims.User.List);
 
         await Page.GetByLabel("Name").FillAsync(role.Name!);
-        await Page.GetByLabel("Description").FillAsync(role.Description);
+        await Page.GetByLabel("Description").FillAsync(role.Description!);
         await Page.GetByLabel("Search:").FillAsync("List");
         foreach (var claim in role.Claims)
         {
@@ -220,7 +220,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         await Assertions.Expect(locator).ToHaveValueAsync(role.Name!);
 
         locator = Page.GetByRole(AriaRole.Textbox).Nth(2);
-        await Assertions.Expect(locator).ToHaveValueAsync(role.Description);
+        await Assertions.Expect(locator).ToHaveValueAsync(role.Description!);
 
         // Verify assigned User is displayed
         locator = Page.GetByRole(AriaRole.Cell, new() { Name = login.Email });
