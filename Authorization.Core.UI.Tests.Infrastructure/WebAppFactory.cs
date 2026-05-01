@@ -7,5 +7,5 @@ public class WebAppFactory : WebApplicationFactory<Program, ApplicationDbContext
 {
     public override string HostingEnvironment => "IntegrationTests";
 
-    public override string HostUrl => "http://AuthCoreUi.dev.localhost";
+    public override Uri HostUri => new("http://AuthCoreUi.dev.localhost");
 }
