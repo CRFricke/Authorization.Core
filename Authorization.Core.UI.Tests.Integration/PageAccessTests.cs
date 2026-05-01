@@ -56,83 +56,94 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
         ArgumentNullException.ThrowIfNull(factory);
 
         WebAppFactory = factory;
-        HostUrl = factory.HostUrl;
+        HostUri = factory.HostUri;
     }
 
     public WebAppFactory WebAppFactory { get; }
 
-    private string HostUrl { get; }
+    private Uri HostUri { get; }
 
 
     [Theory(DisplayName = "Can access Management page via friendly area name ")]
     [MemberData(nameof(Test01Data))]
-    public async Task PageAccessTest01(string endpoint, bool needsId)
+    public async Task Test01Async(string endpoint, bool needsId)
     {
         ArgumentNullException.ThrowIfNull(endpoint);
 
         var client = CreateClientWithAuthenticationScheme();
+
+        var uriBuilder = new UriBuilder(HostUri)
+        {
+            Path = endpoint
+        };
 
         if (needsId)
         {
             var id = (endpoint.Contains("Role", StringComparison.Ordinal))
                 ? AppGuids.Role.CalendarManager
                 : AppGuids.User.CalendarGuy;
-            endpoint += $"?id={id}";
+            uriBuilder.Query = $"id={id}";
         }
 
-        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(uriBuilder.Uri, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact(DisplayName = "Can access customer page actually located in friendly name area")]
-    public async Task PageAccessTest02()
+    public async Task Test02Async()
     {
         var client = CreateClientWithAuthenticationScheme(
             nameof(AppGuids.Role.CalendarManager)
             );
+        var uriEndpoint = new Uri(HostUri, "/Admin/Calendar");
 
-        var response = await client.GetAsync(new Uri("/Admin/Calendar", UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(uriEndpoint, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory(DisplayName = "Can access Management pages in default area ")]
     [MemberData(nameof(Test03Data))]
-    public async Task PageAccessTest03Async(string endpoint, bool needsId)
+    public async Task Test03Async(string endpoint, bool needsId)
     {
         var client = CreateClientWithAuthenticationScheme();
+
+        var uriBuilder = new UriBuilder(HostUri)
+        {
+            Path = endpoint
+        };
 
         if (needsId)
         {
             var id = (endpoint.Contains("Role", StringComparison.Ordinal))
                 ? AppGuids.Role.CalendarManager
                 : AppGuids.User.CalendarGuy;
-            endpoint += $"?id={id}";
+            uriBuilder.Query = $"id={id}";
         }
 
-        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(uriBuilder.Uri, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory(DisplayName = "Redirects to AccessDenied page without proper claim ")]
     [MemberData(nameof(Test04Data))]
-    public async Task PageAccessTest04Async(string endpoint)
+    public async Task Test04Async(string endpoint)
     {
         var client = WebAppFactory.CreateClient(new WebApplicationFactoryClientOptions
         {
-            AllowAutoRedirect = false, BaseAddress = new(HostUrl)
+            AllowAutoRedirect = false, BaseAddress = HostUri
         });
 
-        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(HostUri, endpoint), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
     }
 
     [Theory(DisplayName = "Can access management page with proper claim ")]
     [MemberData(nameof(Test05Data))]
-    public async Task PageAccessTest05Async(string endpoint, string claim, bool needsId)
+    public async Task Test05Async(string endpoint, string claim, bool needsId)
     {
         using var scope = WebAppFactory.Services.CreateScope();
         var authManager = scope.ServiceProvider.GetRequiredService<IAuthorizationManager>();
@@ -148,42 +159,47 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
         var client = CreateClientWithAuthenticationScheme(
             nameof(AppGuids.Role.DocumentManager)
             );
+        var uriBuilder = new UriBuilder(HostUri)
+        {
+            Path = endpoint
+        };
 
         if (needsId)
         {
             var id = (endpoint.Contains("Role", StringComparison.Ordinal))
                 ? AppGuids.Role.CalendarManager
                 : AppGuids.User.CalendarGuy;
-            endpoint += $"?id={id}";
+            uriBuilder.Query = $"id={id}";
         }
 
-        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(uriBuilder.Uri, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory(DisplayName = "Returns NotFound for null Id ")]
     [MemberData(nameof(Test06Data))]
-    public async Task PageAccessTest06Async(string endpoint)
+    public async Task Test06Async(string endpoint)
     {
         var client = CreateClientWithAuthenticationScheme(
             nameof(SysGuids.Role.Administrator)
             );
 
-        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(HostUri, endpoint), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Theory(DisplayName = "Returns NotFound for non-existing Id ")]
     [MemberData(nameof(Test06Data))]
-    public async Task PageAccessTest07Async(string endpoint)
+    public async Task Test07Async(string endpoint)
     {
         var client = CreateClientWithAuthenticationScheme(
             nameof(SysGuids.Role.Administrator)
             );
+        var uriEndpoint = new Uri(HostUri, $"{endpoint}?Id={Guid.Empty}");
 
-        var response = await client.GetAsync(new Uri($"{endpoint}?Id={Guid.Empty}", UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(uriEndpoint, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -202,7 +218,7 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
         }).CreateClient(new()
         {
             AllowAutoRedirect = allowRedirect,
-            BaseAddress = new(HostUrl)
+            BaseAddress = HostUri
         });
 
         client.DefaultRequestHeaders.Authorization =
