@@ -130,8 +130,8 @@ public class UserManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         await Assertions.Expect(Page.GetByLabel("First Name")).ToHaveValueAsync(user.GivenName);
         await Assertions.Expect(Page.GetByLabel("Last Name")).ToHaveValueAsync(user.Surname);
         await Assertions.Expect(Page.GetByLabel("Phone Number", new() { Exact = true })).ToHaveValueAsync(user.PhoneNumber);
-        await Assertions.Expect(Page.Locator("#UserModel_LockoutEnd")).ToHaveValueAsync(user.LockoutEnd?.ToString("M/d/yyyy h:mm:ss tt K", CultureInfo.InvariantCulture) ?? string.Empty);
-        await Assertions.Expect(Page.GetByLabel("Failed Logins")).ToHaveValueAsync(user.AccessFailedCount.ToString(CultureInfo.InvariantCulture) ?? string.Empty);
+        await Assertions.Expect(Page.Locator("#UserModel_LockoutEnd")).ToHaveValueAsync(user.LockoutEnd?.ToString(CultureInfo.CurrentCulture) ?? string.Empty);
+        await Assertions.Expect(Page.GetByLabel("Failed Logins")).ToHaveValueAsync(user.AccessFailedCount.ToString(CultureInfo.CurrentCulture) ?? string.Empty);
 
         var rows = Page.GetByRole(AriaRole.Row)
             .GetByRole(AriaRole.Checkbox, new() { Checked = true });
@@ -189,7 +189,7 @@ public class UserManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         await locator.FillAsync(user.PhoneNumber);
 
         locator = Page.GetByLabel("Lockout Ends On (UTC)");
-        await Assertions.Expect(locator).ToHaveValueAsync($"{user.LockoutEnd!.Value.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.InvariantCulture).TrimEnd('0')}");
+        await Assertions.Expect(locator).ToHaveValueAsync($"{user.LockoutEnd!.Value.ToString("yyyy-MM-ddTHH:mm:ss.fff", CultureInfo.CurrentCulture).TrimEnd('0')}");
         user.LockoutEnd = null;
         await locator.FillAsync(string.Empty);
 
@@ -252,8 +252,8 @@ public class UserManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         await Assertions.Expect(Page.GetByLabel("First Name")).ToHaveValueAsync(user.GivenName!);
         await Assertions.Expect(Page.GetByLabel("Last Name")).ToHaveValueAsync(user.Surname!);
         await Assertions.Expect(Page.GetByLabel("Phone Number", new() { Exact = true })).ToHaveValueAsync(user.PhoneNumber ?? string.Empty);
-        await Assertions.Expect(Page.Locator("#UserModel_LockoutEnd")).ToHaveValueAsync(user.LockoutEnd?.ToString("M/d/yyyy h:mm:ss tt K", CultureInfo.InvariantCulture) ?? string.Empty);
-        await Assertions.Expect(Page.GetByLabel("Failed Logins")).ToHaveValueAsync(user.AccessFailedCount.ToString(CultureInfo.InvariantCulture) ?? string.Empty);
+        await Assertions.Expect(Page.Locator("#UserModel_LockoutEnd")).ToHaveValueAsync(user.LockoutEnd?.ToString(CultureInfo.CurrentCulture) ?? string.Empty);
+        await Assertions.Expect(Page.GetByLabel("Failed Logins")).ToHaveValueAsync(user.AccessFailedCount.ToString(CultureInfo.CurrentCulture) ?? string.Empty);
 
         var rows = Page.GetByRole(AriaRole.Row)
             .GetByRole(AriaRole.Checkbox, new() { Checked = true });
