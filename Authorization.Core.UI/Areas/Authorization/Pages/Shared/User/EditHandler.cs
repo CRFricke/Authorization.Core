@@ -124,9 +124,11 @@ internal class EditHandler<
                 {
                     modelState.AddModelError(string.Empty, "You may not update the Roles assigned to a system User.");
 
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
-                        principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+                    _logger.LogAttemptedSystemUserRolesUpdate(
+                        principal.Identity!.Name,
+                        typeof(TUser).Name,
+                        user.Email,
+                        user.Id
                         );
                     return modelBase.Page();
                 }
@@ -134,16 +136,17 @@ internal class EditHandler<
                 if (principal.UserId() != user.Id)
                 {
                     modelState.AddModelError(string.Empty, "You can not give a User more privileges than you have.");
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
-                        principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+                    _logger.LogAttemptedElevatedPrivilegeUserUpdate(
+                        principal.Identity!.Name,
+                        typeof(TUser).Name,
+                        user.Email,
+                        user.Id
                         );
                 }
                 else
                 {
                     modelState.AddModelError(string.Empty, "You can not elevate your own privileges.");
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to elevate their own privileges.",
+                    _logger.LogAttemptedSelfPrivilegeElevation(
                         principal.Identity!.Name
                         );
                 }
@@ -162,9 +165,12 @@ internal class EditHandler<
             modelState.AddModelError(string.Empty, "Could not update User:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not update {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserUpdateFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
 
             return modelBase.Page();
@@ -183,9 +189,11 @@ internal class EditHandler<
                 $"User '{user.Email}' successfully updated."
                 );
 
-            _logger.LogInformation(
-                "'{PrincipalEmail}' updated {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserUpdated(
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
         }
 

@@ -115,9 +115,11 @@ internal class DeleteHandler<
             modelState.AddModelError(string.Empty, "Can not delete Role:");
             modelState.AddModelError(string.Empty, "System Roles may not be deleted.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogAttemptedSystemRoleDeletion(
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
@@ -146,9 +148,12 @@ internal class DeleteHandler<
             modelState.AddModelError(string.Empty, "Could not delete Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleDeletionFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
@@ -173,9 +178,11 @@ internal class DeleteHandler<
             $"Role '{role.Name}' successfully deleted."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
-            principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+        _logger.LogRoleDeleted(
+            principal.Identity!.Name,
+            typeof(TRole).Name,
+            role.Name,
+            role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

@@ -127,17 +127,21 @@ internal class EditHandler<
                 {
                     var message = "You may not update the Claims assigned to a system Role.";
                     modelState.AddModelError(string.Empty, message);
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                        principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+                    _logger.LogAttemptedSystemRoleClaimsUpdate(
+                        principal.Identity!.Name,
+                        typeof(TRole).Name,
+                        role.Name,
+                        role.Id
                         );
                     return modelBase.Page();
                 }
 
                 modelState.AddModelError(string.Empty, "You can not give a Role more privileges than you have.");
-                _logger.LogWarning(
-                    "'{PrincipalEmail}' attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
-                    principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+                _logger.LogAttemptedElevatedPrivilegeRoleUpdate(
+                    principal.Identity!.Name,
+                    typeof(TRole).Name,
+                    role.Name,
+                    role.Id
                     );
                 return modelBase.Page();
             }
@@ -153,9 +157,12 @@ internal class EditHandler<
             modelState.AddModelError(string.Empty, "Could not update Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleUpdateFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             return modelBase.Page();
@@ -174,9 +181,11 @@ internal class EditHandler<
                 $"Role '{role.Name}' was successfully updated."
                 );
 
-            _logger.LogInformation(
-                "'{PrincipalEmail}' updated {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleUpdated(
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
         }
 

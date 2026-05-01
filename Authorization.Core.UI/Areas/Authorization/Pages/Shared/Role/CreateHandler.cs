@@ -92,9 +92,9 @@ internal class CreateHandler<
             modelState.AddModelError(string.Empty, "Can not create Role:");
             modelState.AddModelError(string.Empty, "You can not create a Role with more privileges than you have.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to create {RoleType} with elevated privileges.",
-                principal.Identity!.Name, typeof(TRole).Name
+            _logger.LogAttemptedElevatedPrivilegeRoleCreation(
+                principal.Identity!.Name,
+                typeof(TRole).Name
                 );
 
             return modelBase.Page();
@@ -111,9 +111,12 @@ internal class CreateHandler<
             modelState.AddModelError(string.Empty, "Could not create Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not create {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleCreationFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             return modelBase.Page();
@@ -125,9 +128,11 @@ internal class CreateHandler<
             $"Role '{role.Name}' successfully created."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' created {RoleType} '{RoleName}' (ID: {RoleId}).",
-            principal.Identity!.Name, typeof(TRole).Name, role.Name, role.Id
+        _logger.LogRoleCreated(
+            principal.Identity!.Name,
+            typeof(TRole).Name,
+            role.Name,
+            role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

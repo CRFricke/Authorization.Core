@@ -115,8 +115,7 @@ public abstract class AuthDbContext<
             };
 
             await Roles.AddAsync(role).ConfigureAwait(false);
-            logger.LogInformation(
-                "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
+            logger.LogRoleCreated(
                 typeof(TRole).Name, role.Name, role.Id
                 );
         }
@@ -140,8 +139,7 @@ public abstract class AuthDbContext<
             user.SetClaims<TUser>(role.Id);
 
             await Users.AddAsync(user).ConfigureAwait(false);
-            logger.LogInformation(
-                "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
+            logger.LogUserCreated(
                 typeof(TUser).Name, user.Email, user.Id
                 );
         }
@@ -153,7 +151,7 @@ public abstract class AuthDbContext<
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "SaveChangesAsync() method failed.");
+            logger.LogSaveChangesFailed(ex);
         }
 #pragma warning restore CA1031 // Do not catch general exception types
     }
@@ -197,14 +195,13 @@ public abstract class AuthDbContext<
         {
             await SaveChangesAsync().ConfigureAwait(false);
 
-            logger.LogInformation(
-                "Fixup successful for {UpdateCount} {UpdateEntity}.", 
+            logger.LogFixupSuccessful(
                 userClaimCount, nameof(UserClaims)
                 );
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "FixupUserClaimValuesAsync() method failed.");
+            logger.LogFixupUserClaimValuesFailed(ex);
         }
 #pragma warning restore CA1031 // Do not catch general exception types
     }

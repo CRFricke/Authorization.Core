@@ -93,9 +93,9 @@ internal class CreateHandler<
             modelState.AddModelError(string.Empty, "Can not create User:");
             modelState.AddModelError(string.Empty, "You can not create a User with more privileges than you have.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to create {UserType} with elevated privileges.",
-                principal.Identity!.Name, typeof(TUser).Name
+            _logger.LogAttemptedElevatedPrivilegeUserCreation(
+                principal.Identity!.Name,
+                typeof(TUser).Name
                 );
 
             return modelBase.Page();
@@ -125,9 +125,12 @@ internal class CreateHandler<
             modelState.AddModelError(string.Empty, "Could not create User:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not create {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserCreationFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
 
             return modelBase.Page();
@@ -139,9 +142,11 @@ internal class CreateHandler<
             $"User '{user.Email}' successfully created."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' created {UserType} '{UserEmail}' (ID '{UserId}').",
-            principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+        _logger.LogUserCreated(
+            principal.Identity!.Name,
+            typeof(TUser).Name,
+            user.Email,
+            user.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);
@@ -172,7 +177,7 @@ internal class CreateHandler<
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("User password validation failed: {Errors}.", string.Join(";", errors?.Select(e => e.Code) ?? []));
+                _logger.LogPasswordValidationFailed(string.Join(";", errors?.Select(e => e.Code) ?? []));
             }
             return IdentityResult.Failed([.. errors!]);
         }

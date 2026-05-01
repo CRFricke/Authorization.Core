@@ -179,14 +179,14 @@ public sealed class AuthorizationManager<
 
         ArgumentNullException.ThrowIfNull(principal);
         ArgumentNullException.ThrowIfNull(claimRequirement);
+
         if (resource is not IRequiresAuthorization raResource)
             throw new ArgumentException($"Argument does not implement {nameof(IRequiresAuthorization)} interface.", nameof(resource));
 
         var principalId = principal.UserId();
         if (principalId == null)
         {
-            _logger.LogDebug(
-                "{ClassName} for \"{AppClaimRequirement}\" not met for user '{UserName}' - user ID is null.",
+            _logger.LogClaimRequirementNotMetNoUserId(
                 nameof(AppClaimRequirement), claimRequirement, principal.UserName()
                 );
             return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
@@ -203,9 +203,8 @@ public sealed class AuthorizationManager<
                 var resourceType = resource.GetType().Name;
                 var failedClaim = failedClaims.First();
 
-                _logger.LogInformation(
-                    "{ClassName} of \"{Claim}\" for {ResourceType} '{ObjectName}' not met by '{UserName}' - restricted operation on system User or Role.",
-                    nameof(AppClaimRequirement), failedClaim, resourceType, raResource.Name, userName
+                _logger.LogClaimRequirementNotMetSystemObject(
+                    nameof(AppClaimRequirement), failedClaim, resourceType, raResource.Name!, userName
                     );
                 return AuthorizationResult.SystemObject(failedClaims);
             }
@@ -248,8 +247,7 @@ public sealed class AuthorizationManager<
         var userId = principal.UserId();
         if (userId == null)
         {
-            _logger.LogDebug(
-                "{ClassName} for \"{AppClaimRequirement}\" not met for user '{UserName}' - user ID is null.",
+            _logger.LogClaimRequirementNotMetNoUserId(
                 nameof(AppClaimRequirement), claimRequirement, principal.UserName()
                 );
             return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
@@ -273,8 +271,7 @@ public sealed class AuthorizationManager<
         var principalRoles = await GetUserRolesAsync(userId).ConfigureAwait(false);
         if (principalRoles.Contains(SysGuids.Role.Administrator))
         {
-            _logger.LogDebug(
-                "{ClassName} for \"{AppClaimRequirement}\" met for user '{UserName}' via {RoleName} role.",
+            _logger.LogClaimRequirementMetViaAdministrator(
                 nameof(AppClaimRequirement), claimRequirement, principal.UserName(), nameof(SysGuids.Role.Administrator)
                 );
             return AuthorizationResult.Success();
@@ -283,8 +280,7 @@ public sealed class AuthorizationManager<
         HashSet<string> principalClaims = await GetRoleClaimsAsync(principalRoles).ConfigureAwait(false);
         if (claimRequirement.ClaimValues.IsSubsetOf(principalClaims))
         {
-            _logger.LogDebug(
-                "{ClassName} for \"{AppClaimRequirement}\" met for user '{UserName}'.",
+            _logger.LogClaimRequirementMet(
                 nameof(AppClaimRequirement), claimRequirement, principal.UserName()
                 );
             return AuthorizationResult.Success();

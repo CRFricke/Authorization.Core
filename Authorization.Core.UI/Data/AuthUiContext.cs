@@ -92,9 +92,10 @@ public class AuthUiContext<
                 role.Description = "Administrators have access to all portions of the application.";
 
                 Roles.Update(role);
-                logger.LogInformation(
-                    "{RoleType} '{RoleName}' (ID: {RoleId}) has been updated.",
-                    typeof(TRole).Name, role.Name, role.Id
+                logger.LogRoleSeeded(
+                    typeof(TRole).Name,
+                    role.Name,
+                    role.Id
                     );
             }
         }
@@ -112,9 +113,10 @@ public class AuthUiContext<
             role.SetClaims<AuthUiRole>(SysClaims.Role.DefinedClaims);
 
             await Roles.AddAsync(role).ConfigureAwait(false);
-            logger.LogInformation(
-                "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
-                typeof(TRole).Name, role.Name, role.Id
+            logger.LogRoleCreatedDuringSeed(
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
         }
 
@@ -131,9 +133,10 @@ public class AuthUiContext<
             role.SetClaims<AuthUiRole>(SysClaims.User.DefinedClaims);
 
             await Roles.AddAsync(role).ConfigureAwait(false);
-            logger.LogInformation(
-                "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
-                typeof(TRole).Name, role.Name, role.Id
+            logger.LogRoleCreatedDuringSeed(
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
         }
 
@@ -144,7 +147,7 @@ public class AuthUiContext<
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "SaveChangesAsync() method failed.");
+            logger.LogSaveChangesFailed(ex);
         }
 #pragma warning restore CA1031 // Do not catch general exception types
     }

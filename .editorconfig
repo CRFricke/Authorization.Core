@@ -2,3 +2,6 @@
 
 # CA1034: Nested types should not be visible
 dotnet_diagnostic.CA1034.severity = suggestion
+
+# CA1873: Avoid potentially expensive logging
+dotnet_diagnostic.CA1873.severity = silent

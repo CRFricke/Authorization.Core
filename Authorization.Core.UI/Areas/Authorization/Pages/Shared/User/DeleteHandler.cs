@@ -116,9 +116,11 @@ internal class DeleteHandler<
             modelState.AddModelError(string.Empty, "Can not delete User:");
             modelState.AddModelError(string.Empty, "System accounts may not be deleted.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogAttemptedSystemUserDeletion(
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
 
             (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false)).InitFromUser(user);
@@ -136,9 +138,12 @@ internal class DeleteHandler<
             modelState.AddModelError(string.Empty, "Could not delete User:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserDeletionFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
         }
 #pragma warning restore CA1031 // Do not catch general exception types
@@ -157,9 +162,11 @@ internal class DeleteHandler<
             $"User '{user.Email}' successfully deleted."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' deleted {UserType} '{UserEmail}' (ID '{UserId}').",
-            principal.Identity!.Name, typeof(TUser).Name, user.Email, user.Id
+        _logger.LogUserDeleted(
+            principal.Identity!.Name,
+            typeof(TUser).Name,
+            user.Email,
+            user.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

@@ -51,10 +51,7 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
             }.SetClaims<ApplicationRole>(AppClaims.Calendar.DefinedClaims);
 
             await Roles.AddAsync(role).ConfigureAwait(false);
-            logger.LogInformation(
-                "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
-                nameof(ApplicationRole), role.Name, role.Id
-                );
+            logger.LogRoleCreated(nameof(ApplicationRole), role.Name!, role.Id);
         }
 
         var user = await Users.FindAsync(AppGuids.User.CalendarGuy).ConfigureAwait(false);
@@ -77,10 +74,7 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
             }.SetClaims<ApplicationUser>([role.Id]);
 
             await Users.AddAsync(user).ConfigureAwait(false);
-            logger.LogInformation(
-                "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
-                nameof(ApplicationUser), user.Email, user.Id
-                );
+            logger.LogUserCreated(nameof(ApplicationUser), user.Email!, user.Id);
         }
 
         role = await Roles.FindAsync(AppGuids.Role.DocumentManager).ConfigureAwait(false);
@@ -95,10 +89,7 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
             }.SetClaims<ApplicationRole>(AppClaims.Document.DefinedClaims);
 
             await Roles.AddAsync(role).ConfigureAwait(false);
-            logger.LogInformation(
-                "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
-                nameof(ApplicationRole), role.Name, role.Id
-                );
+            logger.LogRoleCreated(nameof(ApplicationRole), role.Name!, role.Id);
         }
 
         user = await Users.FindAsync(AppGuids.User.DocumentGuy).ConfigureAwait(false);
@@ -121,10 +112,7 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
             }.SetClaims<ApplicationUser>([role.Id]);
 
             await Users.AddAsync(user).ConfigureAwait(false);
-            logger.LogInformation(
-                "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
-                nameof(ApplicationUser), user.Email, user.Id
-                );
+            logger.LogUserCreated(nameof(ApplicationUser), user.Email!, user.Id);
         }
 
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -134,7 +122,7 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "SaveChangesAsync() method failed.");
+            logger.LogSaveChangesFailed(ex);
         }
 #pragma warning restore CA1031 // Do not catch general exception types
     }
