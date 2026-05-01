@@ -70,7 +70,7 @@
                             </thead>
                             <tbody>
                                 @{
-                                    foreach (var role in Model.UserModel.Roles)
+                                    foreach (var role in Model.UserModel.Roles!)
                                     {
                                         var checkedVal = (role.IsAssigned) ? "checked" : "";
                                         <tr>

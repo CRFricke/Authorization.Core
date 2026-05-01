@@ -4,9 +4,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 
@@ -15,7 +15,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 public abstract class EditModel : ModelBase
 {
     [BindProperty]
-    public RoleModel RoleModel { get; set; }
+    public RoleModel RoleModel { get; set; } = null!;
 
     public virtual Task<IActionResult> OnGetAsync(string id) => throw new NotImplementedException();
 
@@ -48,11 +48,11 @@ internal class EditModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         RoleModel = new RoleModel();
-        return await _editHandler.OnGetAsync(RoleModel, this, id);
+        return await _editHandler.OnGetAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 
     public override async Task<IActionResult> OnPostAsync(string hfClaimList)
     {
-        return await _editHandler.OnPostAsync(RoleModel, this, hfClaimList);
+        return await _editHandler.OnPostAsync(RoleModel, this, hfClaimList).ConfigureAwait(false);
     }
 }

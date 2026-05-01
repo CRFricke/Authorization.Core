@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -60,7 +60,7 @@ internal class EditHandler<
         var user = await _repository.Users
             .Include(au => au.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -69,7 +69,7 @@ internal class EditHandler<
 
         userModel.IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
 
-        (await userModel.InitRoleInfoAsync(_repository))
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
             .InitFromUser(user);
 
         return modelBase.Page();
@@ -85,8 +85,8 @@ internal class EditHandler<
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string hfRoleList)
     {
-        (await userModel.InitRoleInfoAsync(_repository))
-            .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
+            .SetAssignedClaims(hfRoleList?.Split(',') ?? []);
 
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
@@ -98,7 +98,7 @@ internal class EditHandler<
 
         var user = await _repository.Users
             .Include(au => au.Claims)
-            .FirstOrDefaultAsync(m => m.Id == userModel.Id);
+            .FirstOrDefaultAsync(m => m.Id == userModel.Id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -115,18 +115,20 @@ internal class EditHandler<
 
         if (userModel.ClaimsUpdated)
         {
-            var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.UpdateClaims));
+            var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.UpdateClaims)).ConfigureAwait(false);
             if (!result.Succeeded)
             {
                 modelState.AddModelError(string.Empty, "Can not update User:");
 
-                if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
+                if (result.Failure!.FailureReason == AuthorizationFailure.Reason.SystemObject)
                 {
                     modelState.AddModelError(string.Empty, "You may not update the Roles assigned to a system User.");
 
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to update the Roles of system {UserType} '{UserEmail}' (ID '{UserId}')",
-                        principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                    _logger.LogAttemptedSystemUserRolesUpdate(
+                        principal.Identity!.Name,
+                        typeof(TUser).Name,
+                        user.Email,
+                        user.Id
                         );
                     return modelBase.Page();
                 }
@@ -134,17 +136,18 @@ internal class EditHandler<
                 if (principal.UserId() != user.Id)
                 {
                     modelState.AddModelError(string.Empty, "You can not give a User more privileges than you have.");
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to give {UserType} '{UserEmail}' (ID '{UserId}') elevated privileges.",
-                        principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+                    _logger.LogAttemptedElevatedPrivilegeUserUpdate(
+                        principal.Identity!.Name,
+                        typeof(TUser).Name,
+                        user.Email,
+                        user.Id
                         );
                 }
                 else
                 {
                     modelState.AddModelError(string.Empty, "You can not elevate your own privileges.");
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to elevate their own privileges.",
-                        principal.Identity.Name
+                    _logger.LogAttemptedSelfPrivilegeElevation(
+                        principal.Identity!.Name
                         );
                 }
 
@@ -152,22 +155,27 @@ internal class EditHandler<
             }
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            rowsUpdated = await _repository.SaveChangesAsync();
+            rowsUpdated = await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             modelState.AddModelError(string.Empty, "Could not update User:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not update {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserUpdateFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         if (rowsUpdated > 0)
         {
@@ -181,9 +189,11 @@ internal class EditHandler<
                 $"User '{user.Email}' successfully updated."
                 );
 
-            _logger.LogInformation(
-                "'{PrincipalEmail}' updated {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserUpdated(
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
         }
 

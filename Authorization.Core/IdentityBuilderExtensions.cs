@@ -3,20 +3,20 @@ using CRFricke.EF.Core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CRFricke.Authorization.Core
+namespace CRFricke.Authorization.Core;
+
+/// <summary>
+/// Provides extension methods for the <see cref="IdentityBuilder"/> class.
+/// </summary>
+public static class IdentityBuilderExtensions
 {
-    /// <summary>
-    /// Provides extension methods for the <see cref="IdentityBuilder"/> class.
-    /// </summary>
-    public static class IdentityBuilderExtensions
+    extension(IdentityBuilder builder)
     {
         /// <summary>
         /// Adds AccessRight based authorization services to the <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <param name="builder">The <see cref="IdentityBuilder"/> instance this method extends.</param>
         /// <param name="dbInitializationOption">
         /// The <see cref="DbInitializationOption"/> to be used to initialize the database.
         /// </param>
@@ -24,7 +24,7 @@ namespace CRFricke.Authorization.Core
         [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2062:DynamicallyAccessedMembers", Justification = "AddScoped() 'implementationType' parameter is DBContext and always has available public constructor.")]
         [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:DynamicallyAccessedMembers", Justification = "AuthorizationManager<,> & IRepository<,> definitions have required DynamicallyAccessedMembers attributes.")]
         [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2076:DynamicallyAccessedMembers", Justification = "Type arguments are validated at runtime via VerifyTypeDerivesFrom to ensure they derive from required base types (AuthUser/AuthRole).")]
-        public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder, DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
+        public IdentityBuilder AddAccessRightBasedAuthorization(DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
         {
             Type contextType;
 
@@ -63,60 +63,61 @@ namespace CRFricke.Authorization.Core
                 .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>()
                 .AddSingleton(
                     typeof(IResourceAuthorizationHandler<>).MakeGenericType(roleType),
-                    typeof(RoleAuthorizationHandler<>).MakeGenericType(roleType) )
+                    typeof(RoleAuthorizationHandler<>).MakeGenericType(roleType))
                 .AddSingleton(
                     typeof(IResourceAuthorizationHandler<>).MakeGenericType(builder.UserType),
-                    typeof(UserAuthorizationHandler<>).MakeGenericType(builder.UserType) )
+                    typeof(UserAuthorizationHandler<>).MakeGenericType(builder.UserType))
                 .AddDbInitializer(options =>
                     options.UseDbContext(contextType, dbInitializationOption)
                     );
 
             return builder;
         }
+    }
 
-        private static void VerifyTypeDerivesFrom(Type type, Type baseType)
+    private static void VerifyTypeDerivesFrom(Type type, Type baseType)
+    {
+        if (!TypeDerivesFrom(type, baseType))
         {
-            if (!TypeDerivesFrom(type, baseType))
-            {
-                throw new InvalidOperationException(
-                    $"'{type}' is not derived from '{baseType}' class."
-                    );
-            }
+            throw new InvalidOperationException(
+                $"'{type}' is not derived from '{baseType}' class."
+                );
         }
+    }
 
 
-        /// <summary>
-        /// Determines whether a specified <see cref="Type"/> derives from the specified base Type.
-        /// </summary>
-        /// <param name="type">The <see cref="Type"/> to be checked.</param>
-        /// <param name="baseType">The base <see cref="Type"/> to checked for.</param>
-        /// <returns>
-        /// <em>true</em>, if the <see cref="Type"/> derives from the base Type; otherwise, <em>false</em>.
-        /// </returns>
-        private static bool TypeDerivesFrom(Type? type, Type baseType)
+    /// <summary>
+    /// Determines whether a specified <see cref="Type"/> derives from the specified base Type.
+    /// </summary>
+    /// <param name="type">The <see cref="Type"/> to be checked.</param>
+    /// <param name="baseType">The base <see cref="Type"/> to checked for.</param>
+    /// <returns>
+    /// <em>true</em>, if the <see cref="Type"/> derives from the base Type; otherwise, <em>false</em>.
+    /// </returns>
+    private static bool TypeDerivesFrom(Type? type, Type baseType)
+    {
+        while (type != null)
         {
-            while (type != null)
+            if (type.Name == baseType.Name)
             {
-                if (type.Name == baseType.Name)
+                if (type.GenericTypeArguments.Length == baseType.GenericTypeArguments.Length)
                 {
-                    if (type.GenericTypeArguments.Length == baseType.GenericTypeArguments.Length)
+                    for (var ix = 0; ix < type.GenericTypeArguments.Length; ix++)
                     {
-                        for (var ix = 0; ix < type.GenericTypeArguments.Length; ix++)
+                        if (!baseType.GenericTypeArguments[ix].IsAssignableFrom(type.GenericTypeArguments[ix]))
                         {
-                            if (!baseType.GenericTypeArguments[ix].IsAssignableFrom(type.GenericTypeArguments[ix]))
-                            {
-                                return false;
-                            }
+                            return false;
                         }
                     }
-
-                    return true;
                 }
 
-                type = type.BaseType;
-            };
+                return true;
+            }
 
-            return false;
+            type = type.BaseType;
         }
+        ;
+
+        return false;
     }
 }

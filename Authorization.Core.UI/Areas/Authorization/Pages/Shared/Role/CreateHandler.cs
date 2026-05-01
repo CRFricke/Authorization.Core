@@ -3,9 +3,10 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable CA1716 // Identifiers should not match keywords
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -68,14 +69,14 @@ internal class CreateHandler<
     /// <item>Thrown if no <see cref="IRepository{TUser, TRole}"/> implementation can be found by the the <see cref="IServiceProvider"/>.</item>
     /// </list>
     /// </exception>
-    public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string hfClaimList)
+    public async Task<IActionResult> OnPostAsync(RoleModel roleModel, ModelBase modelBase, string? hfClaimList)
     {
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
         roleModel.InitRoleClaims(_authManager)
             .SetAssignedClaims(
-                hfClaimList?.Split(',') ?? Array.Empty<string>()
+                hfClaimList?.Split(',') ?? []
                 );
 
         if (!modelState.IsValid)
@@ -85,46 +86,53 @@ internal class CreateHandler<
 
         var role = CreateRole(roleModel);
 
-        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Create));
+        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Create)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not create Role:");
             modelState.AddModelError(string.Empty, "You can not create a Role with more privileges than you have.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to create {RoleType} with elevated privileges.",
-                principal.Identity.Name, typeof(TRole).Name
+            _logger.LogAttemptedElevatedPrivilegeRoleCreation(
+                principal.Identity!.Name,
+                typeof(TRole).Name
                 );
 
             return modelBase.Page();
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.Roles.Add(role);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             modelState.AddModelError(string.Empty, "Could not create Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not create {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleCreationFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         modelBase.SendNotification(
             _notificationReceiver, Severity.Normal,
             $"Role '{role.Name}' successfully created."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' created {RoleType} '{RoleName}' (ID: {RoleId}).",
-            principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+        _logger.LogRoleCreated(
+            principal.Identity!.Name,
+            typeof(TRole).Name,
+            role.Name,
+            role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);
@@ -140,7 +148,7 @@ internal class CreateHandler<
             Description = model.Description,
             Name = model.Name,
             NormalizedName = normalizer.NormalizeName(model.Name)
-        }.SetClaims(model.GetAssignedClaims());
+        }.SetClaims<TRole>(model.GetAssignedClaims());
 
         return role;
     }

@@ -1,69 +1,52 @@
 ﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace CRFricke.Authorization.Core
+namespace CRFricke.Authorization.Core;
+
+/// <summary>
+/// Provides extension methods for manipulating <see cref="AuthRole"/> objects.
+/// </summary>
+public static class AuthRoleExtensions
 {
-    /// <summary>
-    /// Provides extension methods for manipulating <see cref="AuthRole"/> objects.
-    /// </summary>
-    public static class AuthRoleExtensions
+    extension(AuthRole role)
     {
         /// <summary>
         /// Sets the Claims collection of this <see cref="AuthRole"/> object.
         /// </summary>
-        /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
         /// <param name="claims">The claim values to be assigned to this application role.</param>
-        public static TRole SetClaims<TRole>(this TRole role, IEnumerable<string> claims) where TRole : AuthRole
+        public TRole SetClaims<TRole>(params IEnumerable<string> claims) where TRole : AuthRole
         {
-            return SetClaims(role, claims.ToArray());
-        }
+            ArgumentNullException.ThrowIfNull(claims);
 
-        /// <summary>
-        /// Sets the Claims collection of this <see cref="AuthRole"/> object.
-        /// </summary>
-        /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
-        /// <param name="claims">The claim values to be assigned to this application role.</param>
-        public static TRole SetClaims<TRole>(this TRole role, params string[] claims) where TRole : AuthRole
-        {
+            var claimsArray = claims as string[] ?? [.. claims];
+
             role.Claims.Clear();
 
-            foreach (var claim in claims)
+            foreach (var claim in claimsArray)
             {
                 role.Claims.Add(SysClaims.CreateRoleClaim(roleId: role.Id, claimValue: claim));
             }
 
-            return role;
+            return (TRole)role;
         }
 
         /// <summary>
         /// Updates the Claims collection using the specified claim values.
         /// </summary>
-        /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
         /// <param name="assignedClaims">The claim values to be assigned to this application role.</param>
         /// <returns><em>true</em>, if the Claims collection was modified; otherwise, <em>false</em>.</returns>
-        public static bool UpdateClaims(this AuthRole role, IEnumerable<string> assignedClaims)
+        public bool UpdateClaims(params IEnumerable<string> assignedClaims)
         {
-            return UpdateClaims(role, assignedClaims.ToArray());
-        }
+            var claimsArray = assignedClaims as string[] ?? [.. assignedClaims];
 
-        /// <summary>
-        /// Updates the Claims collection using the specified claim values.
-        /// </summary>
-        /// <param name="role">The <see cref="AuthRole"/> whose Claims collection is to be updated.</param>
-        /// <param name="assignedClaims">The claim values to be assigned to this application role.</param>
-        /// <returns><em>true</em>, if the Claims collection was modified; otherwise, <em>false</em>.</returns>
-        public static bool UpdateClaims(this AuthRole role, params string[] assignedClaims)
-        {
-            var oldClaims =
+            var oldClaims = (
                 from claim in role.Claims
-                select claim.ClaimValue;
+                select claim.ClaimValue).ToArray();
 
             // Linq doesn't run queries until the results are needed. We use ToArray() below to force query 
             // execution, which prevents an InvalidOperationException while enumerating the result sets.
-            var claimsInCommon = oldClaims.Intersect(assignedClaims);
-            var claimsToAdd = assignedClaims.Except(claimsInCommon).ToArray();
+            var claimsInCommon = oldClaims.Intersect(claimsArray).ToArray();
+            var claimsToAdd = claimsArray.Except(claimsInCommon).ToArray();
             var claimsToRemove = oldClaims.Except(claimsInCommon).ToArray();
 
             foreach (var claim in claimsToRemove)

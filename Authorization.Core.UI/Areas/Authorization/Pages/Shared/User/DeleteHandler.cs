@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -60,7 +60,7 @@ internal class DeleteHandler<
         var user = await _repository.Users
             .Include(au => au.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -69,7 +69,7 @@ internal class DeleteHandler<
 
         userModel.IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
 
-        (await userModel.InitRoleInfoAsync(_repository))
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
             .InitFromUser(user);
 
         return modelBase.Page();
@@ -92,7 +92,7 @@ internal class DeleteHandler<
 
         var user = await _repository.Users
             .Include(au => au.Claims)
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -110,40 +110,47 @@ internal class DeleteHandler<
         // Don't care about ModelState on Delete.
         modelState.Clear();
 
-        var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.Delete));
+        var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.Delete)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not delete User:");
             modelState.AddModelError(string.Empty, "System accounts may not be deleted.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to delete system {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogAttemptedSystemUserDeletion(
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
 
-            (await userModel.InitRoleInfoAsync(_repository)).InitFromUser(user);
+            (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false)).InitFromUser(user);
             return modelBase.Page();
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.Users.Remove(user);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             modelState.AddModelError(string.Empty, "Could not delete User:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not delete {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserDeletionFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         if (!modelState.IsValid)
         {
-            (await userModel.InitRoleInfoAsync(_repository)).InitFromUser(user);
+            (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false)).InitFromUser(user);
             return modelBase.Page();
         }
 
@@ -155,9 +162,11 @@ internal class DeleteHandler<
             $"User '{user.Email}' successfully deleted."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' deleted {UserType} '{UserEmail}' (ID '{UserId}').",
-            principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+        _logger.LogUserDeleted(
+            principal.Identity!.Name,
+            typeof(TUser).Name,
+            user.Email,
+            user.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

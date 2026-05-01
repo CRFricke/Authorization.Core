@@ -3,11 +3,10 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -61,7 +60,7 @@ internal class DeleteHandler<
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (role == null)
         {
@@ -73,7 +72,7 @@ internal class DeleteHandler<
         await roleModel
             .InitRoleClaims(_authManager)
             .InitFromRole(role)
-            .InitRoleUsersAsync(_repository);
+            .InitRoleUsersAsync(_repository).ConfigureAwait(false);
 
         return modelBase.Page();
     }
@@ -96,7 +95,7 @@ internal class DeleteHandler<
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
-        var role = await _repository.Roles.FindAsync(id);
+        var role = await _repository.Roles.FindAsync(id).ConfigureAwait(false);
         if (role == null)
         {
             modelBase.SendNotification(
@@ -110,20 +109,22 @@ internal class DeleteHandler<
         // Don't care about ModelState on Delete.
         modelState.Clear();
 
-        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Delete));
+        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Delete)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not delete Role:");
             modelState.AddModelError(string.Empty, "System Roles may not be deleted.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to delete system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogAttemptedSystemRoleDeletion(
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
                 .InitFromRole(role)
-                .InitRoleUsersAsync(_repository);
+                .InitRoleUsersAsync(_repository).ConfigureAwait(false);
 
             return modelBase.Page();
         }
@@ -133,30 +134,35 @@ internal class DeleteHandler<
             join au in _repository.Users on uc.UserId equals au.Id
             where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == role.Name
             select uc
-            ).ToArrayAsync();
+            ).ToArrayAsync().ConfigureAwait(false);
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.UserClaims.RemoveRange(userClaims);
             _repository.Roles.Remove(role);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             modelState.AddModelError(string.Empty, "Could not delete Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not delete {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleDeletionFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             await roleModel.InitRoleClaims(_authManager)
                 .InitFromRole(role)
-                .InitRoleUsersAsync(_repository);
+                .InitRoleUsersAsync(_repository).ConfigureAwait(false);
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         // Remove any users that were assigned this role from the UserClaim cache
         foreach (var claim in userClaims)
@@ -172,9 +178,11 @@ internal class DeleteHandler<
             $"Role '{role.Name}' successfully deleted."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' deleted {RoleType} '{RoleName}' (ID: {RoleId}).",
-            principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+        _logger.LogRoleDeleted(
+            principal.Identity!.Name,
+            typeof(TRole).Name,
+            role.Name,
+            role.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);

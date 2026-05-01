@@ -50,7 +50,7 @@
                     </thead>
                     <tbody>
                         @{
-                            foreach (var claim in Model.RoleModel.RoleClaims)
+                            foreach (var claim in Model.RoleModel.RoleClaims!)
                             {
                                 var checkedVal = (claim.IsAssigned || isAdminRole) ? "checked" : "";
                                 <tr>

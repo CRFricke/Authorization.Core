@@ -1,7 +1,4 @@
 ﻿using CRFricke.Authorization.Core.Data;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CRFricke.Authorization.Core;
 
@@ -32,20 +29,20 @@ public class UserAuthorizationHandler<TUser> : IResourceAuthorizationHandler<TUs
         // Principal.UserId() is verified before the ResourceAuthorizationHandler is called.
         var principalId = context.Principal.UserId()!;
 
-        var principalRoles = await context.AuthorizationServices.GetUserRolesAsync(principalId);
+        var principalRoles = await context.AuthorizationServices.GetUserRolesAsync(principalId).ConfigureAwait(false);
         if (principalRoles.Contains(SysGuids.Role.Administrator))
         {
             return AuthorizationResult.Success();
         }
 
-        var userRoles = await context.AuthorizationServices.GetUserRolesAsync(user.Id);
+        var userRoles = await context.AuthorizationServices.GetUserRolesAsync(user.Id).ConfigureAwait(false);
         if (userRoles.Contains(SysGuids.Role.Administrator))
         {
             return AuthorizationResult.Elevation([nameof(SysGuids.Role.Administrator)]);
         }
 
-        var principalClaims = await context.AuthorizationServices.GetRoleClaimsAsync(principalRoles);
-        var userClaims = await context.AuthorizationServices.GetRoleClaimsAsync(userRoles);
+        var principalClaims = await context.AuthorizationServices.GetRoleClaimsAsync(principalRoles).ConfigureAwait(false);
+        var userClaims = await context.AuthorizationServices.GetRoleClaimsAsync(userRoles).ConfigureAwait(false);
 
         if (userClaims.IsSubsetOf(principalClaims))
         {

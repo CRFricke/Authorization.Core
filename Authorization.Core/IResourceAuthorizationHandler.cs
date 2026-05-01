@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace CRFricke.Authorization.Core;
+﻿namespace CRFricke.Authorization.Core;
 
 /// <summary>
 /// Classes that implement this interface perform additional authorization checks for a specified resource.

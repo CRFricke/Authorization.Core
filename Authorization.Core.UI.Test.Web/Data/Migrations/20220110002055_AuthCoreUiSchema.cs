@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+#pragma warning disable CA1515 // Consider making public types internal
+
 namespace Authorization.Core.UI.Test.Web.Data.Migrations
 {
     public partial class AuthCoreUiSchema : Migration

@@ -2,9 +2,9 @@
 using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -49,7 +49,7 @@ internal class DetailsHandler<
         var user = await _repository.Users
             .Include(au => au.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -58,7 +58,7 @@ internal class DetailsHandler<
 
         userModel.IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
 
-        (await userModel.InitRoleInfoAsync(_repository))
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
             .InitFromUser(user);
 
         return modelBase.Page();

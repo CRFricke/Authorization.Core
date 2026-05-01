@@ -1,9 +1,12 @@
 ﻿using CRFricke.Authorization.Core;
-using System.Collections.Generic;
+
+#pragma warning disable CA1033 // Interface methods should be callable by child types
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1515 // Consider making public types internal
 
 namespace Authorization.Core.Tests;
 
-public class TestGuids
+public static class TestGuids
 {
     /// <summary>
     /// The Guids of the system Roles.
@@ -23,12 +26,12 @@ public class TestGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for Role entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids = new()
-        {
+        public static readonly IReadOnlyCollection<string> DefinedGuids =
+        [
             RoleManager, UserManager
-        };
+        ];
 
         ///<inheritdoc/>
-        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
+        IReadOnlyCollection<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 }

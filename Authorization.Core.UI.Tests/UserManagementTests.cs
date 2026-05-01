@@ -16,13 +16,8 @@ using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Authorization.Core.UI.Tests;
 
@@ -65,7 +60,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "UserManagement page returns list of Users")]
-    public async Task UserManagement_Test1Async()
+    public async Task Test01Async()
     {
         var users = new List<ApplicationUser>
         {
@@ -85,7 +80,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create User [Get] initializes the RoleInfo collection")]
-    public async Task UserManagement_Test2()
+    public async Task Test02Async()
     {
         var roles = new List<ApplicationRole>
         {
@@ -110,13 +105,14 @@ public class UserManagementTests : TestsBase
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, userManager, repository, logger);
         _ = await model.OnGetAsync();
 
+        Assert.NotNull(model.UserModel.Roles);
         Assert.Equal(3, model.UserModel.Roles.Count);
         Assert.Equal(roles[0].Name, model.UserModel.Roles.First().Name);
         Assert.Equal(roles[2].Name, model.UserModel.Roles.Last().Name);
     }
 
     [Fact(DisplayName = "Create User [Post] sets assigned role claims")]
-    public async Task UserManagement_Test3Async()
+    public async Task Test03Async()
     {
         ApplicationUser user = null!;
         var expectedClaims = new string[] { SysUiGuids.Role.RoleManager };
@@ -162,7 +158,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create User [Post] handles DB exception")]
-    public async Task UserManagement_Test4Async()
+    public async Task Test04Async()
     {
         ApplicationUser user = null!;
         var dbUpdateException =
@@ -214,20 +210,20 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains("User", errors[0].ErrorMessage);
+        Assert.Contains("User", errors[0].ErrorMessage, StringComparison.Ordinal);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Create User [Post] sends notification on success")]
-    public async Task UserManagement_Test5Async()
+    public async Task Test05Async()
     {
         ApplicationUser user = null!;
 
@@ -272,11 +268,12 @@ public class UserManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email!, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(user.Email!, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Create User [Post] logs success")]
-    public async Task UserManagement_Test6Async()
+    public async Task Test06Async()
     {
         ApplicationUser user = null!;
 
@@ -322,27 +319,27 @@ public class UserManagementTests : TestsBase
         Assert.NotNull(user);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains($"created {nameof(ApplicationUser)}", logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains($"created {nameof(ApplicationUser)}", logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit User [Get] returns NotFound for null ID")]
-    public async Task UserManagement_Test7Async()
+    public async Task Test07Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
         var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Edit User [Get] initializes ApplicationUserModel")]
-    public async Task UserManagement_Test8Async()
+    public async Task Test08Async()
     {
         var roles = new List<ApplicationRole>
         {
@@ -395,13 +392,14 @@ public class UserManagementTests : TestsBase
         Assert.Equal(user.PhoneNumberConfirmed, model.UserModel.PhoneNumberConfirmed);
         Assert.Equal(user.Surname, model.UserModel.Surname);
 
+        Assert.NotNull(model.UserModel.Roles);
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
         Assert.Equal(expectedClaims.Length, user.Claims.Count);
         Assert.Equal(expectedClaims, user.Claims.Select(c => c.ClaimValue));
     }
 
     [Fact(DisplayName = "Edit User [Post] sends notification for DB not found")]
-    public async Task UserManagement_Test9Async()
+    public async Task Test09Async()
     {
         var users = new List<ApplicationUser>();
         var roles = new List<ApplicationRole>();
@@ -426,11 +424,12 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.UserModel.Email, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(model.UserModel.Email, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit User [Post] handles DB exception")]
-    public async Task UserManagement_Test10Async()
+    public async Task Test10Async()
     {
         var dbUpdateException =
             new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
@@ -474,20 +473,20 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains("User", errors[0].ErrorMessage);
+        Assert.Contains("User", errors[0].ErrorMessage, StringComparison.Ordinal);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(users[0].Id, logger.LatestRecord.Message);
-        Assert.Contains(users[0].Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(users[0].Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(users[0].Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit User [Post] sends no notification for no changes")]
-    public async Task UserManagement_Test11Async()
+    public async Task Test11Async()
     {
         var users = new List<ApplicationUser> { new("TestUser@company.com") };
         var roles = new List<ApplicationRole>();
@@ -515,7 +514,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit User [Post] updates User properties")]
-    public async Task UserManagement_Test12Async()
+    public async Task Test12Async()
     {
         var expectedClaims = new string[] { SysUiGuids.Role.RoleManager, SysUiGuids.Role.UserManager };
 
@@ -587,7 +586,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit User [Post] sends notification for successful update")]
-    public async Task UserManagement_Test13Async()
+    public async Task Test13Async()
     {
         var roles = new List<ApplicationRole> { };
 
@@ -617,7 +616,7 @@ public class UserManagementTests : TestsBase
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            UserModel = new UserModel { Id = user.Id, Email = user.Email },
+            UserModel = new UserModel { Id = user.Id, Email = user.Email! },
             PageContext = new PageContext { HttpContext = httpContext },
             TempData = new TestTempDataDictionary()
         };
@@ -626,11 +625,12 @@ public class UserManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email!, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(user.Email!, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit User [Post] logs successful update")]
-    public async Task UserManagement_Test14Async()
+    public async Task Test14Async()
     {
         var roles = new List<ApplicationRole> { };
 
@@ -660,7 +660,7 @@ public class UserManagementTests : TestsBase
 
         var model = new EditModel<ApplicationUser, ApplicationRole>(authManager, repository, logger)
         {
-            UserModel = new UserModel { Id = user.Id, Email = user.Email },
+            UserModel = new UserModel { Id = user.Id, Email = user.Email! },
             PageContext = new PageContext { HttpContext = httpContext },
             TempData = new TestTempDataDictionary()
         };
@@ -670,26 +670,26 @@ public class UserManagementTests : TestsBase
         Assert.NotNull(user);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Display User returns NotFound for null ID")]
-    public async Task UserManagement_Test15Async()
+    public async Task Test15Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Display User returns NotFound for DB not found")]
-    public async Task UserManagement_Test16Async()
+    public async Task Test16Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
 
@@ -704,7 +704,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Display User initializes ApplicationUserModel")]
-    public async Task UserManagement_Test17Async()
+    public async Task Test17Async()
     {
         var roles = new List<ApplicationRole>
         {
@@ -754,26 +754,27 @@ public class UserManagementTests : TestsBase
         Assert.Equal(user.PhoneNumberConfirmed, model.UserModel.PhoneNumberConfirmed);
         Assert.Equal(user.Surname, model.UserModel.Surname);
 
+        Assert.NotNull(model.UserModel.Roles);
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
         Assert.Equal(expectedClaims.Length, user.Claims.Count);
         Assert.Equal(expectedClaims, user.Claims.Select(c => c.ClaimValue));
     }
 
     [Fact(DisplayName = "Delete User [Get] returns NotFound for null ID")]
-    public async Task UserManagement_Test18Async()
+    public async Task Test18Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Delete User [Get] returns NotFound for DB not found")]
-    public async Task UserManagement_Test19Async()
+    public async Task Test19Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
 
@@ -790,7 +791,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete User [Get] initializes RoleInfo collection")]
-    public async Task UserManagement_Test20Async()
+    public async Task Test20Async()
     {
         var roles = GetDefinedRoles();
 
@@ -801,8 +802,8 @@ public class UserManagementTests : TestsBase
         //
         var users = new List<ApplicationUser>
         {
-            new ApplicationUser("TestUser1@company.com").SetClaims(SysGuids.Role.Administrator),
-            new ApplicationUser("TestUser2@company.com").SetClaims(expectedClaims)
+            new ApplicationUser("TestUser1@company.com").SetClaims<ApplicationUser>(SysGuids.Role.Administrator),
+            new ApplicationUser("TestUser2@company.com").SetClaims<ApplicationUser>(expectedClaims)
         };
 
         var authManager = Mock.Of<IAuthorizationManager>(am =>
@@ -819,6 +820,7 @@ public class UserManagementTests : TestsBase
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         await model.OnGetAsync(users[1].Id);
 
+        Assert.NotNull(model.UserModel.Roles);
         Assert.Equal(roles.Count, model.UserModel.Roles.Count);
 
         var claims = model.UserModel.Roles.Where(ri => ri.IsAssigned);
@@ -827,20 +829,20 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete User [Post] returns NotFound for null ID")]
-    public async Task UserManagement_Test21Async()
+    public async Task Test21Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnPostAsync(null);
+        var result = await model.OnPostAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Delete User [Post] sends notification on DB not found")]
-    public async Task UserManagement_Test22Async()
+    public async Task Test22Async()
     {
         var user = new ApplicationUser("TestUser@company.com");
         var users = new List<ApplicationUser>([user]);
@@ -864,11 +866,12 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email!, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(user.Email!, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Delete User [Post] handles DB exception")]
-    public async Task UserManagement_Test23Async()
+    public async Task Test23Async()
     {
         var dbUpdateException =
             new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
@@ -913,20 +916,20 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains("User", errors[0].ErrorMessage);
+        Assert.Contains("User", errors[0].ErrorMessage, StringComparison.Ordinal);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Delete User [Post] sends notification for delete")]
-    public async Task UserManagement_Test24Async()
+    public async Task Test24Async()
     {
         var user = new ApplicationUser("TestUser@company.com");
 
@@ -965,11 +968,12 @@ public class UserManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(user.Email!, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(user.Email!, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Delete User [Post] logs successful delete")]
-    public async Task UserManagement_Test25Async()
+    public async Task Test25Async()
     {
         ApplicationUser deletedUser = null!;
 
@@ -1015,14 +1019,14 @@ public class UserManagementTests : TestsBase
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Delete User [Post] prevents delete of System User")]
-    public async Task UserManagement_Test26Async()
+    public async Task Test26Async()
     {
         var expectedMessage = "System accounts may not be deleted";
 
@@ -1065,19 +1069,19 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains("delete system", logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains("delete system", logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit User [Post] prevents update of System User")]
-    public async Task UserManagement_Test27Async()
+    public async Task Test27Async()
     {
         var expectedMessage = "You may not update the Roles assigned to a system User";
         var expectedLogMessage = $"update the Roles of system {nameof(ApplicationUser)}";
@@ -1133,18 +1137,18 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit User [Post] refreshes User cache on success")]
-    public async Task UserManagement_Test28Async()
+    public async Task Test28Async()
     {
         var roles = new List<ApplicationRole>
         {
@@ -1200,7 +1204,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete User [Post] refreshes User cache on success")]
-    public async Task UserManagement_Test29Async()
+    public async Task Test29Async()
     {
         var user = new ApplicationUser("TestUser@company.com");
 
@@ -1243,7 +1247,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit User [Get] sets IsSystemUser")]
-    public async Task UserManagement_Test30Async()
+    public async Task Test30Async()
     {
         var roles = new List<ApplicationRole>();
 
@@ -1268,7 +1272,7 @@ public class UserManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create User [Post] handles failed elevation check")]
-    public async Task UserManagement_Test31Async()
+    public async Task Test31Async()
     {
         var expectedMessage = "can not create a User with more privileges than you";
         var expectedLogMessage = $"create {nameof(ApplicationUser)} with elevated privileges";
@@ -1314,17 +1318,17 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.Null(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit User [Post] handles failed elevation check")]
-    public async Task UserManagement_Test32Async()
+    public async Task Test32Async()
     {
         var expectedMessage = "can not give a User more privileges than you";
         var expectedLogMessage = "elevated privileges";
@@ -1377,20 +1381,20 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalUser.UserName!, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message);
-        Assert.Contains(user.Email!, logger.LatestRecord.Message);
-        Assert.Contains(user.Id, logger.LatestRecord.Message);
-        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Contains(principalUser.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationUser), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Email!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(user.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.Null(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit User [Post] handles elevation of self")]
-    public async Task UserManagement_Test33Async()
+    public async Task Test33Async()
     {
         var expectedMessage = "can not elevate your own privileges";
         var expectedLogMessage = "attempted to elevate their own privileges";
@@ -1443,12 +1447,12 @@ public class UserManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principal.UserName!, logger.LatestRecord.Message);
-        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Contains(principal.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.Null(logger.LatestRecord.Exception);
     }
 }

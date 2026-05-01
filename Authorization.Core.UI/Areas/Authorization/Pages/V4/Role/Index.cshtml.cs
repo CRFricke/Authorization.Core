@@ -1,10 +1,10 @@
 using CRFricke.Authorization.Core.Attributes;
 using CRFricke.Authorization.Core.UI.Data;
 using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable CA2227 // Collection properties should be read only
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V4.Role;
 
@@ -12,7 +12,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V4.Role;
 [PageImplementationType(typeof(IndexModel<,>))]
 public abstract class IndexModel : ModelBase
 {
-    public IList<RoleInfo> RoleInfo { get; set; }
+    public IList<RoleInfo> RoleInfo { get; protected set; } = null!;
 
     public virtual Task OnGetAsync() => throw new NotImplementedException();
 }
@@ -37,6 +37,6 @@ internal class IndexModel<
 
     public override async Task OnGetAsync()
     {
-        RoleInfo = await _indexHandler.OnGetAsync();
+        RoleInfo = await _indexHandler.OnGetAsync().ConfigureAwait(false);
     }
 }

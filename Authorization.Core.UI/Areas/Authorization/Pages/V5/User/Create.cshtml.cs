@@ -5,9 +5,9 @@ using CRFricke.Authorization.Core.UI.Pages.Shared.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.User;
 
@@ -16,13 +16,13 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.User;
 public abstract class CreateModel : ModelBase
 {
     [BindProperty]
-    public UserModel UserModel { get; set; }
+    public UserModel UserModel { get; set; } = null!;
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public virtual Task<IActionResult> OnGetAsync() => throw new NotImplementedException();
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
-    public virtual Task<IActionResult> OnPostAsync(string hfRoleList) => throw new NotImplementedException();
+    public virtual Task<IActionResult> OnPostAsync(string? hfRoleList) => throw new NotImplementedException();
 }
 
 internal class CreateModel<
@@ -54,12 +54,12 @@ internal class CreateModel<
     public override async Task<IActionResult> OnGetAsync()
     {
         UserModel = new();
-        return await _createHandler.OnGetAsync(UserModel, this);
+        return await _createHandler.OnGetAsync(UserModel, this).ConfigureAwait(false);
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
-    public override async Task<IActionResult> OnPostAsync(string hfRoleList)
+    public override async Task<IActionResult> OnPostAsync(string? hfRoleList)
     {
-        return await _createHandler.OnPostAsync(UserModel, this, hfRoleList);
+        return await _createHandler.OnPostAsync(UserModel, this, hfRoleList).ConfigureAwait(false);
     }
 }

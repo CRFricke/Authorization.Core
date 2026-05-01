@@ -3,9 +3,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 
@@ -58,7 +58,7 @@ internal class EditHandler<
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (role == null)
         {
@@ -91,7 +91,7 @@ internal class EditHandler<
 
         roleModel.InitRoleClaims(_authManager)
             .SetAssignedClaims(
-                hfClaimList?.Split(',') ?? Array.Empty<string>()
+                hfClaimList?.Split(',') ?? []
                 );
 
         if (!modelState.IsValid)
@@ -101,7 +101,7 @@ internal class EditHandler<
 
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
-            .FirstOrDefaultAsync(m => m.Id == roleModel.Id);
+            .FirstOrDefaultAsync(m => m.Id == roleModel.Id).ConfigureAwait(false);
 
         if (role == null)
         {
@@ -118,47 +118,56 @@ internal class EditHandler<
 
         if (roleModel.ClaimsUpdated)
         {
-            var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.UpdateClaims));
+            var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.UpdateClaims)).ConfigureAwait(false);
             if (!result.Succeeded)
             {
                 modelState.AddModelError(string.Empty, "Can not update Role:");
 
-                if (result.Failure.FailureReason == AuthorizationFailure.Reason.SystemObject)
+                if (result.Failure!.FailureReason == AuthorizationFailure.Reason.SystemObject)
                 {
                     var message = "You may not update the Claims assigned to a system Role.";
                     modelState.AddModelError(string.Empty, message);
-                    _logger.LogWarning(
-                        "'{PrincipalEmail}' attempted to update the claims of system {RoleType} '{RoleName}' (ID: {RoleId}).",
-                        principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                    _logger.LogAttemptedSystemRoleClaimsUpdate(
+                        principal.Identity!.Name,
+                        typeof(TRole).Name,
+                        role.Name,
+                        role.Id
                         );
                     return modelBase.Page();
                 }
 
                 modelState.AddModelError(string.Empty, "You can not give a Role more privileges than you have.");
-                _logger.LogWarning(
-                    "'{PrincipalEmail}' attempted to give {RoleType} '{RoleName}' (ID: {RoleId}) elevated privileges.",
-                    principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+                _logger.LogAttemptedElevatedPrivilegeRoleUpdate(
+                    principal.Identity!.Name,
+                    typeof(TRole).Name,
+                    role.Name,
+                    role.Id
                     );
                 return modelBase.Page();
             }
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            rowsUpdated = await _repository.SaveChangesAsync();
+            rowsUpdated = await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             modelState.AddModelError(string.Empty, "Could not update Role:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not update {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleUpdateFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         if (rowsUpdated > 0)
         {
@@ -172,9 +181,11 @@ internal class EditHandler<
                 $"Role '{role.Name}' was successfully updated."
                 );
 
-            _logger.LogInformation(
-                "'{PrincipalEmail}' updated {RoleType} '{RoleName}' (ID: {RoleId}).",
-                principal.Identity.Name, typeof(TRole).Name, role.Name, role.Id
+            _logger.LogRoleUpdated(
+                principal.Identity!.Name,
+                typeof(TRole).Name,
+                role.Name,
+                role.Id
                 );
         }
 

@@ -25,7 +25,7 @@ namespace Authorization.Core.UI.Tests;
 public class NonParallelTests : TestsBase
 {
     [Fact(DisplayName = "Create Role [Get] initializes RoleClaim collection")]
-    public void RoleManagement_Test2()
+    public void Test01()
     {
         var authManager = Mock.Of<IAuthorizationManager>(am =>
             am.DefinedClaims == GetDefinedClaims()
@@ -37,14 +37,14 @@ public class NonParallelTests : TestsBase
         var model = new CreateModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
         model.OnGet();
 
-        Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims.Count);
+        Assert.Equal(authManager.DefinedClaims.Count, model.RoleModel.RoleClaims!.Count);
     }
 }
 
 public class RoleManagementTests : TestsBase
 {
     [Fact(DisplayName = "RoleManagement page returns list of ApplicationRoles")]
-    public async Task RoleManagement_Test1Async()
+    public async Task Test01Async()
     {
         var roles = new List<ApplicationRole>
         {
@@ -65,7 +65,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create Role [Post] sets assigned claims")]
-    public async Task RoleManagement_Test3Async()
+    public async Task Test02Async()
     {
         ApplicationRole role = null!;
         var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
@@ -108,7 +108,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create Role [Post] sets ApplicationRole properties")]
-    public async Task RoleManagement_Test4Async()
+    public async Task Test03Async()
     {
         ApplicationRole role = null!;
         var name = "TestRole";
@@ -153,7 +153,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create Role [Post] handles DB exception")]
-    public async Task RoleManagement_Test5Async()
+    public async Task Test04Async()
     {
         var dbUpdateException =
             new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
@@ -195,18 +195,18 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains("Role", errors[0].ErrorMessage);
+        Assert.Contains("Role", errors[0].ErrorMessage, StringComparison.Ordinal);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Create Role [Post] logs success")]
-    public async Task RoleManagement_Test6Async()   
+    public async Task Test05Async()   
     {
         ApplicationRole role = null!;
 
@@ -245,14 +245,14 @@ public class RoleManagementTests : TestsBase
         Assert.NotNull(role);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name!, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name!, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Create Role [Post] sends notification on success")]
-    public async Task RoleManagement_Test7Async()
+    public async Task Test06Async()
     {
         var principalId = Guid.NewGuid().ToString();
         var principalName = "TestUser@company.com";
@@ -287,24 +287,24 @@ public class RoleManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+        Assert.Contains(model.RoleModel.Name, notifications?[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit Role [Get] returns NotFound for null ID")]
-    public async Task RoleManagement_Test8Async()
+    public async Task Test07Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
         var logger = new FakeLogger<EditHandler>();
 
         var model = new EditModel<ApplicationUser, ApplicationRole> (authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Edit Role [Get] returns NotFound for DB not found")]
-    public async Task RoleManagement_Test9Async()
+    public async Task Test08Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
@@ -319,7 +319,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit Role [Get] initializes RoleModel")]
-    public async Task RoleManagement_Test10Async()
+    public async Task Test09Async()
     {
         var expectedValue = "Role.List";
 
@@ -351,7 +351,7 @@ public class RoleManagementTests : TestsBase
         Assert.Equal(roles[0].Id, model.RoleModel.Id);
         Assert.Equal(roles[0].Description, model.RoleModel.Description);
         Assert.Equal(roles[0].Name, model.RoleModel.Name);
-        Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
+        Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims!.Count);
 
         var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
         Assert.Single(claims);
@@ -359,7 +359,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit Role [Post] sends notification for DB not found")]
-    public async Task RoleManagement_Test11Async()
+    public async Task Test10Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>(am =>
             am.DefinedClaims == GetDefinedClaims()
@@ -382,11 +382,11 @@ public class RoleManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+        Assert.Contains(model.RoleModel.Name, notifications?[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit Role [Post] handles DB exception")]
-    public async Task RoleManagement_Test12Async()
+    public async Task Test11Async()
     {
         var dbUpdateException =
             new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
@@ -431,20 +431,20 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains("Role", errors[0].ErrorMessage);
+        Assert.Contains("Role", errors[0].ErrorMessage, StringComparison.Ordinal);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit Role [Post] sends no notification for no changes")]
-    public async Task RoleManagement_Test13Async()
+    public async Task Test12Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
         var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
@@ -473,7 +473,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit Role [Post] sets ApplicationRole properties")]
-    public async Task RoleManagement_Test14Async()
+    public async Task Test13Async()
     {
         var expectedName = "TestManager";
         var expectedDescription = "TestManagers do things related to testing.";
@@ -519,7 +519,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit Role [Post] updates RoleClaims")]
-    public async Task RoleManagement_Test15Async()
+    public async Task Test14Async()
     {
         var expectedClaims = new string[] { SysClaims.Role.Create, SysClaims.Role.Update };
 
@@ -568,7 +568,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit Role [Post] sends notification for update")]
-    public async Task RoleManagement_Test16Async()
+    public async Task Test15Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
         var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
@@ -606,11 +606,12 @@ public class RoleManagementTests : TestsBase
 
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(model.RoleModel.Name, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit Role [Post] logs success")]
-    public async Task RoleManagement_Test17Async()
+    public async Task Test16Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
         var dbSet = new List<ApplicationRole> { role }.BuildMockDbSet();
@@ -648,26 +649,26 @@ public class RoleManagementTests : TestsBase
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Display Role returns NotFound for null ID")]
-    public async Task RoleManagement_Test18Async()
+    public async Task Test17Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
 
         var model = new DetailsModel<ApplicationUser, ApplicationRole>(authManager, repository);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Display Role returns NotFound for DB not found")]
-    public async Task RoleManagement_Test19Async()
+    public async Task Test18Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
@@ -681,7 +682,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Display Role initializes RoleModel")]
-    public async Task RoleManagement_Test20Async()
+    public async Task Test19Async()
     {
         var expectedValue = "Role.List";
 
@@ -710,6 +711,7 @@ public class RoleManagementTests : TestsBase
         Assert.Equal(roles[0].Id, model.RoleModel.Id);
         Assert.Equal(roles[0].Description, model.RoleModel.Description);
         Assert.Equal(roles[0].Name, model.RoleModel.Name);
+        Assert.NotNull(model.RoleModel.RoleClaims);
         Assert.Equal(definedClaims.Count, model.RoleModel.RoleClaims.Count);
 
         var claims = model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned);
@@ -718,20 +720,20 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete Role [Get] returns NotFound for null ID")]
-    public async Task RoleManagement_Test21Async()
+    public async Task Test20Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnGetAsync(null);
+        var result = await model.OnGetAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Delete Role [Get] returns NotFound for DB not found")]
-    public async Task RoleManagement_Test22Async()
+    public async Task Test21Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
@@ -746,7 +748,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete Role [Get] initializes RoleUser collection")]
-    public async Task RoleManagement_Test23Async()
+    public async Task Test22Async()
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
         var roles = new List<ApplicationRole> { role }.BuildMockDbSet();
@@ -775,26 +777,27 @@ public class RoleManagementTests : TestsBase
 
         Assert.IsType<PageResult>(result);
         Assert.Equal(role.Id, model.RoleModel.Id);
+        Assert.NotNull(model.RoleModel.RoleUsers);
         Assert.Single(model.RoleModel.RoleUsers);
         Assert.Equal(user.DisplayName, model.RoleModel.RoleUsers.First().Name);
         Assert.Equal(user.Email, model.RoleModel.RoleUsers.First().Email);
     }
 
     [Fact(DisplayName = "Delete Role [Post] returns NotFound for null ID")]
-    public async Task RoleManagement_Test24Async()
+    public async Task Test23Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>();
         var logger = new FakeLogger<DeleteHandler>();
 
         var model = new DeleteModel<ApplicationUser, ApplicationRole>(authManager, repository, logger);
-        var result = await model.OnPostAsync(null);
+        var result = await model.OnPostAsync(null!);
 
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact(DisplayName = "Delete Role [Post] sends notification for DB not found")]
-    public async Task RoleManagement_Test25Async()
+    public async Task Test24Async()
     {
         var authManager = Mock.Of<IAuthorizationManager>();
         var repository = Mock.Of<IRepository<ApplicationUser, ApplicationRole>>(db =>
@@ -813,11 +816,12 @@ public class RoleManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(model.RoleModel.Name, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(model.RoleModel.Name, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Delete Role [Post] prevents delete of System Role")]
-    public async Task RoleManagement_Test26Async()
+    public async Task Test25Async()
     {
         var expectedMessage1 = "System Roles may not be deleted";
         var expectedMessage2 = $"delete system {nameof(ApplicationRole)}";
@@ -864,18 +868,18 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage1, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(expectedMessage2, logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedMessage2, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Delete Role [Post] handles DB exception")]
-    public async Task RoleManagement_Test27Async()
+    public async Task Test26Async()
     {
         var dbUpdateException =
             new DbUpdateException("One or more errors occurred. (An error occurred while updating the entries. See the inner exception for details.)",
@@ -928,20 +932,20 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains("Role", errors[0].ErrorMessage);
+        Assert.Contains("Role", errors[0].ErrorMessage, StringComparison.Ordinal);
         Assert.Equal(dbUpdateException.GetBaseException().Message, errors[1].ErrorMessage);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.NotNull(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Delete Role [Post] sends notification for delete")]
-    public async Task RoleManagement_Test28Async()
+    public async Task Test27Async()
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
@@ -990,11 +994,12 @@ public class RoleManagementTests : TestsBase
         Assert.IsType<RedirectToPageResult>(result);
         Assert.Single(model.TempData);
         var notifications = model.TempData.GetNotifications(model.TempData.Keys.First());
-        Assert.Contains(role.Name, notifications[0].Message);
+        Assert.NotNull(notifications);
+        Assert.Contains(role.Name, notifications[0].Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Delete Role [Post] logs success")]
-    public async Task RoleManagement_Test29Async()
+    public async Task Test28Async()
     {
         ApplicationRole deletedRole = null!;
 
@@ -1048,14 +1053,14 @@ public class RoleManagementTests : TestsBase
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit Role [Post] prevents update of System Role")]
-    public async Task RoleManagement_Test30Async()
+    public async Task Test29Async()
     {
         var expectedMessage1 = "You may not update the Claims assigned to a system Role";
         var expectedMessage2 = $"update the claims of system {nameof(ApplicationRole)}";
@@ -1099,18 +1104,18 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage1, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage1, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(expectedMessage2, logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedMessage2, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "Edit Role [Post] refreshes Role cache on success")]
-    public async Task RoleManagement_Test31Async()
+    public async Task Test30Async()
     {
         var role = new ApplicationRole { Name = "TestRole", Description = "Can do tester stuff." };
         role.Claims.Add(new IdentityRoleClaim<string> { Id = 1, RoleId = role.Id, ClaimType = SysClaims.ClaimType, ClaimValue = role.Name });
@@ -1152,7 +1157,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete Role [Post] refreshes Role cache on success")]
-    public async Task RoleManagement_Test32Async()
+    public async Task Test31Async()
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
@@ -1197,7 +1202,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Edit Role [Get] sets IsSystemRole")]
-    public async Task RoleManagement_Test33Async()
+    public async Task Test32Async()
     {
         var role = new ApplicationRole { Id = SysUiGuids.Role.UserManager, Name = nameof(SysUiGuids.Role.UserManager) };
 
@@ -1219,7 +1224,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Create Role [Post] handles failed elevation check")]
-    public async Task RoleManagement_Test34Async()
+    public async Task Test33Async()
     {
         var expectedMessage = "can not create a Role with more privileges";
         var expectedLogMessage = $"create {nameof(ApplicationRole)} with elevated privileges";
@@ -1257,17 +1262,17 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.Null(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Edit Role [Post] handles failed elevation check")]
-    public async Task RoleManagement_Test35Async()
+    public async Task Test34Async()
     {
         var expectedMessage = "can not give a Role more privileges";
         var expectedLogMessage = "elevated privileges";
@@ -1311,20 +1316,20 @@ public class RoleManagementTests : TestsBase
         Assert.False(model.ModelState.IsValid);
         Assert.Equal(2, model.ModelState.ErrorCount);
         var errors = model.ModelState[string.Empty]!.Errors;
-        Assert.Contains(expectedMessage, errors[1].ErrorMessage);
+        Assert.Contains(expectedMessage, errors[1].ErrorMessage, StringComparison.Ordinal);
 
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Warning, logger.LatestRecord.Level);
-        Assert.Contains(principalName, logger.LatestRecord.Message);
-        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message);
-        Assert.Contains(role.Name, logger.LatestRecord.Message);
-        Assert.Contains(role.Id, logger.LatestRecord.Message);
-        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message);
+        Assert.Contains(principalName, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ApplicationRole), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(role.Id, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(expectedLogMessage, logger.LatestRecord.Message, StringComparison.Ordinal);
         Assert.Null(logger.LatestRecord.Exception);
     }
 
     [Fact(DisplayName = "Delete Role [Post] removes UserClaim associated with Role")]
-    public async Task RoleManagement_Test36Async()
+    public async Task Test35Async()
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 
@@ -1377,7 +1382,7 @@ public class RoleManagementTests : TestsBase
     }
 
     [Fact(DisplayName = "Delete Role [Post] refreshes UserClaim cache on success")]
-    public async Task RoleManagement_Test37Async()
+    public async Task Test36Async()
     {
         var role = new ApplicationRole { Name = "TestManager", Description = "Does all things that are testing." };
 

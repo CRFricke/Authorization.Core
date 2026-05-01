@@ -7,6 +7,8 @@ using System.Security.Claims;
 
 namespace Authorization.Core.UI.Tests.Infrastructure;
 
+#pragma warning disable CA1724 // Type names should not match namespaces
+
 public static class Extensions
 {
     extension(WebAppFactory webAppFixture)
@@ -23,11 +25,11 @@ public static class Extensions
         public async Task DeleteRoleAsync(string roleId)
         {
             var dbContext = webAppFixture.Services.GetRequiredService<ApplicationDbContext>();
-            var dbRole = await dbContext.Roles.FindAsync(roleId);
+            var dbRole = await dbContext.Roles.FindAsync(roleId).ConfigureAwait(false);
             if (dbRole is not null)
             {
                 dbContext.Roles.Remove(dbRole);
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 
@@ -43,11 +45,11 @@ public static class Extensions
         public async Task DeleteUserAsync(string userId)
         {
             var dbContext = webAppFixture.Services.GetRequiredService<ApplicationDbContext>();
-            var dbUser = await dbContext.Users.FindAsync(userId);
+            var dbUser = await dbContext.Users.FindAsync(userId).ConfigureAwait(false);
             if (dbUser is not null)
             {
                 dbContext.Users.Remove(dbUser);
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 
@@ -60,8 +62,10 @@ public static class Extensions
         /// </returns>
         public async Task<ApplicationRole> EnsureRoleAsync(ApplicationRole role)
         {
+            ArgumentNullException.ThrowIfNull(role);
+
             var dbContext = webAppFixture.Services.GetRequiredService<ApplicationDbContext>();
-            var dbRole = await dbContext.Roles.FirstOrDefaultAsync(r => r.Name == role.Name);
+            var dbRole = await dbContext.Roles.FirstOrDefaultAsync(r => r.Name == role.Name).ConfigureAwait(false);
             if (dbRole is not null)
             {
                 return dbRole;
@@ -70,8 +74,8 @@ public static class Extensions
             var normalizer = webAppFixture.Services.GetRequiredService<ILookupNormalizer>();
             role.NormalizedName = normalizer.NormalizeName(role.Name);
 
-            await dbContext.Roles.AddAsync(role);
-            await dbContext.SaveChangesAsync();
+            await dbContext.Roles.AddAsync(role).ConfigureAwait(false);
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
             return role;
         }
@@ -91,6 +95,8 @@ public static class Extensions
             Login login,
             string? userClaimValue = null)
         {
+            ArgumentNullException.ThrowIfNull(login);
+
             return EnsureUserAsync(
                 webAppFixture,
                 new() { Email = login.Email },
@@ -112,11 +118,13 @@ public static class Extensions
             Login login,
             string? userClaimValue = null)
         {
+            ArgumentNullException.ThrowIfNull(login);
+
             return await EnsureUserAsync(
                 webAppFixture,
                 new() { Email = login.Email },
                 login.Password,
-                userClaimValue);
+                userClaimValue).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -136,8 +144,10 @@ public static class Extensions
             string password,
             string? userClaimValue = null)
         {
+            ArgumentNullException.ThrowIfNull(user);
+
             var dbContext = webAppFixture.Services.GetRequiredService<ApplicationDbContext>();
-            var dbUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            var dbUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == user.Email).ConfigureAwait(false);
             if (dbUser is not null)
             {
                 return dbUser;
@@ -152,7 +162,7 @@ public static class Extensions
             user.PasswordHash = hasher.HashPassword(user, password);
             user.UserName = user.Email;
 
-            await dbContext.Users.AddAsync(user);
+            await dbContext.Users.AddAsync(user).ConfigureAwait(false);
 
             bool userNeedsRefresh = false;
 
@@ -162,7 +172,7 @@ public static class Extensions
                     uc.UserId == user.Id &&
                     uc.ClaimType == ClaimTypes.Role &&
                     uc.ClaimValue == userClaimValue
-                    );
+                    ).ConfigureAwait(false);
 
                 if (userClaim is null)
                 {
@@ -173,12 +183,12 @@ public static class Extensions
                         ClaimValue = userClaimValue
                     };
 
-                    await dbContext.UserClaims.AddAsync(userClaim);
+                    await dbContext.UserClaims.AddAsync(userClaim).ConfigureAwait(false);
                     userNeedsRefresh = true;
                 }
             }
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
             if (userNeedsRefresh)
             {
@@ -202,7 +212,7 @@ public static class Extensions
                 .Where(r => r.Id == roleId)
                 .Include(r => r.Claims)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -218,7 +228,7 @@ public static class Extensions
                 .Where(r => r.Name == roleName)
                 .Include(r => r.Claims)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -259,7 +269,7 @@ public static class Extensions
                 .Where(u => u.Email == userEmail)
                 .Include(u => u.Claims)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -279,7 +289,7 @@ public static class Extensions
                 .Where(u => u.Id == userId)
                 .Include(u => u.Claims)
                 .AsNoTracking()
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -293,7 +303,7 @@ public static class Extensions
         public async Task VerifyRoleExistsAsync(string roleName)
         {
             var dbContext = webAppFixture.Services.GetRequiredService<ApplicationDbContext>();
-            Assert.True(await dbContext.Roles.AnyAsync(r => r.Name == roleName));
+            Assert.True(await dbContext.Roles.AnyAsync(r => r.Name == roleName).ConfigureAwait(false));
         }
     }
 }

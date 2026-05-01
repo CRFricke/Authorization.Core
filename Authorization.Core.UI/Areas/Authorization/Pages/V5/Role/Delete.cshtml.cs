@@ -4,9 +4,9 @@ using CRFricke.Authorization.Core.UI.Models;
 using CRFricke.Authorization.Core.UI.Pages.Shared.Role;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 
@@ -15,7 +15,7 @@ namespace CRFricke.Authorization.Core.UI.Pages.V5.Role;
 public abstract class DeleteModel : ModelBase
 {
     [BindProperty]
-    public RoleModel RoleModel { get; set; }
+    public RoleModel RoleModel { get; set; } = null!;
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.New(ConstructorInfo, IEnumerable<Expression>, MemberInfo[]): The Property metadata or other accessor may be trimmed.")]
     public virtual Task<IActionResult> OnGetAsync(string id) => throw new NotImplementedException();
@@ -51,12 +51,12 @@ internal class DeleteModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         RoleModel = new RoleModel();
-        return await _deleteHandler.OnGetAsync(RoleModel, this, id);
+        return await _deleteHandler.OnGetAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.New(ConstructorInfo, IEnumerable<Expression>, MemberInfo[]): The Property metadata or other accessor may be trimmed.")]
     public override async Task<IActionResult> OnPostAsync(string id)
     {
-        return await _deleteHandler.OnPostAsync(RoleModel, this, id);
+        return await _deleteHandler.OnPostAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 }

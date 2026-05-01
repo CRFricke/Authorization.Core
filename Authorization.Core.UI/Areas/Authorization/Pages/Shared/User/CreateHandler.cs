@@ -3,11 +3,11 @@ using CRFricke.Authorization.Core.UI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
+
+#pragma warning disable CA1716 // Identifiers should not match keywords
+#pragma warning disable CA1724 // Type names should not match namespaces
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
 
@@ -59,7 +59,7 @@ internal class CreateHandler<
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnGetAsync(UserModel userModel, ModelBase modelBase)
     {
-        await userModel.InitRoleInfoAsync(_repository);
+        await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false);
         return modelBase.Page();
     }
 
@@ -71,13 +71,13 @@ internal class CreateHandler<
     /// <param name="hfRoleList">A list of Roles to be assigned to the new User.</param>
     /// <returns>The <see cref="IActionResult"/> to be used to display the next Razor page.</returns>
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
-    public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string hfRoleList)
+    public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string? hfRoleList)
     {
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
-        (await userModel.InitRoleInfoAsync(_repository))
-            .SetAssignedClaims(hfRoleList?.Split(',') ?? Array.Empty<string>());
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
+            .SetAssignedClaims(hfRoleList?.Split(',') ?? []);
 
         if (!modelState.IsValid)
         {
@@ -87,21 +87,21 @@ internal class CreateHandler<
         var user = new TUser();
         userModel.UpdateUser(user);
 
-        var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.Create));
+        var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.Create)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not create User:");
             modelState.AddModelError(string.Empty, "You can not create a User with more privileges than you have.");
 
-            _logger.LogWarning(
-                "'{PrincipalEmail}' attempted to create {UserType} with elevated privileges.",
-                principal.Identity.Name, typeof(TUser).Name
+            _logger.LogAttemptedElevatedPrivilegeUserCreation(
+                principal.Identity!.Name,
+                typeof(TUser).Name
                 );
 
             return modelBase.Page();
         }
 
-        var identityResult = await ValidPasswordAsync(user, userModel.Password);
+        var identityResult = await ValidPasswordAsync(user, userModel.Password).ConfigureAwait(false);
         if (!identityResult.Succeeded)
         {
             foreach (var error in identityResult.Errors)
@@ -114,32 +114,39 @@ internal class CreateHandler<
 
         user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, userModel.Password);
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.Users.Add(user);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             modelState.AddModelError(string.Empty, "Could not create User:");
             modelState.AddModelError(string.Empty, ex.GetBaseException().Message);
 
-            _logger.LogError(
-                ex, "'{PrincipalEmail}' could not create {UserType} '{UserEmail}' (ID '{UserId}').",
-                principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+            _logger.LogUserCreationFailed(
+                ex,
+                principal.Identity!.Name,
+                typeof(TUser).Name,
+                user.Email,
+                user.Id
                 );
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         modelBase.SendNotification(
             _notificationReceiver, Severity.Normal,
             $"User '{user.Email}' successfully created."
             );
 
-        _logger.LogInformation(
-            "'{PrincipalEmail}' created {UserType} '{UserEmail}' (ID '{UserId}').",
-            principal.Identity.Name, typeof(TUser).Name, user.Email, user.Id
+        _logger.LogUserCreated(
+            principal.Identity!.Name,
+            typeof(TUser).Name,
+            user.Email,
+            user.Id
             );
 
         return modelBase.RedirectToPage(IndexHandler.PageName);
@@ -147,7 +154,7 @@ internal class CreateHandler<
 
     private async Task<IdentityResult> ValidPasswordAsync(TUser user, string password)
     {
-        List<IdentityError> errors = null;
+        List<IdentityError> errors = null!;
         bool isValid = true;
         foreach (var passwordValidator in _userManager.PasswordValidators)
         {
@@ -159,10 +166,7 @@ internal class CreateHandler<
 
             if (identityResult.Errors.Any())
             {
-                if (errors == null)
-                {
-                    errors = [];
-                }
+                errors ??= [];
                 errors.AddRange(identityResult.Errors);
             }
 
@@ -173,9 +177,9 @@ internal class CreateHandler<
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("User password validation failed: {errors}.", string.Join(";", errors?.Select((IdentityError e) => e.Code) ?? []));
+                _logger.LogPasswordValidationFailed(string.Join(";", errors?.Select(e => e.Code) ?? []));
             }
-            return IdentityResult.Failed([.. errors]);
+            return IdentityResult.Failed([.. errors!]);
         }
 
         return IdentityResult.Success;

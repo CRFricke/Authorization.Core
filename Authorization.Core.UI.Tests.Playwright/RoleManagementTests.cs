@@ -11,7 +11,9 @@ namespace Authorization.Core.UI.Tests.Playwright;
 [Collection("Playwright")]
 public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLifetime
 {
+#pragma warning disable CA1056 // URI-like properties should not be strings
     public string BaseUrl { get; private set; } = null!;
+#pragma warning restore CA1056 // URI-like properties should not be strings
 
     private IPage Page { get; set; } = null!;
 
@@ -21,7 +23,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
     public async ValueTask InitializeAsync()
     {
-        Page = await playwrightFixture.CreatePageAsync();
+        Page = await playwrightFixture.CreatePageAsync().ConfigureAwait(false);
 
         WebAppFactory = new WebAppFactory();
         WebAppFactory.UseKestrel();
@@ -35,8 +37,8 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
     public async ValueTask DisposeAsync()
     {
-        await Page.CloseAsync();
-        await WebAppFactory.DisposeAsync();
+        await Page.CloseAsync().ConfigureAwait(false);
+        await WebAppFactory.DisposeAsync().ConfigureAwait(false);
         GC.SuppressFinalize(this);
     }
 
@@ -45,20 +47,20 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
     {
         await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Page.GetByRole(AriaRole.Link, new() { Name = "Create New" }).ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Create Role", title);
+        Assert.Contains("Create Role", title, StringComparison.Ordinal);
 
         var role = new ApplicationRole
         {
             Name = "Test01Role",
             Description = "Test Role"
-        }.SetClaims(AppClaims.Calendar.List, AppClaims.Document.List, SysClaims.Role.List, SysClaims.User.List);
+        }.SetClaims<ApplicationRole>(AppClaims.Calendar.List, AppClaims.Document.List, SysClaims.Role.List, SysClaims.User.List);
 
         await Page.GetByLabel("Name").FillAsync(role.Name!);
-        await Page.GetByLabel("Description").FillAsync(role.Description);
+        await Page.GetByLabel("Description").FillAsync(role.Description!);
         await Page.GetByLabel("Search:").FillAsync("List");
         foreach (var claim in role.Claims)
         {
@@ -67,7 +69,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         }
         await Page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Assertions.Expect(
             Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully created." })
@@ -90,14 +92,14 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
             .GetByRole(AriaRole.Link, new() { Name = "View" })
             .ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Role Details", title);
+        Assert.Contains("Role Details", title, StringComparison.Ordinal);
 
         await Assertions.Expect(Page.GetByLabel("Id")).ToHaveValueAsync(role.Id);
         await Assertions.Expect(Page.GetByLabel("Name")).ToHaveValueAsync(role.Name!);
@@ -124,19 +126,19 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         {
             Name = "Test03Role",
             Description = "Can list and view news items."
-        }.SetClaims(AppClaims.Calendar.List, AppClaims.Calendar.Read);
+        }.SetClaims<ApplicationRole>(AppClaims.Calendar.List, AppClaims.Calendar.Read);
         await WebAppFactory.EnsureRoleAsync(role);
 
         await LogUserInAsync(Logins.Administrator, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
             .GetByRole(AriaRole.Link, new() { Name = "Edit" })
             .ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Edit Role", title);
+        Assert.Contains("Edit Role", title, StringComparison.Ordinal);
 
         var locator = Page.GetByLabel(nameof(role.Name));
         await Assertions.Expect(locator).ToHaveValueAsync(role.Name ?? string.Empty);
@@ -170,11 +172,11 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save" }).ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
         locator = Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' was successfully updated." });
         Assert.NotNull(locator);
 
-        role.SetClaims(AppClaims.Calendar.DefinedClaims);
+        role.SetClaims<ApplicationRole>(AppClaims.Calendar.DefinedClaims);
 
         var dbRole = await WebAppFactory.GetRoleByIdAsync(role.Id);
         Assert.NotNull(dbRole);
@@ -196,7 +198,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         {
             Name = "Test04Role",
             Description = "Can create, delete, list, read, and update calendar items."
-        }.SetClaims(AppClaims.Calendar.DefinedClaims);
+        }.SetClaims<ApplicationRole>(AppClaims.Calendar.DefinedClaims);
         await WebAppFactory.EnsureRoleAsync(role);
 
         var login = new Login("Test04User@company.com", "Test04pa$$");
@@ -204,14 +206,14 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
             .GetByRole(AriaRole.Link, new() { Name = "Delete" })
             .ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Delete Role", title);
+        Assert.Contains("Delete Role", title, StringComparison.Ordinal);
 
         var locator = Page.GetByRole(AriaRole.Textbox).Nth(0);
         await Assertions.Expect(locator).ToHaveValueAsync(role.Id);
@@ -220,14 +222,14 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         await Assertions.Expect(locator).ToHaveValueAsync(role.Name!);
 
         locator = Page.GetByRole(AriaRole.Textbox).Nth(2);
-        await Assertions.Expect(locator).ToHaveValueAsync(role.Description);
+        await Assertions.Expect(locator).ToHaveValueAsync(role.Description!);
 
         // Verify assigned User is displayed
         locator = Page.GetByRole(AriaRole.Cell, new() { Name = login.Email });
         await Assertions.Expect(locator).ToHaveCountAsync(1);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First.ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Assertions.Expect(
             Page.GetByRole(AriaRole.Heading, new() { Name = $"Role '{role.Name}' successfully deleted." })
@@ -239,14 +241,14 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
     {
         await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = nameof(AppGuids.Role.DocumentManager) })
             .GetByRole(AriaRole.Link, new() { Name = "Delete" })
             .ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Delete Role", title);
+        Assert.Contains("Delete Role", title, StringComparison.Ordinal);
 
         await Assertions.Expect(
             Page.GetByRole(AriaRole.Heading, new() { Name = "System Roles may not be deleted!" })
@@ -265,20 +267,20 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(Logins.RoleManager, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
             .GetByRole(AriaRole.Link, new() { Name = "Delete" })
             .ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Delete Role", title);
+        Assert.Contains("Delete Role", title, StringComparison.Ordinal);
 
         await WebAppFactory.DeleteRoleAsync(role.Id);
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).First.ClickAsync();
         title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         await Assertions.Expect(
             Page.GetByRole(AriaRole.Heading, new() { Name = $"Error: Role '{role.Name}' was not found in the database." })
@@ -292,7 +294,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         {
             Name = "CalendarReader",
             Description = "Test Role"
-        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Create]));
+        }.SetClaims<ApplicationRole>(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Create]));
         await WebAppFactory.EnsureRoleAsync(role);
 
         var login = new Login("Test07User@company.com", "TestO7pa$$");
@@ -300,7 +302,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(login, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         var locator = Page.GetByRole(AriaRole.Link, new() { Name = "Create New" });
         await Assertions.Expect(locator).ToBeDisabledAsync();
@@ -313,7 +315,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         {
             Name = "Test08Role",
             Description = "Test Role"
-        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Update]));
+        }.SetClaims<ApplicationRole>(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Update]));
         await WebAppFactory.EnsureRoleAsync(role);
 
         var login = new Login("Test08User@company.com", "TestO8pa$$");
@@ -321,7 +323,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(login, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         var locator = Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
@@ -336,7 +338,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         {
             Name = "Test09Role",
             Description = "Test Role"
-        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Read]));
+        }.SetClaims<ApplicationRole>(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Read]));
         await WebAppFactory.EnsureRoleAsync(role);
 
         var login = new Login("Test09User@company.com", "TestO9pa$$");
@@ -344,7 +346,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(login, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         var locator = Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
@@ -359,7 +361,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
         {
             Name = "Test10Role",
             Description = "Test Role"
-        }.SetClaims(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Delete]));
+        }.SetClaims<ApplicationRole>(SysClaims.Role.DefinedClaims.Except([SysClaims.Role.Delete]));
         await WebAppFactory.EnsureRoleAsync(role);
 
         var login = new Login("Test10User@company.com", "Test10pa$$");
@@ -367,7 +369,7 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
 
         await LogUserInAsync(login, "/Admin/Role");
         var title = await Page.TitleAsync();
-        Assert.Contains("Role Management", title);
+        Assert.Contains("Role Management", title, StringComparison.Ordinal);
 
         var locator = Page.GetByRole(AriaRole.Row)
             .Filter(new() { HasText = role!.Name })
@@ -383,6 +385,6 @@ public class RoleManagementTests(PlaywrightFixture playwrightFixture) : IAsyncLi
     /// <returns>A task that represents the asynchronous login operation.</returns>
     private async Task LogUserInAsync(Login login, string? returnUrl = null)
     {
-        await TestHelpers.LogUserInAsync(Page, login, returnUrl);
+        await TestHelpers.LogUserInAsync(Page, login, returnUrl).ConfigureAwait(false);
     }
 }
