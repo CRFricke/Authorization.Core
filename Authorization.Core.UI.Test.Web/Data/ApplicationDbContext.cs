@@ -3,6 +3,8 @@ using CRFricke.Authorization.Core.UI.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CA1515 // Consider making public types internal
+
 namespace Authorization.Core.UI.Test.Web.Data;
 
 public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRole>
@@ -31,13 +33,13 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
     /// <inheritdoc/>
     public override async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
     {
-        await base.SeedDatabaseAsync(serviceProvider);
+        await base.SeedDatabaseAsync(serviceProvider).ConfigureAwait(false);
 
         var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
         var hasher = serviceProvider.GetRequiredService<IPasswordHasher<ApplicationUser>>();
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<ApplicationDbContext>();
 
-        var role = await Roles.FindAsync(AppGuids.Role.CalendarManager);
+        var role = await Roles.FindAsync(AppGuids.Role.CalendarManager).ConfigureAwait(false);
         if (role == null)
         {
             role = new ApplicationRole
@@ -46,16 +48,16 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
                 Name = nameof(AppGuids.Role.CalendarManager),
                 Description = "CalendarManagers are responsible for managing the company's calendar.",
                 NormalizedName = normalizer.NormalizeName(nameof(AppGuids.Role.CalendarManager))
-            }.SetClaims(AppClaims.Calendar.DefinedClaims);
+            }.SetClaims<ApplicationRole>(AppClaims.Calendar.DefinedClaims);
 
-            await Roles.AddAsync(role);
+            await Roles.AddAsync(role).ConfigureAwait(false);
             logger.LogInformation(
                 "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
                 nameof(ApplicationRole), role.Name, role.Id
                 );
         }
 
-        var user = await Users.FindAsync(AppGuids.User.CalendarGuy);
+        var user = await Users.FindAsync(AppGuids.User.CalendarGuy).ConfigureAwait(false);
         if (user == null)
         {
             var email = "CalendarGuy@company.com";
@@ -72,16 +74,16 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
                 PasswordHash = hasher.HashPassword(user!, "Calend@rGuy!"),
                 Surname = "Guy",
                 UserName = email
-            }.SetClaims([role.Id]);
+            }.SetClaims<ApplicationUser>([role.Id]);
 
-            await Users.AddAsync(user);
+            await Users.AddAsync(user).ConfigureAwait(false);
             logger.LogInformation(
                 "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
                 nameof(ApplicationUser), user.Email, user.Id
                 );
         }
 
-        role = await Roles.FindAsync(AppGuids.Role.DocumentManager);
+        role = await Roles.FindAsync(AppGuids.Role.DocumentManager).ConfigureAwait(false);
         if (role == null)
         {
             role = new ApplicationRole
@@ -90,16 +92,16 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
                 Name = nameof(AppGuids.Role.DocumentManager),
                 Description = "DocumentManagers are responsible for managing the company's documents.",
                 NormalizedName = normalizer.NormalizeName(nameof(AppGuids.Role.DocumentManager))
-            }.SetClaims(AppClaims.Document.DefinedClaims);
+            }.SetClaims<ApplicationRole>(AppClaims.Document.DefinedClaims);
 
-            await Roles.AddAsync(role);
+            await Roles.AddAsync(role).ConfigureAwait(false);
             logger.LogInformation(
                 "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
                 nameof(ApplicationRole), role.Name, role.Id
                 );
         }
 
-        user = await Users.FindAsync(AppGuids.User.DocumentGuy);
+        user = await Users.FindAsync(AppGuids.User.DocumentGuy).ConfigureAwait(false);
         if (user == null)
         {
             var email = "DocumentGuy@company.com";
@@ -116,22 +118,24 @@ public class ApplicationDbContext : AuthUiContext<ApplicationUser, ApplicationRo
                 PasswordHash = hasher.HashPassword(user!, "D0cumentGuy!"),
                 Surname = "Guy",
                 UserName = email
-            }.SetClaims([role.Id]);
+            }.SetClaims<ApplicationUser>([role.Id]);
 
-            await Users.AddAsync(user);
+            await Users.AddAsync(user).ConfigureAwait(false);
             logger.LogInformation(
                 "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
                 nameof(ApplicationUser), user.Email, user.Id
                 );
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            await SaveChangesAsync();
+            await SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "SaveChangesAsync() method failed.");
         }
+#pragma warning restore CA1031 // Do not catch general exception types
     }
 }

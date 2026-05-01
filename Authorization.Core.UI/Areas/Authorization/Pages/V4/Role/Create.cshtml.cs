@@ -53,6 +53,6 @@ internal class CreateModel<
 
     public override async Task<IActionResult> OnPostAsync(string hfClaimList)
     {
-        return await _createHandler.OnPostAsync(RoleModel, this, hfClaimList);
+        return await _createHandler.OnPostAsync(RoleModel, this, hfClaimList).ConfigureAwait(false);
     }
 }

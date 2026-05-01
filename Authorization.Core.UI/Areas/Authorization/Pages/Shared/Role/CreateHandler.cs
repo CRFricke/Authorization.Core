@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CA1716 // Identifiers should not match keywords
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.Role;
@@ -85,7 +86,7 @@ internal class CreateHandler<
 
         var role = CreateRole(roleModel);
 
-        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Create));
+        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Create)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not create Role:");
@@ -99,10 +100,11 @@ internal class CreateHandler<
             return modelBase.Page();
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.Roles.Add(role);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -116,6 +118,7 @@ internal class CreateHandler<
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         modelBase.SendNotification(
             _notificationReceiver, Severity.Normal,
@@ -140,7 +143,7 @@ internal class CreateHandler<
             Description = model.Description,
             Name = model.Name,
             NormalizedName = normalizer.NormalizeName(model.Name)
-        }.SetClaims(model.GetAssignedClaims());
+        }.SetClaims<TRole>(model.GetAssignedClaims());
 
         return role;
     }

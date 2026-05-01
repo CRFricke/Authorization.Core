@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
+using System.Globalization;
 using System.Security.Claims;
 
 using AuthorizationFailure = CRFricke.Authorization.Core.AuthorizationFailure;
@@ -24,7 +25,7 @@ public class AuthorizationManagerTests
     private static readonly Claim[] emptyClaims = [];
 
     [Fact(DisplayName = "AuthorizeAsync returns NoUserId")]
-    public async Task AuthorizationManagerTest01Async()
+    public async Task Test01Async()
     {
         var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Read);
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -40,11 +41,11 @@ public class AuthorizationManagerTests
 
         Assert.False(result.Succeeded);
         Assert.Equal(AuthorizationFailure.Reason.NoUserId, result.Failure!.FailureReason);
-        Assert.Equal(appClaimRequirement.ClaimValues, result.Failure.FailingClaims);
+        Assert.Equal(appClaimRequirement.ClaimValues.Order(), result.Failure.FailingClaims!.Order());
     }
 
     [Fact(DisplayName = "AuthorizeAsync returns NotAuthorized")]
-    public async Task AuthorizationManagerTest02Async()
+    public async Task Test02Async()
     {
         var user = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole() { Name = "RoleManager" };
@@ -81,11 +82,11 @@ public class AuthorizationManagerTests
 
         Assert.False(result.Succeeded);
         Assert.Equal(AuthorizationFailure.Reason.NotAuthorized, result.Failure!.FailureReason);
-        Assert.Equal(appClaimRequirement.ClaimValues, result.Failure!.FailingClaims);
+        Assert.Equal(appClaimRequirement.ClaimValues.Order(), result.Failure!.FailingClaims!.Order());
     }
 
     [Fact(DisplayName = "AuthorizeAsync returns Succeeded for Administrator")]
-    public async Task AuthorizationManagerTest03Async()
+    public async Task Test03Async()
     {
         var user = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole() { Name = "Administrator" };
@@ -117,7 +118,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync returns Succeeded")]
-    public async Task AuthorizationManagerTest04Async()
+    public async Task Test04Async()
     {
         var user = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole() { Name = "RoleManager" };
@@ -157,7 +158,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync loads UserRoleCache")]
-    public async Task AuthorizationManagerTest05Async()
+    public async Task Test05Async()
     {
         var user = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole() { Id = SysGuids.Role.Administrator, Name = nameof(SysGuids.Role.Administrator) };
@@ -201,7 +202,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync returns ArgumentException")]
-    public async Task AuthorizationManagerTest07Async()
+    public async Task Test07Async()
     {
         var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Read);
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -214,16 +215,16 @@ public class AuthorizationManagerTests
 
         var authorizationManager = new AuthorizationManager<AppUser, AppRole>(serviceProvider, logger);
         var ex = await Record.ExceptionAsync(async () =>
-            await authorizationManager.AuthorizeAsync(claimsPrincipal, Guid.Empty.ToString(), appClaimRequirement)
+            await authorizationManager.AuthorizeAsync(claimsPrincipal, Guid.Empty.ToString(), appClaimRequirement).ConfigureAwait(false)
             );
 
         Assert.NotNull(ex);
         Assert.IsType<ArgumentException>(ex);
-        Assert.Contains($"does not implement {nameof(IRequiresAuthorization)} interface", ex.Message);
+        Assert.Contains($"does not implement {nameof(IRequiresAuthorization)} interface", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "RefreshUser removes UserRoleCache entry")]
-    public void AuthorizationManagerTest08()
+    public void Test08()
     {
         object? cacheKey = null;
         var user = new AppUser("TestUser@StEmilian.com");
@@ -245,7 +246,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "RefreshRole removes RoleClaimCache entry")]
-    public void AuthorizationManagerTest09()
+    public void Test09()
     {
         object? cacheKey = null;
         var role = new AppRole() { Name = "RoleManager" };
@@ -267,7 +268,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync [User] returns Succeeded for Administrator")]
-    public async Task AuthorizationManagerTest10Async()
+    public async Task Test10Async()
     {
         var user = new AppUser("TestUser@StEmilian.com");
         var newUser = new AppUser("NewUser@StEmilian.com");
@@ -299,7 +300,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync [User] returns Elevation for adding Administrator role")]
-    public async Task AuthorizationManagerTest11Async()
+    public async Task Test11Async()
     {
         var principal = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole { Id = SysGuids.Role.Administrator, Name = nameof(SysGuids.Role.Administrator) };
@@ -352,11 +353,11 @@ public class AuthorizationManagerTests
 
         Assert.False(result.Succeeded);
         Assert.Equal(AuthorizationFailure.Reason.Elevation, result.Failure!.FailureReason);
-        Assert.Equal(expectedClaims, result.Failure!.FailingClaims);
+        Assert.Equal(expectedClaims.Order(), result.Failure!.FailingClaims!.Order());
     }
 
     [Fact(DisplayName = "AuthorizeAsync [User] returns Elevation")]
-    public async Task AuthorizationManagerTest12Async()
+    public async Task Test12Async()
     {
         var principal = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole { Id = TestGuids.Role.RoleManager, Name = nameof(TestGuids.Role.RoleManager) };
@@ -411,11 +412,11 @@ public class AuthorizationManagerTests
 
         Assert.False(result.Succeeded);
         Assert.Equal(AuthorizationFailure.Reason.Elevation, result.Failure!.FailureReason);
-        Assert.Equal(expectedClaims, result.Failure.FailingClaims);
+        Assert.Equal(expectedClaims.Order(), result.Failure.FailingClaims!.Order());
     }
 
     [Fact(DisplayName = "AuthorizeAsync [User] returns Succeeded")]
-    public async Task AuthorizationManagerTest13Async()
+    public async Task Test13Async()
     {
         var principal = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole { Id = TestGuids.Role.UserManager, Name = nameof(TestGuids.Role.UserManager) };
@@ -471,7 +472,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync [Role] returns Succeeded for Administrator")]
-    public async Task AuthorizationManagerTest14Async()
+    public async Task Test14Async()
     {
         var principal = new AppUser("TestUser@StEmilian.com");
         var role = new AppRole { Name = "NewRole" };
@@ -503,7 +504,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AuthorizeAsync [Role] returns Elevation")]
-    public async Task AuthorizationManagerTest15Async()
+    public async Task Test15Async()
     {
         var principal = new AppUser("TestUser@StEmilian.com");
         var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Create);
@@ -554,11 +555,11 @@ public class AuthorizationManagerTests
 
         Assert.False(result.Succeeded);
         Assert.Equal(AuthorizationFailure.Reason.Elevation, result.Failure!.FailureReason);
-        Assert.Equal(expectedClaims, result.Failure.FailingClaims);
+        Assert.Equal(expectedClaims.Order(), result.Failure.FailingClaims!.Order());
     }
 
     [Fact(DisplayName = "AuthorizeAsync [Role] returns Succeeded")]
-    public async Task AuthorizationManagerTest16Async()
+    public async Task Test16Async()
     {
         var principal = new AppUser("TestUser@StEmilian.com");
         var appClaimRequirement = new AppClaimRequirement(SysClaims.Role.Create);
@@ -610,7 +611,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "IsAuthorized returns True")]
-    public async Task AuthorizationManagerTest17Async()
+    public async Task Test17Async()
     {
         var role = new AppRole { Id = TestGuids.Role.UserManager, Name = nameof(TestGuids.Role.UserManager) };
         var roleClaimCache = new Mock<RoleClaimCache>();
@@ -647,7 +648,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "IsAuthorized returns False")]
-    public async Task AuthorizationManagerTest18Async()
+    public async Task Test18Async()
     {
         var role = new AppRole { Id = TestGuids.Role.UserManager, Name = nameof(TestGuids.Role.UserManager) };
         var roleClaimCache = new Mock<RoleClaimCache>();
@@ -684,7 +685,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AppClaimRequirementProvider returns valid AuthorizationPolicy")]
-    public async Task AuthorizationManagerTest19Async()
+    public async Task Test19Async()
     {
         var attribute = new RequiresClaimsAttribute(SysClaims.Role.Read);
 
@@ -700,7 +701,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [User] fails delete request for system user")]
-    public async Task AuthorizationManagerTest20Async()
+    public async Task Test20Async()
     {
         var principal = new AppUser("UserManager@StEmilian.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -732,15 +733,15 @@ public class AuthorizationManagerTests
         Assert.False(authContext.HasSucceeded);
         Assert.Equal(1,logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
-        Assert.Contains(typeof(AppUser).Name, logger.LatestRecord.Message);
-        Assert.Contains(resource.UserName!, logger.LatestRecord.Message);
-        Assert.Contains(principal.UserName!, logger.LatestRecord.Message);
-        Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
+        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(typeof(AppUser).Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(resource.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(principal.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains("restricted operation on system", logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [User] fails claim update request for system user")]
-    public async Task AuthorizationManagerTest21Async()
+    public async Task Test21Async()
     {
         var principal = new AppUser("UserManager@StEmilian.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -772,15 +773,15 @@ public class AuthorizationManagerTests
         Assert.False(authContext.HasSucceeded);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
-        Assert.Contains(typeof(AppUser).Name, logger.LatestRecord.Message);
-        Assert.Contains(resource.UserName!, logger.LatestRecord.Message);
-        Assert.Contains(principal.UserName!, logger.LatestRecord.Message);
-        Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
+        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(typeof(AppUser).Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(resource.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(principal.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains("restricted operation on system", logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [User] allows update request for non-system user")]
-    public async Task AuthorizationManagerTest22Async()
+    public async Task Test22Async()
     {
         var resource = new AppUser("ExistingUser@StEmilian.com");
         var principal = new AppUser("UserManager@StEmilian.com");
@@ -837,7 +838,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [Role] fails delete request for system role")]
-    public async Task AuthorizationManagerTest23Async()
+    public async Task Test23Async()
     {
         var principal = new AppUser("UserManager@StEmilian.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -869,15 +870,15 @@ public class AuthorizationManagerTests
         Assert.False(authContext.HasSucceeded);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
-        Assert.Contains(typeof(AppRole).Name, logger.LatestRecord.Message);
-        Assert.Contains(resource.Name, logger.LatestRecord.Message);
-        Assert.Contains(principal.UserName!, logger.LatestRecord.Message);
-        Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
+        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(typeof(AppRole).Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(resource.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(principal.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains("restricted operation on system", logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [Role] fails claim update request for system role")]
-    public async Task AuthorizationManagerTest24Async()
+    public async Task Test24Async()
     {
         var principal = new AppUser("UserManager@StEmilian.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -909,15 +910,15 @@ public class AuthorizationManagerTests
         Assert.False(authContext.HasSucceeded);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message);
-        Assert.Contains(typeof(AppRole).Name, logger.LatestRecord.Message);
-        Assert.Contains(resource.Name, logger.LatestRecord.Message);
-        Assert.Contains(principal.UserName!, logger.LatestRecord.Message);
-        Assert.Contains("restricted operation on system", logger.LatestRecord.Message);
+        Assert.Contains(appClaimRequirement.ToString(), logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(typeof(AppRole).Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(resource.Name, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains(principal.UserName!, logger.LatestRecord.Message, StringComparison.Ordinal);
+        Assert.Contains("restricted operation on system", logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [Role] allows update request for non-system role")]
-    public async Task AuthorizationManagerTest25Async()
+    public async Task Test25Async()
     {
         var resource = new AppRole() { Name = "ExistingRole" };
         var principal = new AppUser("RoleManager@StEmilian.com");
@@ -964,7 +965,7 @@ public class AuthorizationManagerTests
     }
 
     [Fact(DisplayName = "AppClaimRequirementHandler [Role] only returns failing claims.")]
-    public async Task AuthorizationManagerTest26Async()
+    public async Task Test26Async()
     {
         var principal = new AppUser("RoleManager@StEmilian.com");
         var claimsPrincipal = Mock.Of<ClaimsPrincipal>(cp =>
@@ -1004,6 +1005,6 @@ public class AuthorizationManagerTests
         Assert.False(authContext.HasSucceeded);
         Assert.Equal(1, logger.Collector.Count);
         Assert.Equal(LogLevel.Information, logger.LatestRecord.Level);
-        Assert.DoesNotContain(SysClaims.Role.Read, logger.LatestRecord.Message);
+        Assert.DoesNotContain(SysClaims.Role.Read, logger.LatestRecord.Message, StringComparison.Ordinal);
     }
 }

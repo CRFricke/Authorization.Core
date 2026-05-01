@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CA1716 // Identifiers should not match keywords
+#pragma warning disable CA1724 // Type names should not match namespaces
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace CRFricke.Authorization.Core.UI.Pages.Shared.User;
@@ -57,7 +59,7 @@ internal class CreateHandler<
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnGetAsync(UserModel userModel, ModelBase modelBase)
     {
-        await userModel.InitRoleInfoAsync(_repository);
+        await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false);
         return modelBase.Page();
     }
 
@@ -74,7 +76,7 @@ internal class CreateHandler<
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
-        (await userModel.InitRoleInfoAsync(_repository))
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
             .SetAssignedClaims(hfRoleList?.Split(',') ?? []);
 
         if (!modelState.IsValid)
@@ -85,7 +87,7 @@ internal class CreateHandler<
         var user = new TUser();
         userModel.UpdateUser(user);
 
-        var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.Create));
+        var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.Create)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not create User:");
@@ -99,7 +101,7 @@ internal class CreateHandler<
             return modelBase.Page();
         }
 
-        var identityResult = await ValidPasswordAsync(user, userModel.Password);
+        var identityResult = await ValidPasswordAsync(user, userModel.Password).ConfigureAwait(false);
         if (!identityResult.Succeeded)
         {
             foreach (var error in identityResult.Errors)
@@ -112,10 +114,11 @@ internal class CreateHandler<
 
         user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, userModel.Password);
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.Users.Add(user);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -129,6 +132,7 @@ internal class CreateHandler<
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         modelBase.SendNotification(
             _notificationReceiver, Severity.Normal,
@@ -168,7 +172,7 @@ internal class CreateHandler<
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("User password validation failed: {errors}.", string.Join(";", errors?.Select(e => e.Code) ?? []));
+                _logger.LogDebug("User password validation failed: {Errors}.", string.Join(";", errors?.Select(e => e.Code) ?? []));
             }
             return IdentityResult.Failed([.. errors!]);
         }

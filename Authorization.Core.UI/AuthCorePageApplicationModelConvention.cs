@@ -26,7 +26,7 @@ internal class AuthCorePageApplicationModelConvention<TUser, TRole> : IPageAppli
 
         if (attribute.Type.GetGenericArguments().Length == 1)
         {
-            var typeArg = pam.ModelType!.Namespace!.EndsWith(".User") ? typeof(TUser) : typeof(TRole);
+            var typeArg = pam.ModelType!.Namespace!.EndsWith(".User", StringComparison.Ordinal) ? typeof(TUser) : typeof(TRole);
 
             pam.ModelType = attribute.Type.MakeGenericType(typeArg).GetTypeInfo();
             return;

@@ -51,12 +51,12 @@ internal class DeleteModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         UserModel = new();
-        return await _deleteHandler.OnGetAsync(UserModel, this, id);
+        return await _deleteHandler.OnGetAsync(UserModel, this, id).ConfigureAwait(false);
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public override async Task<IActionResult> OnPostAsync(string id)
     {
-        return await _deleteHandler.OnPostAsync(UserModel, this, id);
+        return await _deleteHandler.OnPostAsync(UserModel, this, id).ConfigureAwait(false);
     }
 }

@@ -29,14 +29,14 @@ public class RoleAuthorizationHandler<TRole> : IResourceAuthorizationHandler<TRo
         // Principal.UserId() is verified before the ResourceAuthorizationHandler is called.
         var principalId = context.Principal.UserId()!;
 
-        var principalRoles = await context.AuthorizationServices.GetUserRolesAsync(principalId);
+        var principalRoles = await context.AuthorizationServices.GetUserRolesAsync(principalId).ConfigureAwait(false);
         if (principalRoles.Contains(SysGuids.Role.Administrator))
         {
             return AuthorizationResult.Success();
         }
 
-        var principalClaims = await context.AuthorizationServices.GetRoleClaimsAsync(principalRoles);
-        var roleClaims = await context.AuthorizationServices.GetRoleClaimsAsync(role.Id);
+        var principalClaims = await context.AuthorizationServices.GetRoleClaimsAsync(principalRoles).ConfigureAwait(false);
+        var roleClaims = await context.AuthorizationServices.GetRoleClaimsAsync(role.Id).ConfigureAwait(false);
 
         if (roleClaims.IsSubsetOf(principalClaims))
         {

@@ -1,18 +1,20 @@
 ﻿using CRFricke.Authorization.Core;
 
 #pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1515 // Consider making public types internal
+#pragma warning disable CA1724 // Type names should not match namespaces
 
 namespace Authorization.Core.UI.Test.Web;
 
 /// <summary>
 /// Defines the Guids used by the application.
 /// </summary>
-public class AppGuids
+public sealed class AppGuids
 {
     /// <summary>
     /// The Guids of the application's default roles.
     /// </summary>
-    public class Role : IDefinesGuids
+    public sealed class Role : IDefinesGuids
     {
         /// <summary>
         /// The Guid assigned to the CalendarManager role.
@@ -27,19 +29,19 @@ public class AppGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for role entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids =
+        public static readonly IReadOnlyCollection<string> DefinedGuids =
         [
             CalendarManager, DocumentManager
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
+        IReadOnlyCollection<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 
     /// <summary>
     /// The Guids of the application's default users.
     /// </summary>
-    public class User : IDefinesGuids
+    public sealed class User : IDefinesGuids
     {
         /// <summary>
         /// The Guid assigned to the <see cref="CalendarGuy"/> user account.
@@ -54,13 +56,13 @@ public class AppGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for user entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids =
+        public static readonly IReadOnlyCollection<string> DefinedGuids =
         [
             CalendarGuy, DocumentGuy
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
+        IReadOnlyCollection<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 
 }

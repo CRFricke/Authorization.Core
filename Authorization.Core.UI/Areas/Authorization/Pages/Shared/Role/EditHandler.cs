@@ -58,7 +58,7 @@ internal class EditHandler<
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (role == null)
         {
@@ -101,7 +101,7 @@ internal class EditHandler<
 
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
-            .FirstOrDefaultAsync(m => m.Id == roleModel.Id);
+            .FirstOrDefaultAsync(m => m.Id == roleModel.Id).ConfigureAwait(false);
 
         if (role == null)
         {
@@ -118,7 +118,7 @@ internal class EditHandler<
 
         if (roleModel.ClaimsUpdated)
         {
-            var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.UpdateClaims));
+            var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.UpdateClaims)).ConfigureAwait(false);
             if (!result.Succeeded)
             {
                 modelState.AddModelError(string.Empty, "Can not update Role:");
@@ -143,9 +143,10 @@ internal class EditHandler<
             }
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            rowsUpdated = await _repository.SaveChangesAsync();
+            rowsUpdated = await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -159,6 +160,7 @@ internal class EditHandler<
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         if (rowsUpdated > 0)
         {

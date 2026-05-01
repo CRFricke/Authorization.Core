@@ -10,46 +10,47 @@ namespace CRFricke.Authorization.Core.UI;
 
 public static class IdentityBuilderExtensions
 {
-    /// <summary>
-    /// Adds a default, self contained, UI for managing the User and Role entities exposed by the Authorization.Core package.
-    /// </summary>
-    /// <param name="builder">The <see cref="IdentityBuilder"/>.</param>
-    /// <returns>The same <see cref="IdentityBuilder"/> so multiple calls can be chained.</returns>
-    public static IdentityBuilder AddAuthorizationCoreUI(this IdentityBuilder builder)
+    extension(IdentityBuilder builder)
     {
-        return AddAuthorizationCoreUI(builder, o => { });
-    }
+        /// <summary>
+        /// Adds a default, self contained, UI for managing the User and Role entities exposed by the Authorization.Core package.
+        /// </summary>
+        /// <returns>The same <see cref="IdentityBuilder"/> so multiple calls can be chained.</returns>
+        public IdentityBuilder AddAuthorizationCoreUI()
+        {
+            return AddAuthorizationCoreUI(builder, o => { });
+        }
 
-    /// <summary>
-    /// Adds a default, self contained, UI for managing the User and Role entities exposed by the Authorization.Core package.
-    /// </summary>
-    /// <param name="builder">The <see cref="IdentityBuilder"/>.</param>
-    /// <param name="configUIOptions">Configures the <see cref="AuthCoreUIOptions"/></param>
-    /// <returns>The same <see cref="IdentityBuilder"/> so multiple calls can be chained.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown when the <see cref="ApplicationPartManager"/> service cannot be loaded. The service should be added 
-    /// during processing of the .AddDefaultIdentity statement.
-    /// </exception>
-    public static IdentityBuilder AddAuthorizationCoreUI(this IdentityBuilder builder, Action<AuthCoreUIOptions> configUIOptions)
-    {
-        var roleType = builder.RoleType ?? typeof(IdentityUserRole<string>);
+        /// <summary>
+        /// Adds a default, self contained, UI for managing the User and Role entities exposed by the Authorization.Core package.
+        /// </summary>
+        /// <param name="configUIOptions">Configures the <see cref="AuthCoreUIOptions"/></param>
+        /// <returns>The same <see cref="IdentityBuilder"/> so multiple calls can be chained.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the <see cref="ApplicationPartManager"/> service cannot be loaded. The service should be added 
+        /// during processing of the .AddDefaultIdentity statement.
+        /// </exception>
+        public IdentityBuilder AddAuthorizationCoreUI(Action<AuthCoreUIOptions> configUIOptions)
+        {
+            var roleType = builder.RoleType ?? typeof(IdentityUserRole<string>);
 
-        builder.Services.Configure(configUIOptions);
+            builder.Services.Configure(configUIOptions);
 
-        builder.Services.ConfigureOptions(
-            typeof(ConfigureAuthCoreUIRazorOptions<,>).MakeGenericType(builder.UserType, roleType)
-            );
+            builder.Services.ConfigureOptions(
+                typeof(ConfigureAuthCoreUIRazorOptions<,>).MakeGenericType(builder.UserType, roleType)
+                );
 
-        var partManager = GetService<ApplicationPartManager>(builder.Services)
-            ?? throw new InvalidOperationException($"Could not load {nameof(ApplicationPartManager)} service.");
+            var partManager = GetService<ApplicationPartManager>(builder.Services)
+                ?? throw new InvalidOperationException($"Could not load {nameof(ApplicationPartManager)} service.");
 
-        TryAddApplicationParts(partManager);
+            TryAddApplicationParts(partManager);
 
-        partManager.FeatureProviders.Add(
-            new ViewVersionFeatureProvider(DetermineUIFramework(builder.Services))
-            );
+            partManager.FeatureProviders.Add(
+                new ViewVersionFeatureProvider(DetermineUIFramework(builder.Services))
+                );
 
-        return builder;
+            return builder;
+        }
     }
 
     /// <summary>
@@ -211,7 +212,7 @@ public static class IdentityBuilderExtensions
                     switch (_framework)
                     {
                         case UIFramework.Bootstrap4:
-                            if (descriptor.Type?.FullName?.Contains("V5") ?? false)
+                            if (descriptor.Type?.FullName?.Contains("V5", StringComparison.Ordinal) ?? false)
                             {
                                 // Remove V5 views
                                 viewsToRemove.Add(descriptor);
@@ -219,11 +220,11 @@ public static class IdentityBuilderExtensions
                             else
                             {
                                 // Fix up paths to eliminate version subdir
-                                descriptor.RelativePath = descriptor.RelativePath.Replace("V4/", "");
+                                descriptor.RelativePath = descriptor.RelativePath.Replace("V4/", "", StringComparison.Ordinal);
                             }
                             break;
                         case UIFramework.Bootstrap5:
-                            if (descriptor.Type?.FullName?.Contains("V4") ?? false)
+                            if (descriptor.Type?.FullName?.Contains("V4", StringComparison.Ordinal) ?? false)
                             {
                                 // Remove V4 views
                                 viewsToRemove.Add(descriptor);
@@ -231,7 +232,7 @@ public static class IdentityBuilderExtensions
                             else
                             {
                                 // Fix up paths to eliminate version subdir
-                                descriptor.RelativePath = descriptor.RelativePath.Replace("V5/", "");
+                                descriptor.RelativePath = descriptor.RelativePath.Replace("V5/", "", StringComparison.Ordinal);
                             }
                             break;
                         default:

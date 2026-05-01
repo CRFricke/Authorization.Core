@@ -1,18 +1,20 @@
 ﻿using CRFricke.Authorization.Core;
 
 #pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1515 // Consider making public types internal
+#pragma warning disable CA1724 // Type names should not match namespaces
 
 namespace Authorization.Core.UI.Test.Web;
 
 /// <summary>
 /// Defines the Claims used by the application.
 /// </summary>
-public class AppClaims
+public sealed class AppClaims
 {
     /// <summary>
     /// Defines the claims required to manipulate Calendar events.
     /// </summary>
-    public class Calendar : IDefinesClaims
+    public sealed class Calendar : IDefinesClaims
     {
         /// <summary>
         /// The user can create CalendarEvent entities.
@@ -42,19 +44,19 @@ public class AppClaims
         /// <summary>
         /// Returns a list of all Claims defined for Calendar entities.
         /// </summary>
-        public static readonly List<string> DefinedClaims =
+        public static readonly IReadOnlyCollection<string> DefinedClaims =
         [
             Create, Delete, Read, Update, List
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesClaims.DefinedClaims => DefinedClaims;
+        IReadOnlyCollection<string> IDefinesClaims.DefinedClaims => DefinedClaims;
     }
 
     /// <summary>
     /// Defines the claims required to manipulate Documents.
     /// </summary>
-    public class Document : IDefinesClaims
+    public sealed class Document : IDefinesClaims
     {
         /// <summary>
         /// The user can upload Documents.
@@ -79,12 +81,12 @@ public class AppClaims
         /// <summary>
         /// Returns a list of all Claims defined for Document entities.
         /// </summary>
-        public static readonly List<string> DefinedClaims =
+        public static readonly IReadOnlyCollection<string> DefinedClaims =
         [
             Upload, Delete, Read, List
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesClaims.DefinedClaims => DefinedClaims;
+        IReadOnlyCollection<string> IDefinesClaims.DefinedClaims => DefinedClaims;
     }
 }

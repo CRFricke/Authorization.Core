@@ -11,7 +11,7 @@ public interface IRequiresAuthorization
     string Id { get; }
 
     /// <summary>
-    /// Tha name of the resource requiring authorization.
+    /// The name of the resource requiring authorization.
     /// </summary>
     string? Name { get; }
 }

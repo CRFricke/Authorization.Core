@@ -47,7 +47,7 @@ internal class DetailsHandler<
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (role == null)
         {

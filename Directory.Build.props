@@ -2,7 +2,7 @@
 
   <!-- Common properties for all projects -->
   <PropertyGroup>
-	<!--<AnalysisMode>All</AnalysisMode>-->
+	<AnalysisMode>All</AnalysisMode>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<LangVersion>latest</LangVersion>
 	<Nullable>enable</Nullable>

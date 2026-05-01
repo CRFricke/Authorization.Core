@@ -8,5 +8,5 @@ public interface IDefinesClaims
     /// <summary>
     /// Returns all Claims defined for a resource.
     /// </summary>
-    List<string> DefinedClaims { get; }
+    IReadOnlyCollection<string> DefinedClaims { get; }
 }

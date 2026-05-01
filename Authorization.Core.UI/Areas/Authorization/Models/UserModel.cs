@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 #pragma warning disable CA1034 // Nested types should not be visible
@@ -31,7 +32,7 @@ public class UserModel
 
         public override string ToString()
         {
-            return string.Format("{0}{1}",
+            return string.Format(CultureInfo.InvariantCulture, "{0}{1}",
                 Name, IsAssigned ? " (assigned)" : string.Empty
                 );
         }
@@ -105,6 +106,8 @@ public class UserModel
     /// <returns>The initialized <see cref="UserModel"/> object.</returns>
     public virtual UserModel InitFromUser<TUser>(TUser user) where TUser : AuthUiUser
     {
+        ArgumentNullException.ThrowIfNull(user);
+
         Id = user.Id;
         AccessFailedCount = user.AccessFailedCount;
         Email = user.Email!;
@@ -131,10 +134,12 @@ public class UserModel
         where TRole : AuthUiRole
         where TUser : AuthUiUser
     {
+        ArgumentNullException.ThrowIfNull(repository);
+
         Roles = await (
             from ar in repository.Roles
             select new RoleInfo { Description = ar.Description, Id = ar.Id, IsAssigned = false, Name = ar.Name }
-            ).ToArrayAsync();
+            ).ToArrayAsync().ConfigureAwait(false);
 
         return this;
     }
@@ -162,14 +167,18 @@ public class UserModel
     {
         VerifyRolesLoaded();
 
+        var rolesArray = roles.ToHashSet();
+
         foreach (var role in Roles!)
         {
-            role.IsAssigned = roles.Contains(role.Id);
+            role.IsAssigned = rolesArray.Contains(role.Id);
         }
     }
 
     public virtual void UpdateUser<TUser>(TUser user) where TUser : AuthUiUser
     {
+        ArgumentNullException.ThrowIfNull(user);
+
         var normalizer = new UpperInvariantLookupNormalizer();
 
         if (AccessFailedCount != user.AccessFailedCount)

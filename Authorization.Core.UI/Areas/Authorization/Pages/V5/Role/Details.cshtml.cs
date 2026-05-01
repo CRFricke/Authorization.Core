@@ -41,6 +41,6 @@ internal class DetailsModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         RoleModel = new RoleModel();
-        return await _detailsHandler.OnGetAsync(RoleModel, this, id);
+        return await _detailsHandler.OnGetAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 }

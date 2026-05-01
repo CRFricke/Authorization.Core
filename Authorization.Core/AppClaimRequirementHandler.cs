@@ -21,11 +21,13 @@ public class AppClaimRequirementHandler : AuthorizationHandler<AppClaimRequireme
     /// <inheritdoc/>
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AppClaimRequirement requirement, object resource)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         AuthorizationResult result;
 
         if (resource is not IRequiresAuthorization)
         {
-            result = await _authorizationManager.AuthorizeAsync(context.User, requirement);
+            result = await _authorizationManager.AuthorizeAsync(context.User, requirement).ConfigureAwait(false);
             if (result.Succeeded)
             {
                 context.Succeed(requirement);
@@ -34,7 +36,7 @@ public class AppClaimRequirementHandler : AuthorizationHandler<AppClaimRequireme
             return;
         }
 
-        result = await _authorizationManager.AuthorizeAsync(context.User, resource, requirement);
+        result = await _authorizationManager.AuthorizeAsync(context.User, resource, requirement).ConfigureAwait(false);
         if (result.Succeeded)
         {
             context.Succeed(requirement);

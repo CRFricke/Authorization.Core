@@ -35,7 +35,7 @@ internal class IndexHandler<
         return await _repository.Roles
             .AsNoTracking()
             .Select(ar => RoleInfo.Create(ar))
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
     }
 
 }

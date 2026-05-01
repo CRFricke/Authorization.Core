@@ -31,6 +31,8 @@ public class AppClaimRequirementProvider : IAuthorizationPolicyProvider
     /// <inheritdoc />
     public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
     {
+        ArgumentNullException.ThrowIfNull(policyName);
+
         if (RequiresClaimsAttribute.TryParse(policyName, out RequiresClaimsAttribute? requiresClaimsAttribute))
         {
             var policy = new AuthorizationPolicyBuilder();

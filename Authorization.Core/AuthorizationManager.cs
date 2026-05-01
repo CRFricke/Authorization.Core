@@ -151,12 +151,12 @@ public sealed class AuthorizationManager<
     /// <summary>
     /// Returns a list of all claims defined by the application.
     /// </summary>
-    List<string> IAuthorizationManager.DefinedClaims => DefinedClaims;
+    IReadOnlyCollection<string> IAuthorizationManager.DefinedClaims => DefinedClaims;
 
     /// <summary>
     /// Returns a list of all Guids defined by the application.
     /// </summary>
-    List<string> IAuthorizationManager.DefinedGuids => DefinedGuids;
+    IReadOnlyCollection<string> IAuthorizationManager.DefinedGuids => DefinedGuids;
 
 
 
@@ -174,7 +174,7 @@ public sealed class AuthorizationManager<
     {
         if (resource == null)
         {
-            return await AuthorizeAsync(principal, claimRequirement);
+            return await AuthorizeAsync(principal, claimRequirement).ConfigureAwait(false);
         }
 
         ArgumentNullException.ThrowIfNull(principal);
@@ -196,8 +196,8 @@ public sealed class AuthorizationManager<
         if (DefinedGuids.Contains(raResource.Id))
         {
             // Yes - fail requests for restricted claims
-            var failedClaims = claimRequirement.ClaimValues.Intersect(RestrictedClaims);
-            if (failedClaims.Any())
+            var failedClaims = claimRequirement.ClaimValues.Intersect(RestrictedClaims).ToList();
+            if (failedClaims.Count != 0)
             {
                 var userName = principal.UserName();
                 var resourceType = resource.GetType().Name;
@@ -211,7 +211,7 @@ public sealed class AuthorizationManager<
             }
         }
 
-        var result = await AuthorizeInternalAsync(principal, claimRequirement);
+        var result = await AuthorizeInternalAsync(principal, claimRequirement).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             return result;
@@ -226,7 +226,7 @@ public sealed class AuthorizationManager<
         {
             return await handler.HandleAsync(
                 new ResourceAuthorizationHandlerContext(this, raResource, principal, claimRequirement)
-                );
+                ).ConfigureAwait(false);
         }
 
         return result;
@@ -255,7 +255,7 @@ public sealed class AuthorizationManager<
             return AuthorizationResult.NoUserId(claimRequirement.ClaimValues);
         }
 
-        return await AuthorizeInternalAsync(principal, claimRequirement);
+        return await AuthorizeInternalAsync(principal, claimRequirement).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ public sealed class AuthorizationManager<
     {
         var userId = principal.UserId() ?? throw new InvalidOperationException("Specified ClaimsPrincipal does not have a 'NameIdentifier' Claim.");
 
-        var principalRoles = await GetUserRolesAsync(userId);
+        var principalRoles = await GetUserRolesAsync(userId).ConfigureAwait(false);
         if (principalRoles.Contains(SysGuids.Role.Administrator))
         {
             _logger.LogDebug(
@@ -280,7 +280,7 @@ public sealed class AuthorizationManager<
             return AuthorizationResult.Success();
         }
 
-        HashSet<string> principalClaims = await GetRoleClaimsAsync(principalRoles);
+        HashSet<string> principalClaims = await GetRoleClaimsAsync(principalRoles).ConfigureAwait(false);
         if (claimRequirement.ClaimValues.IsSubsetOf(principalClaims))
         {
             _logger.LogDebug(
@@ -306,7 +306,7 @@ public sealed class AuthorizationManager<
 
         foreach (var roleId in roleIds)
         {
-            claimHash.UnionWith(await GetRoleClaimsAsync(roleId));
+            claimHash.UnionWith(await GetRoleClaimsAsync(roleId).ConfigureAwait(false));
         }
 
         return claimHash;
@@ -331,7 +331,7 @@ public sealed class AuthorizationManager<
                 dbContext.Set<IdentityRoleClaim<string>>()
                 .Where(rc => rc.RoleId == roleId && rc.ClaimType == SysClaims.ClaimType)
                 .Select(rc => rc.ClaimValue!)
-                .ToArrayAsync()
+                .ToArrayAsync().ConfigureAwait(false)
                 ).ToHashSet();
 
             roleClaimCache.Set(
@@ -363,7 +363,7 @@ public sealed class AuthorizationManager<
             from ar in dbContext.Set<TRole>()
             where roleNames.Contains(ar.Name)
             select ar.Id
-            ).ToArrayAsync()).ToHashSet();
+            ).ToArrayAsync().ConfigureAwait(false)).ToHashSet();
     }
 
     /// <summary>
@@ -387,7 +387,7 @@ public sealed class AuthorizationManager<
                 join ar in dbContext.Set<TRole>() on uc.ClaimValue equals ar.Id
                 where uc.UserId == userId && uc.ClaimType == ClaimTypes.Role
                 select ar.Id
-                ).ToArrayAsync()).ToHashSet();
+                ).ToArrayAsync().ConfigureAwait(false)).ToHashSet();
 
             userRoleCache.Set(
                 userId, hashSet,
@@ -408,7 +408,7 @@ public sealed class AuthorizationManager<
     /// </returns>
     public async Task<bool> IsAuthorizedAsync(ClaimsPrincipal principal, params string[] requiredClaims)
     {
-        var result = await AuthorizeAsync(principal, new AppClaimRequirement(requiredClaims));
+        var result = await AuthorizeAsync(principal, new AppClaimRequirement(requiredClaims)).ConfigureAwait(false);
         return result.Succeeded;
     }
 

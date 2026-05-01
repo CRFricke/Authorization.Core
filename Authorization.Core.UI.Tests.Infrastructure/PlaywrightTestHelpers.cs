@@ -1,6 +1,8 @@
 ﻿using Microsoft.Playwright;
 using System.Web;
 
+#pragma warning disable CA1054 // URI-like parameters should not be strings
+
 namespace Authorization.Core.UI.Tests.Infrastructure;
 
 public class PlaywrightTestHelpers(string baseUrl)
@@ -23,10 +25,10 @@ public class PlaywrightTestHelpers(string baseUrl)
             url += "?ReturnUrl=" + HttpUtility.UrlEncode(returnUrl);
         }
 
-        await page.GotoAsync(url);
-        await page.GetByPlaceholder("name@example.com").FillAsync(login.Email);
-        await page.GetByPlaceholder("password").FillAsync(login.Password);
-        await page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
+        await page.GotoAsync(url).ConfigureAwait(false);
+        await page.GetByPlaceholder("name@example.com").FillAsync(login.Email).ConfigureAwait(false);
+        await page.GetByPlaceholder("password").FillAsync(login.Password).ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -46,26 +48,26 @@ public class PlaywrightTestHelpers(string baseUrl)
         var password = "Test123!@#";
 
         // Register
-        await page.GotoAsync($"{baseUrl}/Identity/Account/Register");
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await page.GotoAsync($"{baseUrl}/Identity/Account/Register").ConfigureAwait(false);
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle).ConfigureAwait(false);
 
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync(userEmail);
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password", Exact = true }).FillAsync(password);
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Confirm Password" }).FillAsync(password);
-        await page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync();
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync(userEmail).ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password", Exact = true }).FillAsync(password).ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Confirm Password" }).FillAsync(password).ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync().ConfigureAwait(false);
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle).ConfigureAwait(false);
 
-        await page.GetByRole(AriaRole.Heading, new() { Name = "Register confirmation" }).IsVisibleAsync();
-        await page.GetByRole(AriaRole.Link, new() { Name = "Click here to confirm" }).ClickAsync();
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await page.GetByRole(AriaRole.Heading, new() { Name = "Register confirmation" }).IsVisibleAsync().ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Link, new() { Name = "Click here to confirm" }).ClickAsync().ConfigureAwait(false);
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle).ConfigureAwait(false);
 
-        await page.GotoAsync($"{baseUrl}/Identity/Account/Login");
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await page.GotoAsync($"{baseUrl}/Identity/Account/Login").ConfigureAwait(false);
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle).ConfigureAwait(false);
 
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync(userEmail);
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync(password);
-        await page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync(userEmail).ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync(password).ConfigureAwait(false);
+        await page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync().ConfigureAwait(false);
 
-        await page.WaitForURLAsync(baseUrl, new() { Timeout = 10_000 });
+        await page.WaitForURLAsync(baseUrl, new() { Timeout = 10_000 }).ConfigureAwait(false);
     }
 }

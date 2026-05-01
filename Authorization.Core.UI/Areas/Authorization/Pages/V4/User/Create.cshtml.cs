@@ -54,12 +54,12 @@ internal class CreateModel<
     public override async Task<IActionResult> OnGetAsync()
     {
         UserModel = new UserModel();
-        return await _createHandler.OnGetAsync(UserModel, this);
+        return await _createHandler.OnGetAsync(UserModel, this).ConfigureAwait(false);
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public override async Task<IActionResult> OnPostAsync(string hfRoleList)
     {
-        return await _createHandler.OnPostAsync(UserModel, this, hfRoleList);
+        return await _createHandler.OnPostAsync(UserModel, this, hfRoleList).ConfigureAwait(false);
     }
 }

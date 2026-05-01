@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
-using System.Collections.Generic;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 
@@ -37,5 +35,5 @@ public class ModelBase : PageModel
         base.OnPageHandlerExecuting(context);
     }
 
-    public List<Notification>? Notifications { get; private set; }
+    public IList<Notification>? Notifications { get; private set; }
 }

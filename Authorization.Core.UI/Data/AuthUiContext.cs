@@ -79,12 +79,12 @@ public class AuthUiContext<
     /// <inheritdoc/>
     public override async Task SeedDatabaseAsync(IServiceProvider serviceProvider)
     {
-        await base.SeedDatabaseAsync(serviceProvider);
+        await base.SeedDatabaseAsync(serviceProvider).ConfigureAwait(false);
 
         var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthUiContext>();
 
-        var role = await Roles.FindAsync(SysGuids.Role.Administrator);
+        var role = await Roles.FindAsync(SysGuids.Role.Administrator).ConfigureAwait(false);
         if (role != null)
         {
             if (role.Description == null)
@@ -99,7 +99,7 @@ public class AuthUiContext<
             }
         }
 
-        role = await Roles.FindAsync(SysUiGuids.Role.RoleManager);
+        role = await Roles.FindAsync(SysUiGuids.Role.RoleManager).ConfigureAwait(false);
         if (role == null)
         {
             role = new TRole
@@ -109,16 +109,16 @@ public class AuthUiContext<
                 Description = "RoleManagers are responsible for managing the application's Roles.",
                 NormalizedName = normalizer.NormalizeName(nameof(SysUiGuids.Role.RoleManager))
             };
-            ((AuthUiRole)role).SetClaims(SysClaims.Role.DefinedClaims);
+            role.SetClaims<AuthUiRole>(SysClaims.Role.DefinedClaims);
 
-            await Roles.AddAsync(role);
+            await Roles.AddAsync(role).ConfigureAwait(false);
             logger.LogInformation(
                 "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
                 typeof(TRole).Name, role.Name, role.Id
                 );
         }
 
-        role = await Roles.FindAsync(SysUiGuids.Role.UserManager);
+        role = await Roles.FindAsync(SysUiGuids.Role.UserManager).ConfigureAwait(false);
         if (role == null)
         {
             role = new TRole
@@ -128,22 +128,24 @@ public class AuthUiContext<
                 Description = "UserManagers are responsible for managing the application's Users.",
                 NormalizedName = normalizer.NormalizeName(nameof(SysUiGuids.Role.UserManager))
             };
-            ((AuthUiRole)role).SetClaims(SysClaims.User.DefinedClaims);
+            role.SetClaims<AuthUiRole>(SysClaims.User.DefinedClaims);
 
-            await Roles.AddAsync(role);
+            await Roles.AddAsync(role).ConfigureAwait(false);
             logger.LogInformation(
                 "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
                 typeof(TRole).Name, role.Name, role.Id
                 );
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            await SaveChangesAsync();
+            await SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "SaveChangesAsync() method failed.");
         }
+#pragma warning restore CA1031 // Do not catch general exception types
     }
 }

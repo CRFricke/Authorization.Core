@@ -1,11 +1,13 @@
-﻿#pragma warning disable CA1034 // Nested types should not be visible
+﻿namespace CRFricke.Authorization.Core.UI;
 
-namespace CRFricke.Authorization.Core.UI;
+#pragma warning disable CA1033 // Interface methods should be callable by child types
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1724 // Type names should not match namespaces
 
 /// <summary>
 /// Defines the Guids used by the Authorization system UI.
 /// </summary>
-public class SysUiGuids
+public static class SysUiGuids
 {
     /// <summary>
     /// The Guids of the system Roles.
@@ -25,12 +27,12 @@ public class SysUiGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for Role entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids =
+        public static readonly IReadOnlyCollection<string> DefinedGuids =
         [
             RoleManager, UserManager
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
+        IReadOnlyCollection<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 }

@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CA1716 // Identifiers should not match keywords
+
 namespace CRFricke.Authorization.Core;
 
 /// <summary>
-/// Defines the <see cref="System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes" /> referenced by Entity Framework entities.
+/// Defines the <see cref="DynamicallyAccessedMemberTypes" /> referenced by Entity Framework entities.
 /// </summary>
 public partial interface IRepository
 {
@@ -14,13 +16,13 @@ public partial interface IRepository
     /// Specifies the types of members that are dynamically accessed.
     /// </summary>
     public const DynamicallyAccessedMemberTypes DynamicallyAccessedMemberTypes =
-        System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors
-        | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicConstructors
-        | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties
-        | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields
-        | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicProperties
-        | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicFields
-        | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces;
+        DynamicallyAccessedMemberTypes.PublicConstructors
+        | DynamicallyAccessedMemberTypes.NonPublicConstructors
+        | DynamicallyAccessedMemberTypes.PublicProperties
+        | DynamicallyAccessedMemberTypes.PublicFields
+        | DynamicallyAccessedMemberTypes.NonPublicProperties
+        | DynamicallyAccessedMemberTypes.NonPublicFields
+        | DynamicallyAccessedMemberTypes.Interfaces;
 }
 
 /// <summary>

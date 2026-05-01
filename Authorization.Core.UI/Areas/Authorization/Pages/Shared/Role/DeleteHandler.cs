@@ -60,7 +60,7 @@ internal class DeleteHandler<
         var role = await _repository.Roles
             .Include(ar => ar.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (role == null)
         {
@@ -72,7 +72,7 @@ internal class DeleteHandler<
         await roleModel
             .InitRoleClaims(_authManager)
             .InitFromRole(role)
-            .InitRoleUsersAsync(_repository);
+            .InitRoleUsersAsync(_repository).ConfigureAwait(false);
 
         return modelBase.Page();
     }
@@ -95,7 +95,7 @@ internal class DeleteHandler<
         var modelState = modelBase.ModelState;
         var principal = modelBase.User;
 
-        var role = await _repository.Roles.FindAsync(id);
+        var role = await _repository.Roles.FindAsync(id).ConfigureAwait(false);
         if (role == null)
         {
             modelBase.SendNotification(
@@ -109,7 +109,7 @@ internal class DeleteHandler<
         // Don't care about ModelState on Delete.
         modelState.Clear();
 
-        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Delete));
+        var result = await _authManager.AuthorizeAsync(principal, role, new AppClaimRequirement(SysClaims.Role.Delete)).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             modelState.AddModelError(string.Empty, "Can not delete Role:");
@@ -122,7 +122,7 @@ internal class DeleteHandler<
 
             await roleModel.InitRoleClaims(_authManager)
                 .InitFromRole(role)
-                .InitRoleUsersAsync(_repository);
+                .InitRoleUsersAsync(_repository).ConfigureAwait(false);
 
             return modelBase.Page();
         }
@@ -132,13 +132,14 @@ internal class DeleteHandler<
             join au in _repository.Users on uc.UserId equals au.Id
             where uc.ClaimType == ClaimTypes.Role && uc.ClaimValue == role.Name
             select uc
-            ).ToArrayAsync();
+            ).ToArrayAsync().ConfigureAwait(false);
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             _repository.UserClaims.RemoveRange(userClaims);
             _repository.Roles.Remove(role);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -152,10 +153,11 @@ internal class DeleteHandler<
 
             await roleModel.InitRoleClaims(_authManager)
                 .InitFromRole(role)
-                .InitRoleUsersAsync(_repository);
+                .InitRoleUsersAsync(_repository).ConfigureAwait(false);
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         // Remove any users that were assigned this role from the UserClaim cache
         foreach (var claim in userClaims)

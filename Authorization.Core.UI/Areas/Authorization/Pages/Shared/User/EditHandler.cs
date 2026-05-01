@@ -60,7 +60,7 @@ internal class EditHandler<
         var user = await _repository.Users
             .Include(au => au.Claims)
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -69,7 +69,7 @@ internal class EditHandler<
 
         userModel.IsSystemUser = _authManager.DefinedGuids.Contains(user.Id);
 
-        (await userModel.InitRoleInfoAsync(_repository))
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
             .InitFromUser(user);
 
         return modelBase.Page();
@@ -85,7 +85,7 @@ internal class EditHandler<
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public async Task<IActionResult> OnPostAsync(UserModel userModel, ModelBase modelBase, string hfRoleList)
     {
-        (await userModel.InitRoleInfoAsync(_repository))
+        (await userModel.InitRoleInfoAsync(_repository).ConfigureAwait(false))
             .SetAssignedClaims(hfRoleList?.Split(',') ?? []);
 
         var modelState = modelBase.ModelState;
@@ -98,7 +98,7 @@ internal class EditHandler<
 
         var user = await _repository.Users
             .Include(au => au.Claims)
-            .FirstOrDefaultAsync(m => m.Id == userModel.Id);
+            .FirstOrDefaultAsync(m => m.Id == userModel.Id).ConfigureAwait(false);
 
         if (user == null)
         {
@@ -115,7 +115,7 @@ internal class EditHandler<
 
         if (userModel.ClaimsUpdated)
         {
-            var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.UpdateClaims));
+            var result = await _authManager.AuthorizeAsync(principal, user, new AppClaimRequirement(SysClaims.User.UpdateClaims)).ConfigureAwait(false);
             if (!result.Succeeded)
             {
                 modelState.AddModelError(string.Empty, "Can not update User:");
@@ -152,9 +152,10 @@ internal class EditHandler<
             }
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            rowsUpdated = await _repository.SaveChangesAsync();
+            rowsUpdated = await _repository.SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -168,6 +169,7 @@ internal class EditHandler<
 
             return modelBase.Page();
         }
+#pragma warning restore CA1031 // Do not catch general exception types
 
         if (rowsUpdated > 0)
         {

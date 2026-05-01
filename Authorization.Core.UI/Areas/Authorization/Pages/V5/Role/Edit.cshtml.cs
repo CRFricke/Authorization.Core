@@ -48,11 +48,11 @@ internal class EditModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         RoleModel = new RoleModel();
-        return await _editHandler.OnGetAsync(RoleModel, this, id);
+        return await _editHandler.OnGetAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 
     public override async Task<IActionResult> OnPostAsync(string hfClaimList)
     {
-        return await _editHandler.OnPostAsync(RoleModel, this, hfClaimList);
+        return await _editHandler.OnPostAsync(RoleModel, this, hfClaimList).ConfigureAwait(false);
     }
 }

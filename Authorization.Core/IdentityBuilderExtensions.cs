@@ -12,65 +12,67 @@ namespace CRFricke.Authorization.Core;
 /// </summary>
 public static class IdentityBuilderExtensions
 {
-    /// <summary>
-    /// Adds AccessRight based authorization services to the <see cref="IServiceCollection"/>.
-    /// </summary>
-    /// <param name="builder">The <see cref="IdentityBuilder"/> instance this method extends.</param>
-    /// <param name="dbInitializationOption">
-    /// The <see cref="DbInitializationOption"/> to be used to initialize the database.
-    /// </param>
-    /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
-    [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2062:DynamicallyAccessedMembers", Justification = "AddScoped() 'implementationType' parameter is DBContext and always has available public constructor.")]
-    [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:DynamicallyAccessedMembers", Justification = "AuthorizationManager<,> & IRepository<,> definitions have required DynamicallyAccessedMembers attributes.")]
-    [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2076:DynamicallyAccessedMembers", Justification = "Type arguments are validated at runtime via VerifyTypeDerivesFrom to ensure they derive from required base types (AuthUser/AuthRole).")]
-    public static IdentityBuilder AddAccessRightBasedAuthorization(this IdentityBuilder builder, DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
+    extension(IdentityBuilder builder)
     {
-        Type contextType;
-
-        using (var serviceProvider = builder.Services.BuildServiceProvider())
+        /// <summary>
+        /// Adds AccessRight based authorization services to the <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="dbInitializationOption">
+        /// The <see cref="DbInitializationOption"/> to be used to initialize the database.
+        /// </param>
+        /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2062:DynamicallyAccessedMembers", Justification = "AddScoped() 'implementationType' parameter is DBContext and always has available public constructor.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2075:DynamicallyAccessedMembers", Justification = "AuthorizationManager<,> & IRepository<,> definitions have required DynamicallyAccessedMembers attributes.")]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2076:DynamicallyAccessedMembers", Justification = "Type arguments are validated at runtime via VerifyTypeDerivesFrom to ensure they derive from required base types (AuthUser/AuthRole).")]
+        public IdentityBuilder AddAccessRightBasedAuthorization(DbInitializationOption dbInitializationOption = DbInitializationOption.Migrate)
         {
-            var storeType = builder.RoleType != null
-                ? serviceProvider.GetRequiredService(typeof(IRoleStore<>).MakeGenericType(builder.RoleType)).GetType()
-                : serviceProvider.GetRequiredService(typeof(IUserStore<>).MakeGenericType(builder.UserType)).GetType();
+            Type contextType;
 
-            contextType = storeType.GenericTypeArguments[1];
+            using (var serviceProvider = builder.Services.BuildServiceProvider())
+            {
+                var storeType = builder.RoleType != null
+                    ? serviceProvider.GetRequiredService(typeof(IRoleStore<>).MakeGenericType(builder.RoleType)).GetType()
+                    : serviceProvider.GetRequiredService(typeof(IUserStore<>).MakeGenericType(builder.UserType)).GetType();
+
+                contextType = storeType.GenericTypeArguments[1];
+            }
+
+            VerifyTypeDerivesFrom(contextType, typeof(AuthDbContext<,>));
+
+            VerifyTypeDerivesFrom(builder.UserType, typeof(AuthUser));
+
+            if (builder.RoleType != null)
+            {
+                VerifyTypeDerivesFrom(builder.RoleType, typeof(AuthRole));
+            }
+
+            var roleType = builder.RoleType ?? typeof(AuthRole);
+
+            var authManagerType = typeof(AuthorizationManager<,>)
+                .MakeGenericType(builder.UserType, roleType);
+            var iRepository = typeof(IRepository<,>)
+                .MakeGenericType(builder.UserType, roleType);
+
+            builder.Services
+                .AddHttpContextAccessor()
+                .AddSingleton<RoleClaimCache>()
+                .AddSingleton<UserRoleCache>()
+                .AddScoped(iRepository, contextType)
+                .AddSingleton(typeof(IAuthorizationManager), authManagerType)
+                .AddSingleton<IAuthorizationPolicyProvider, AppClaimRequirementProvider>()
+                .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>()
+                .AddSingleton(
+                    typeof(IResourceAuthorizationHandler<>).MakeGenericType(roleType),
+                    typeof(RoleAuthorizationHandler<>).MakeGenericType(roleType))
+                .AddSingleton(
+                    typeof(IResourceAuthorizationHandler<>).MakeGenericType(builder.UserType),
+                    typeof(UserAuthorizationHandler<>).MakeGenericType(builder.UserType))
+                .AddDbInitializer(options =>
+                    options.UseDbContext(contextType, dbInitializationOption)
+                    );
+
+            return builder;
         }
-
-        VerifyTypeDerivesFrom(contextType, typeof(AuthDbContext<,>));
-
-        VerifyTypeDerivesFrom(builder.UserType, typeof(AuthUser));
-
-        if (builder.RoleType != null)
-        {
-            VerifyTypeDerivesFrom(builder.RoleType, typeof(AuthRole));
-        }
-
-        var roleType = builder.RoleType ?? typeof(AuthRole);
-
-        var authManagerType = typeof(AuthorizationManager<,>)
-            .MakeGenericType(builder.UserType, roleType);
-        var iRepository = typeof(IRepository<,>)
-            .MakeGenericType(builder.UserType, roleType);
-
-        builder.Services
-            .AddHttpContextAccessor()
-            .AddSingleton<RoleClaimCache>()
-            .AddSingleton<UserRoleCache>()
-            .AddScoped(iRepository, contextType)
-            .AddSingleton(typeof(IAuthorizationManager), authManagerType)
-            .AddSingleton<IAuthorizationPolicyProvider, AppClaimRequirementProvider>()
-            .AddSingleton<IAuthorizationHandler, AppClaimRequirementHandler>()
-            .AddSingleton(
-                typeof(IResourceAuthorizationHandler<>).MakeGenericType(roleType),
-                typeof(RoleAuthorizationHandler<>).MakeGenericType(roleType) )
-            .AddSingleton(
-                typeof(IResourceAuthorizationHandler<>).MakeGenericType(builder.UserType),
-                typeof(UserAuthorizationHandler<>).MakeGenericType(builder.UserType) )
-            .AddDbInitializer(options =>
-                options.UseDbContext(contextType, dbInitializationOption)
-                );
-
-        return builder;
     }
 
     private static void VerifyTypeDerivesFrom(Type type, Type baseType)
@@ -113,7 +115,8 @@ public static class IdentityBuilderExtensions
             }
 
             type = type.BaseType;
-        };
+        }
+        ;
 
         return false;
     }

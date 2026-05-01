@@ -4,12 +4,13 @@ using System.Security.Claims;
 
 namespace CRFricke.Authorization.Core;
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types
 #pragma warning disable CA1034 // Nested types should not be visible
 
 /// <summary>
 /// Defines the Claims used by the Authorization system.
 /// </summary>
-public class SysClaims
+public static class SysClaims
 {
     /// <summary>
     /// The claim type of the claims the Authorization.Core library uses.
@@ -76,13 +77,13 @@ public class SysClaims
         /// <summary>
         /// Returns a list of all Claims defined for Role entities.
         /// </summary>
-        public static readonly List<string> DefinedClaims =
+        public static readonly IReadOnlyCollection<string> DefinedClaims =
         [
             Create, Delete, Read, Update, List, UpdateClaims
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesClaims.DefinedClaims => DefinedClaims;
+        IReadOnlyCollection<string> IDefinesClaims.DefinedClaims => DefinedClaims;
     }
 
     /// <summary>
@@ -125,12 +126,12 @@ public class SysClaims
         /// <summary>
         /// Returns a list of all Claims defined for User entities.
         /// </summary>
-        public static readonly List<string> DefinedClaims =
+        public static readonly IReadOnlyCollection<string> DefinedClaims =
         [
             Create, Delete, Read, Update, List, UpdateClaims
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesClaims.DefinedClaims => DefinedClaims;
+        IReadOnlyCollection<string> IDefinesClaims.DefinedClaims => DefinedClaims;
     }
 }

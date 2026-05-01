@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CRFricke.Authorization.Core.Attributes
 {
     ///<inheritdoc/>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class RequiresClaimsAttribute : AuthorizeAttribute
+    public sealed class RequiresClaimsAttribute : AuthorizeAttribute
     {
         internal const string PolicyDelimeter = ": ";
         internal const string PolicyHeader = "RequiresClaims";

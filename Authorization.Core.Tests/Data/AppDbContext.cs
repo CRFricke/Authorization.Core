@@ -1,6 +1,8 @@
 ﻿using CRFricke.Authorization.Core.Data;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CA1515 // Consider making public types internal
+
 namespace Authorization.Core.Tests.Data;
 
 public class AppDbContext : AuthDbContext<AppUser, AppRole>

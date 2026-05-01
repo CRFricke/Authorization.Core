@@ -4,8 +4,8 @@
     ViewData["Title"] = "Role Details";
 
     var roleClaims = Model.RoleModel.Id == SysGuids.Role.Administrator
-        ? Model.RoleModel.RoleClaims.Select(rc => rc.Claim)
-        : Model.RoleModel.RoleClaims.Where(rc => rc.IsAssigned).Select(rc => rc.Claim);
+        ? Model.RoleModel.RoleClaims!.Select(rc => rc.Claim)
+        : Model.RoleModel.RoleClaims!.Where(rc => rc.IsAssigned).Select(rc => rc.Claim);
 
     var classEdit = (await AuthManager.IsAuthorizedAsync(User, SysClaims.Role.Update)) ? "" : "disabled";
 }

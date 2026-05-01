@@ -51,12 +51,12 @@ internal class DeleteModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         RoleModel = new RoleModel();
-        return await _deleteHandler.OnGetAsync(RoleModel, this, id);
+        return await _deleteHandler.OnGetAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.New(ConstructorInfo, IEnumerable<Expression>, MemberInfo[]): The Property metadata or other accessor may be trimmed.")]
     public override async Task<IActionResult> OnPostAsync(string id)
     {
-        return await _deleteHandler.OnPostAsync(RoleModel, this, id);
+        return await _deleteHandler.OnPostAsync(RoleModel, this, id).ConfigureAwait(false);
     }
 }

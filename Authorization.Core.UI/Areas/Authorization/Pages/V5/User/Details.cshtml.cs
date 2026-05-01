@@ -42,6 +42,6 @@ internal class DetailsModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         UserModel = new();
-        return await _detailsHandler.OnGetAsync(UserModel, this, id);
+        return await _detailsHandler.OnGetAsync(UserModel, this, id).ConfigureAwait(false);
     }
 }

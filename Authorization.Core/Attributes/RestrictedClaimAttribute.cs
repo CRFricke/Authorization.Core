@@ -9,7 +9,7 @@ namespace CRFricke.Authorization.Core.Attributes
     /// This attribute is used to prevent system entities (e.g. the Administrator user or role) from being deleted.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Field)]
-    public class RestrictedClaimAttribute : Attribute
+    public sealed class RestrictedClaimAttribute : Attribute
     {
     }
 }

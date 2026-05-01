@@ -48,12 +48,12 @@ internal class EditModel<
     public override async Task<IActionResult> OnGetAsync(string id)
     {
         UserModel = new();
-        return await _editHandler.OnGetAsync(UserModel, this, id);
+        return await _editHandler.OnGetAsync(UserModel, this, id).ConfigureAwait(false);
     }
 
     [RequiresUnreferencedCode("System.Linq.Expressions.Expression.Bind(MethodInfo, Expression): The Property metadata or other accessor may be trimmed.")]
     public override async Task<IActionResult> OnPostAsync(string hfRoleList)
     {
-        return await _editHandler.OnPostAsync(UserModel, this, hfRoleList);
+        return await _editHandler.OnPostAsync(UserModel, this, hfRoleList).ConfigureAwait(false);
     }
 }

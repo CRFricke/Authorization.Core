@@ -7,36 +7,34 @@ namespace CRFricke.Authorization.Core.UI;
 
 public static class TempDataDictionaryExtensions
 {
-    /// <summary>
-    /// Saves the specified <see cref="Notification"/> collection in the TempData Dictionary.
-    /// </summary>
-    /// <param name="tempDataDictionary">The <see cref="ITempDataDictionary"/> to be updated.</param>
-    /// <param name="key">The key to be used when saving the Notification collection.</param>
-    /// <param name="notifications">The Notification collection to be saved.</param>
-    public static void SetNotifications(this ITempDataDictionary tempDataDictionary, string key, List<Notification> notifications)
+    extension(ITempDataDictionary tempDataDictionary)
     {
-        ArgumentNullException.ThrowIfNull(tempDataDictionary);
-
-        tempDataDictionary[key] = JsonSerializer.Serialize(notifications, NotificationSerializerContext.Default.ListNotification);
-    }
-
-    /// <summary>
-    /// Retrieves the <see cref="Notification"/> collection with the specified key from the TempData Dictionary.
-    /// </summary>
-    /// <param name="tempDataDictionary">The <see cref="ITempDataDictionary"/> that contains the collection to be retrieved.</param>
-    /// <param name="key">The key to use when retrieving the collection from the TempData Dictionary.</param>
-    /// <returns>The requested <see cref="Notification"/> collection; <em>null</em>, if not found.</returns>
-    public static List<Notification>? GetNotifications(this ITempDataDictionary tempDataDictionary, string key)
-    {
-        ArgumentNullException.ThrowIfNull(tempDataDictionary);
-
-        var jsonString = tempDataDictionary[key] as string;
-        if (string.IsNullOrEmpty(jsonString))
+        /// <summary>
+        /// Saves the specified <see cref="Notification"/> collection in the TempData Dictionary.
+        /// </summary>
+        /// <param name="key">The key to be used when saving the Notification collection.</param>
+        /// <param name="notifications">The Notification collection to be saved.</param>
+        public void SetNotifications(string key, IEnumerable<Notification> notifications)
         {
-            return default;
+            var notificationList = notifications as List<Notification> ?? [.. notifications];
+            tempDataDictionary[key] = JsonSerializer.Serialize(notificationList, NotificationSerializerContext.Default.ListNotification);
         }
 
-        return JsonSerializer.Deserialize(jsonString, NotificationSerializerContext.Default.ListNotification);
+        /// <summary>
+        /// Retrieves the <see cref="Notification"/> collection with the specified key from the TempData Dictionary.
+        /// </summary>
+        /// <param name="key">The key to use when retrieving the collection from the TempData Dictionary.</param>
+        /// <returns>The requested <see cref="Notification"/> collection; <em>null</em>, if not found.</returns>
+        public  IList<Notification>? GetNotifications(string key)
+        {
+            var jsonString = tempDataDictionary[key] as string;
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                return default;
+            }
+
+            return JsonSerializer.Deserialize(jsonString, NotificationSerializerContext.Default.ListNotification);
+        }
     }
 }
 

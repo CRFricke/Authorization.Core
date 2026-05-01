@@ -1,11 +1,12 @@
 ﻿namespace CRFricke.Authorization.Core;
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types
 #pragma warning disable CA1034 // Nested types should not be visible
 
 /// <summary>
 /// Defines the Guids used by the Authorization system.
 /// </summary>
-public class SysGuids
+public static class SysGuids
 {
     /// <summary>
     /// The Guids of the system Roles.
@@ -20,13 +21,13 @@ public class SysGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for Role entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids =
+        public static readonly IReadOnlyCollection<string> DefinedGuids =
         [
             Administrator
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
+        IReadOnlyCollection<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 
     /// <summary>
@@ -42,12 +43,12 @@ public class SysGuids
         /// <summary>
         /// Returns a list of all GUIDs defined for User entities.
         /// </summary>
-        public static readonly List<string> DefinedGuids =
+        public static readonly IReadOnlyCollection<string> DefinedGuids =
         [
             Administrator
         ];
 
         ///<inheritdoc/>
-        List<string> IDefinesGuids.DefinedGuids => DefinedGuids;
+        IReadOnlyCollection<string> IDefinesGuids.DefinedGuids => DefinedGuids;
     }
 }

@@ -3,6 +3,9 @@ using CRFricke.Authorization.Core;
 using CRFricke.Authorization.Core.UI;
 using CRFricke.Authorization.Core.UI.Models;
 
+#pragma warning disable CA1052 // Static holder types should be Static or NotInheritable
+#pragma warning disable CA1515 // Consider making public types internal
+
 namespace Authorization.Core.UI.Tests;
 
 public class TestsBase

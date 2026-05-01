@@ -57,7 +57,7 @@ public abstract class AuthDbContext<
     /// Initializes a new instance of the <see cref="AuthDbContext"/> class using the specified options.
     /// </summary>
     /// <param name="options">The options to be used by the new <see cref="AuthDbContext"/> instance.</param>
-    public AuthDbContext(DbContextOptions<AuthDbContext<TUser, TRole>> options) : base(options)
+    protected AuthDbContext(DbContextOptions<AuthDbContext<TUser, TRole>> options) : base(options)
     { }
 
     /// <summary>
@@ -75,6 +75,8 @@ public abstract class AuthDbContext<
     /// </param>
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         base.OnModelCreating(builder);
 
         builder.Entity<TRole>()
@@ -97,12 +99,12 @@ public abstract class AuthDbContext<
     {
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<AuthDbContext>();
 
-        await FixupUserClaimValuesAsync(logger);
+        await FixupUserClaimValuesAsync(logger).ConfigureAwait(false);
 
         var hasher = serviceProvider.GetRequiredService<IPasswordHasher<TUser>>();
         var normalizer = serviceProvider.GetRequiredService<ILookupNormalizer>();
 
-        var role = await Roles.FindAsync(SysGuids.Role.Administrator);
+        var role = await Roles.FindAsync(SysGuids.Role.Administrator).ConfigureAwait(false);
         if (role == null)
         {
             role = new TRole
@@ -112,14 +114,14 @@ public abstract class AuthDbContext<
                 NormalizedName = normalizer.NormalizeName(nameof(SysGuids.Role.Administrator))
             };
 
-            await Roles.AddAsync(role);
+            await Roles.AddAsync(role).ConfigureAwait(false);
             logger.LogInformation(
                 "{RoleType} '{RoleName}' (ID: {RoleId}) has been created.",
                 typeof(TRole).Name, role.Name, role.Id
                 );
         }
 
-        var user = await Users.FindAsync(SysGuids.User.Administrator);
+        var user = await Users.FindAsync(SysGuids.User.Administrator).ConfigureAwait(false);
         if (user == null)
         {
             var email = "Admin@company.com";
@@ -135,23 +137,25 @@ public abstract class AuthDbContext<
                 PasswordHash = hasher.HashPassword(user!, "Administrat0r!"),
                 UserName = email
             };
-            ((AuthUser)user).SetClaims(role.Id);
+            user.SetClaims<TUser>(role.Id);
 
-            await Users.AddAsync(user);
+            await Users.AddAsync(user).ConfigureAwait(false);
             logger.LogInformation(
                 "{UserType} '{UserEmail}' (ID: {UserId}) has been created.",
                 typeof(TUser).Name, user.Email, user.Id
                 );
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            await SaveChangesAsync();
+            await SaveChangesAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "SaveChangesAsync() method failed.");
         }
+#pragma warning restore CA1031 // Do not catch general exception types
     }
 
     /// <summary>
@@ -172,7 +176,7 @@ public abstract class AuthDbContext<
             where uc.ClaimType == ClaimTypes.Role
             select uc;
 
-        var userClaimCount = await userClaims.CountAsync();
+        var userClaimCount = await userClaims.CountAsync().ConfigureAwait(false);
 
         if (userClaimCount == 0)
         {
@@ -181,16 +185,17 @@ public abstract class AuthDbContext<
 
         var roleDictionary = await Roles
             .Where(r => r.Name != null)
-            .ToDictionaryAsync(k => k.Name!, e => e.Id);
+            .ToDictionaryAsync(k => k.Name!, e => e.Id).ConfigureAwait(false);
 
         foreach (var claim in userClaims)
         {
             claim.ClaimValue = roleDictionary[claim.ClaimValue!];
         }
 
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            await SaveChangesAsync();
+            await SaveChangesAsync().ConfigureAwait(false);
 
             logger.LogInformation(
                 "Fixup successful for {UpdateCount} {UpdateEntity}.", 
@@ -201,5 +206,6 @@ public abstract class AuthDbContext<
         {
             logger.LogError(ex, "FixupUserClaimValuesAsync() method failed.");
         }
+#pragma warning restore CA1031 // Do not catch general exception types
     }
 }

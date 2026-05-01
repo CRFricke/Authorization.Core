@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types
+
 namespace CRFricke.Authorization.Core.Data;
 
 /// <summary>

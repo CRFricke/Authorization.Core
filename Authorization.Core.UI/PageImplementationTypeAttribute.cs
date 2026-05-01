@@ -1,5 +1,7 @@
 ﻿namespace CRFricke.Authorization.Core.UI;
 
+#pragma warning disable CA1019 // Define accessors for attribute arguments
+
 /// <summary>
 /// Specifies the generic type template to be used to instantiate the model for the associated razor page.
 /// </summary>

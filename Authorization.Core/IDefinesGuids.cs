@@ -8,5 +8,5 @@ public interface IDefinesGuids
     /// <summary>
     /// Returns all GUIDs defined for a resource.
     /// </summary>
-    List<string> DefinedGuids { get; }
+    IReadOnlyCollection<string> DefinedGuids { get; }
 }

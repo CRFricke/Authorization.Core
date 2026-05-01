@@ -10,7 +10,7 @@ public class AuthorizationFailure
     /// <summary>
     /// Defines the reason codes that can be returned as a <see cref="FailureReason"/>.
     /// </summary>
-    public class Reason
+    public static class Reason
     {
         /// <summary>
         /// The user is not authorized (is missing one or more required claims). 
@@ -47,7 +47,7 @@ public class AuthorizationFailure
     /// <summary>
     /// The missing claims that caused authorization to fail.
     /// </summary>
-    public string[]? FailingClaims { get; private set; }
+    public IReadOnlyCollection<string>? FailingClaims { get; private set; }
 
     /// <summary>
     /// Returns a string representing the current <see cref="AuthorizationFailure"/> object.

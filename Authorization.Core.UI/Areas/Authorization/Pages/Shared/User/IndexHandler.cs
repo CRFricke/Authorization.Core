@@ -36,7 +36,7 @@ internal class IndexHandler<
         return await _repository.Users
             .AsNoTracking()
             .Select(au => new UserInfo().InitFromUser(au))
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
     }
 }
 

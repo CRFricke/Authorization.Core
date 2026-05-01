@@ -10,12 +10,12 @@ public interface IAuthorizationManager
     /// <summary>
     /// Returns a list of all claims defined by the application.
     /// </summary>
-    List<string> DefinedClaims { get; }
+    IReadOnlyCollection<string> DefinedClaims { get; }
 
     /// <summary>
     /// Returns a list of all Guids defined by the application.
     /// </summary>
-    List<string> DefinedGuids { get; }
+    IReadOnlyCollection<string> DefinedGuids { get; }
 
     /// <summary>
     /// Returns an indication of whether the specified <paramref name="principal"/> meets the specified <paramref name="claimRequirement"/> 

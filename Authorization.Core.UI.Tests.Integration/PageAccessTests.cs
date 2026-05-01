@@ -13,6 +13,9 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+#pragma warning disable CA1515 // Consider making public types internal
+
 namespace Authorization.Core.UI.Tests.Integration;
 
 #region Test AuthenticationHandler
@@ -50,6 +53,8 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
 {
     public PageAccessTests(WebAppFactory factory)
     {
+        ArgumentNullException.ThrowIfNull(factory);
+
         WebAppFactory = factory;
         HostUrl = factory.HostUrl;
     }
@@ -63,17 +68,19 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
     [MemberData(nameof(Test01Data))]
     public async Task PageAccessTest01(string endpoint, bool needsId)
     {
+        ArgumentNullException.ThrowIfNull(endpoint);
+
         var client = CreateClientWithAuthenticationScheme();
 
         if (needsId)
         {
-            var id = (endpoint.Contains("Role"))
+            var id = (endpoint.Contains("Role", StringComparison.Ordinal))
                 ? AppGuids.Role.CalendarManager
                 : AppGuids.User.CalendarGuy;
             endpoint += $"?id={id}";
         }
 
-        var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -85,7 +92,7 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
             nameof(AppGuids.Role.CalendarManager)
             );
 
-        var response = await client.GetAsync("/Admin/Calendar", TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri("/Admin/Calendar", UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -98,13 +105,13 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
 
         if (needsId)
         {
-            var id = (endpoint.Contains("Role"))
+            var id = (endpoint.Contains("Role", StringComparison.Ordinal))
                 ? AppGuids.Role.CalendarManager
                 : AppGuids.User.CalendarGuy;
             endpoint += $"?id={id}";
         }
 
-        var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -118,7 +125,7 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
             AllowAutoRedirect = false, BaseAddress = new(HostUrl)
         });
 
-        var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
     }
@@ -131,9 +138,11 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
         var authManager = scope.ServiceProvider.GetRequiredService<IAuthorizationManager>();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        var role = dbContext.Roles.Find(AppGuids.Role.DocumentManager)!.SetClaims(claim);
+        var role = (
+            await dbContext.Roles.FindAsync([AppGuids.Role.DocumentManager], TestContext.Current.CancellationToken)
+            )!.SetClaims<ApplicationRole>(claim);
         dbContext.Roles.Update(role);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         authManager.RefreshRole(role.Id);
 
         var client = CreateClientWithAuthenticationScheme(
@@ -142,13 +151,13 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
 
         if (needsId)
         {
-            var id = (endpoint.Contains("Role"))
+            var id = (endpoint.Contains("Role", StringComparison.Ordinal))
                 ? AppGuids.Role.CalendarManager
                 : AppGuids.User.CalendarGuy;
             endpoint += $"?id={id}";
         }
 
-        var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -161,7 +170,7 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
             nameof(SysGuids.Role.Administrator)
             );
 
-        var response = await client.GetAsync(endpoint, TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri(endpoint, UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -174,7 +183,7 @@ public class PageAccessTests : IClassFixture<WebAppFactory>
             nameof(SysGuids.Role.Administrator)
             );
 
-        var response = await client.GetAsync($"{endpoint}?Id={Guid.Empty}", TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri($"{endpoint}?Id={Guid.Empty}", UriKind.Relative), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
